@@ -26,8 +26,8 @@ Assign keyboard shortcuts to
 The first one gives you suggestions on the currently highlighted word.
 The second one simply gives you a list of all word, you can search through them.
 
-**TIP:** You can search for words by their starting few and ending few words by
-typing `starting-few-words ending-few-words` at the `Type to search >` prompt.
+**TIP:** You can search for words by their sparts by
+typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 # Custom words
 
