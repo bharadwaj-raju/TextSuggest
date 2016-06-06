@@ -7,7 +7,7 @@
 # A simple linux tool to autocomplete text inputs in the GUI
 
 # Uses the English Open Word List (http://dreamsteep.com/projects/the-english-open-word-list.html)
-# Plus another set (in Custom_Words.txt) to include a few words that
+# Plus another set (in Extra_Words.txt) to include a few words that
 # the EOWL doesn't.
 
 # Inspired by zsh's smart tab completion
@@ -56,13 +56,33 @@ def get_all_words():
 
         f.close()
 
-    with open(os.path.join(script_cwd, 'Custom_Words.txt')) as f:
+    with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
 
         for word in f:
 
             full_words_list.append(word)
 
     f.close()
+
+    if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
+
+        with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
+
+            for word in f:
+
+                full_words_list.append(word)
+
+        f.close()
+
+    if os.path.isfile(os.path.expanduser('~/.Custom_Expansions.txt')):
+
+        with open(os.path.expanduser('~/.Custom_Expansions.txt')) as f:
+
+            for word in f:
+
+                full_words_list.append(word)
+
+        f.close()
 
     # Apply history
 
@@ -72,24 +92,25 @@ def get_all_words():
 
             for hist_word in f:
 
-                full_words_list.append(hist_word)
+                if hist_word in full_words_list:
+
+                    full_words_list.append(hist_word)
 
         f.close()
 
-        # Sort by frequency, since commonly-used words would appear more
+    # Sort by frequency, since commonly-used words would appear more
 
-        full_words_list = sorted(full_words_list, key=Counter(full_words_list).get, reverse=True)
+    full_words_list = sorted(full_words_list, key=Counter(full_words_list).get, reverse=True)
 
-        # Remove duplicates
+    # Remove duplicates
 
-        def remove_dups(s_list):
-            seen = set()
-            seen_add = seen.add
+    def remove_dups(s_list):
+        seen = set()
+        seen_add = seen.add
 
-            return [x for x in s_list if not (x in seen or seen_add(x))]
+        return [x for x in s_list if not (x in seen or seen_add(x))]
 
-        full_words_list = remove_dups(full_words_list)
-
+    full_words_list = remove_dups(full_words_list)
 
     return full_words_list
 
@@ -127,7 +148,7 @@ def get_suggestions(string):
 
         f.close()
 
-        with open(os.path.join(script_cwd, 'Custom_Words.txt')) as f:
+        with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
 
             for word in f:
 
@@ -151,19 +172,21 @@ def get_suggestions(string):
 
             f.close()
 
-            # Sort by frequency, since commonly-used words would appear more
 
-            suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
 
-            # Remove duplicates
+        # Sort by frequency, since commonly-used words would appear more
 
-            def remove_dups(s_list):
-                seen = set()
-                seen_add = seen.add
+        suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
 
-                return [x for x in s_list if not (x in seen or seen_add(x))]
+        # Remove duplicates
 
-            suggestions = remove_dups(suggestions)
+        def remove_dups(s_list):
+            seen = set()
+            seen_add = seen.add
+
+            return [x for x in s_list if not (x in seen or seen_add(x))]
+
+        suggestions = remove_dups(suggestions)
 
         return suggestions
 
@@ -262,6 +285,14 @@ def apply_suggestion(suggestion):
 
     # Type suggestion
 
-    sp.Popen(['xdotool type %s' % suggestion], shell=True)
+    if '=' in suggestion:
+
+        expand_suggestion = suggestion.split('=')[1]
+
+        sp.Popen(['xdotool type %s' % expand_suggestion], shell=True)
+
+    else:
+
+        sp.Popen(['xdotool type %s' % suggestion], shell=True)
 
 apply_suggestion(display_dialog_list(get_suggestions(current_word)))

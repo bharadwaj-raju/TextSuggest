@@ -34,8 +34,16 @@ typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 # Custom words
 
-Simply add them to the `Custom_Words.txt` file. The `Custom_Words.txt` file already has a
+Simply add them to a `~/.Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
 few jargon, abbreviations and words (total 1653 by default) not included in the EOWL.
+
+You can also define expansions, in the file `~/.Custom_Expansions.txt`.
+
+An entry in `~/.Custom_Expansions.txt` looks like:
+
+    short=really_long_text_you_want_to_type
+
+and will show up as `short=really_lon...` in the menu and when selected, will type `really_long_text_you_want_to_type`.
 
 # Note on dmenu
 
