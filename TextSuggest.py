@@ -18,6 +18,7 @@
 import os
 import subprocess as sp
 import sys
+from collections import Counter
 
 if '--noselect' in sys.argv:
 
@@ -62,6 +63,33 @@ def get_all_words():
             full_words_list.append(word)
 
     f.close()
+
+    # Apply history
+
+    if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+
+        with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
+
+            for hist_word in f:
+
+                full_words_list.append('hist_word')
+
+        f.close()
+
+        # Sort by frequency, since commonly-used words would appear more
+
+        full_words_list = sorted(full_words_list, key=Counter(full_words_list).get, reverse=True)
+
+        # Remove duplicates
+
+        def remove_dups(s_list):
+            seen = set()
+            seen_add = seen.add
+
+            return [x for x in s_list if not (x in seen or seen_add(x))]
+
+        full_words_list = remove_dups(full_words_list)
+
 
     return full_words_list
 
@@ -108,6 +136,34 @@ def get_suggestions(string):
                     suggestions.append(word)
 
         f.close()
+
+        # Apply history
+
+        if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+
+            with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
+
+                for hist_word in f:
+
+                    if string in hist_word:
+
+                        suggestions.append('hist_word')
+
+            f.close()
+
+            # Sort by frequency, since commonly-used words would appear more
+
+            suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
+
+            # Remove duplicates
+
+            def remove_dups(s_list):
+                seen = set()
+                seen_add = seen.add
+
+                return [x for x in s_list if not (x in seen or seen_add(x))]
+
+            suggestions = remove_dups(suggestions)
 
         return suggestions
 
@@ -195,6 +251,14 @@ def apply_suggestion(suggestion):
             suggestion = suggestion.capitalize()
 
             print(suggestion)
+
+    # Write to history
+
+    with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
+
+        f.write(suggestion + '\n')
+
+    f.close()
 
     # Type suggestion
 

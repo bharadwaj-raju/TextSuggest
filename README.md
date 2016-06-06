@@ -26,6 +26,9 @@ Assign keyboard shortcuts to
 The first one gives you suggestions on the currently highlighted word.
 The second one simply gives you a list of all word, you can search through them.
 
+The script stores frequently used words in a history file (`~/.textsuggest_history.txt`). Suggestions more often used
+are at the top of list.
+
 **TIP:** You can search for words by their sparts by
 typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
