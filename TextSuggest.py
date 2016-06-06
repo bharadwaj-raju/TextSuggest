@@ -103,7 +103,9 @@ def get_suggestions(string):
 
             for word in f:
 
-                suggestions.append(word)
+                if string in word:
+
+                    suggestions.append(word)
 
         f.close()
 
