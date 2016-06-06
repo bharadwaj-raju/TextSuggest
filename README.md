@@ -29,7 +29,7 @@ The second one simply gives you a list of all word, you can search through them.
 The script stores frequently used words in a history file (`~/.textsuggest_history.txt`). Suggestions more often used
 are at the top of list.
 
-**TIP:** You can search for words by their sparts by
+**TIP:** You can search for words by their parts by
 typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 # Custom words
@@ -37,9 +37,8 @@ typing `part1 part2 ... partN` at the `Type to search >` prompt.
 Simply add them to a `~/.Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
 few jargon, abbreviations and words (total 1653 by default) not included in the EOWL.
 
-You can also define expansions, in the file `~/.Custom_Expansions.txt`.
-
-An entry in `~/.Custom_Expansions.txt` looks like:
+You can also define expansions, in `~/.Custom_Words.txt`.
+An entry for an expansion in the `~/.Custom_Words.txt` looks like:
 
     short=really_long_text_you_want_to_type
 

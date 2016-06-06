@@ -23,15 +23,12 @@ from collections import Counter
 if '--noselect' in sys.argv:
 
     current_word = ''
-
     suggest_method = 'insert'
 
 else:
 
     current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
-
     current_word, err_curr_word = current_word_p.communicate()
-
     current_word = current_word.decode('utf-8').strip()
 
     suggest_method = 'replace'
@@ -40,103 +37,46 @@ script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
 dict_dir = os.path.join(script_cwd, 'EnglishOpenWordList')
 
-def get_all_words():
+custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
-    full_words_list = []
+def remove_dups(s_list):
 
-    for file in os.listdir(dict_dir):
+    seen = set()
+    seen_add = seen.add
 
-        file = os.path.join(dict_dir, file)
-
-        with open(file) as f:
-
-            for word in f:
-
-                full_words_list.append(word)
-
-        f.close()
-
-    with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
-
-        for word in f:
-
-            full_words_list.append(word)
-
-    f.close()
-
-    if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
-
-        with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
-
-            for word in f:
-
-                full_words_list.append(word)
-
-        f.close()
-
-    if os.path.isfile(os.path.expanduser('~/.Custom_Expansions.txt')):
-
-        with open(os.path.expanduser('~/.Custom_Expansions.txt')) as f:
-
-            for word in f:
-
-                full_words_list.append(word)
-
-        f.close()
-
-    # Apply history
-
-    if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
-
-        with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
-
-            for hist_word in f:
-
-                if hist_word in full_words_list:
-
-                    full_words_list.append(hist_word)
-
-        f.close()
-
-    # Sort by frequency, since commonly-used words would appear more
-
-    full_words_list = sorted(full_words_list, key=Counter(full_words_list).get, reverse=True)
-
-    # Remove duplicates
-
-    def remove_dups(s_list):
-        seen = set()
-        seen_add = seen.add
-
-        return [x for x in s_list if not (x in seen or seen_add(x))]
-
-    full_words_list = remove_dups(full_words_list)
-
-    return full_words_list
+    return [x for x in s_list if not (x in seen or seen_add(x))]
 
 def get_suggestions(string):
 
     orig_string = string
-
     string = string.lower()
+
+    suggestions = []
+
+    alphabet = str(current_word[:1]).upper()
+
+    print(current_word)
+    print(alphabet)
+
+    dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+
+    print(dict_file)
 
     if suggest_method == 'insert':
 
-        return get_all_words()
+        for file in os.listdir(dict_dir):
 
-    if suggest_method == 'replace':
+            file = os.path.join(dict_dir, file)
 
-        alphabet = str(current_word[:1]).upper()
+            with open(file) as f:
 
-        print(current_word)
+                for word in f:
 
-        print(alphabet)
+                    suggestions.append(word)
 
-        dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+            f.close()
 
-        print(dict_file)
-
-        suggestions = []
+    else:
 
         with open(dict_file) as f:
 
@@ -148,47 +88,60 @@ def get_suggestions(string):
 
         f.close()
 
-        with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
+    with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
+
+        for word in f:
+
+            if suggest_method == 'insert':
+
+                suggestions.append(word)
+
+            elif string in word:
+
+                suggestions.append(word)
+
+    f.close()
+
+    # Apply history
+
+    if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+
+        with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
+
+            for hist_word in f:
+
+                if suggest_method == 'insert':
+
+                    suggestions.append(hist_word)
+
+                if string in hist_word:
+
+                    suggestions.append(hist_word)
+
+        f.close()
+
+    if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
+
+        with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
 
             for word in f:
 
-                if string in word:
+                if suggest_method == 'insert':
+
+                    suggestions.append(word)
+
+                elif string in word:
 
                     suggestions.append(word)
 
         f.close()
 
-        # Apply history
+    # Sort by frequency, since commonly-used words would appear more
 
-        if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+    suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
+    suggestions = remove_dups(suggestions)
 
-            with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
-
-                for hist_word in f:
-
-                    if string in hist_word:
-
-                        suggestions.append(hist_word)
-
-            f.close()
-
-
-
-        # Sort by frequency, since commonly-used words would appear more
-
-        suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
-
-        # Remove duplicates
-
-        def remove_dups(s_list):
-            seen = set()
-            seen_add = seen.add
-
-            return [x for x in s_list if not (x in seen or seen_add(x))]
-
-        suggestions = remove_dups(suggestions)
-
-        return suggestions
+    return suggestions
 
 def display_dialog_list(item_list):
 
@@ -208,13 +161,10 @@ def display_dialog_list(item_list):
         # to be installed. (https://bitbucket.org/melek/dmenu2)
 
         mouse_loc_p = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE)
-
         mouse_loc_raw, err_mouse_loc = mouse_loc_p.communicate()
-
         mouse_loc_raw = mouse_loc_raw.decode('utf-8')
 
         x = mouse_loc_raw.split('\n')[0].replace('X=', '')
-
         y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
 
         dmenu_cmd_str = r'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s -dim 0.4' % (x, y)
@@ -234,20 +184,16 @@ def display_dialog_list(item_list):
 
         with open(full_dict_dmenu_script_path, 'w') as f:
 
-            f.truncate()
-
             f.write(dmenu_cmd_str)
 
         f.close()
 
         full_dict_dmenu_script_p = sp.Popen(['sh %s' % full_dict_dmenu_script_path], shell=True, stdout=sp.PIPE)
-
         choice, err_choice = full_dict_dmenu_script_p.communicate()
 
         return choice
 
     dmenu_p = sp.Popen(dmenu_cmd_str, shell=True, stdout=sp.PIPE)
-
     choice, err_choice = dmenu_p.communicate()
 
     return choice
@@ -276,7 +222,6 @@ def apply_suggestion(suggestion):
             print(suggestion)
 
     # Write to history
-
     with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
         f.write(suggestion)
@@ -288,7 +233,6 @@ def apply_suggestion(suggestion):
     if '=' in suggestion:
 
         expand_suggestion = suggestion.split('=')[1]
-
         sp.Popen(['xdotool type %s' % expand_suggestion], shell=True)
 
     else:
