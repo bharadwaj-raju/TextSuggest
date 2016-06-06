@@ -72,7 +72,7 @@ def get_all_words():
 
             for hist_word in f:
 
-                full_words_list.append('hist_word')
+                full_words_list.append(hist_word)
 
         f.close()
 
@@ -147,7 +147,7 @@ def get_suggestions(string):
 
                     if string in hist_word:
 
-                        suggestions.append('hist_word')
+                        suggestions.append(hist_word)
 
             f.close()
 
@@ -256,7 +256,7 @@ def apply_suggestion(suggestion):
 
     with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
-        f.write(suggestion + '\n')
+        f.write(suggestion)
 
     f.close()
 
