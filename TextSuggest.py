@@ -169,7 +169,7 @@ def display_dialog_list(item_list):
         x = mouse_loc_raw.split('\n')[0].replace('X=', '')
         y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
 
-        dmenu_cmd_str = r'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s -dim 0.4' % (x, y)
+        dmenu_cmd_str = r'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
 
     else:
 
