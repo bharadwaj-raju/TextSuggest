@@ -46,6 +46,8 @@ An entry for an expansion in the `~/.Custom_Words.txt` looks like:
 
 and will show up as `short=really_lon...` in the menu and when selected, will type `really_long_text_you_want_to_type`.
 
+## Command outputs
+
 You can also make it type shell command outputs, define them in `~/.Custom_Words.txt` like this:
 
     #shell_command
@@ -53,6 +55,12 @@ You can also make it type shell command outputs, define them in `~/.Custom_Words
 For example, a `#date` definition will type out the ouput of Unix `/bin/date`.
 
 If you want the output of a shell command *not* defined, then simply type `#command` at the `Type to search >` prompt.
+
+### Combining command outputs and expansions
+
+Simply do:
+
+    short_cmd=#long_command and --options
 
 # Note on dmenu
 

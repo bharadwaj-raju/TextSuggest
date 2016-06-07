@@ -235,16 +235,27 @@ def apply_suggestion(suggestion):
     if '=' in suggestion:
 
         expand_suggestion = suggestion.split('=')[1]
-        sp.Popen(['xdotool type \'%s\'' % expand_suggestion], shell=True)
+
+        if '#' in expand_suggestion:
+
+            command_suggestion = str(expand_suggestion.replace('#', ''))
+
+            command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
+            command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
+            command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+
+            sp.Popen(['xdotool type \'%s\'' % command_suggestion_out], shell=True)
+
+        else:
+
+            sp.Popen(['xdotool type \'%s\'' % expand_suggestion], shell=True)
 
     elif '#' in suggestion:
 
         command_suggestion = str(suggestion.replace('#', ''))
 
         command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
-
         command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
-
         command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
 
         sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
