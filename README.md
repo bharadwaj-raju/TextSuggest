@@ -12,6 +12,8 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
 # Installation
 
+`deb` package: [bharadwaj-raju/packages/TextSuggest/textsuggest_1.0_all.deb](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest_1.0_all.deb)
+
 Make sure you have all the requirements:
 
  - `xdotool`
