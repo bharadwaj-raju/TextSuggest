@@ -52,6 +52,8 @@ You can also make it type shell command outputs, define them in `~/.Custom_Words
 
 For example, a `#date` definition will type out the ouput of Unix `/bin/date`.
 
+If you want the output of a shell command *not* defined, then simply type `#command` at the `Type to search >` prompt.
+
 # Note on dmenu
 
 `dmenu` is contained in the `suckless-tools` package in Debian/Ubuntu.
