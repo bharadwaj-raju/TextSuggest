@@ -44,6 +44,12 @@ An entry for an expansion in the `~/.Custom_Words.txt` looks like:
 
 and will show up as `short=really_lon...` in the menu and when selected, will type `really_long_text_you_want_to_type`.
 
+You can also make it type shell command outputs, define them in `~/.Custom_Words.txt` like this:
+
+    #shell_command
+
+For example, a `#date` definition will type out the ouput of Unix `/bin/date`.
+
 # Note on dmenu
 
 `dmenu` is contained in the `suckless-tools` package in Debian/Ubuntu.
