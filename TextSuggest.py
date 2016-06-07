@@ -235,7 +235,7 @@ def apply_suggestion(suggestion):
     if '=' in suggestion:
 
         expand_suggestion = suggestion.split('=')[1]
-        sp.Popen(['xdotool type %s' % expand_suggestion], shell=True)
+        sp.Popen(['xdotool type \'%s\'' % expand_suggestion], shell=True)
 
     elif '#' in suggestion:
 
@@ -251,6 +251,6 @@ def apply_suggestion(suggestion):
 
     else:
 
-        sp.Popen(['xdotool type %s' % suggestion], shell=True)
+        sp.Popen(['xdotool type \'%s\'' % suggestion], shell=True)
 
 apply_suggestion(display_dialog_list(get_suggestions(current_word)))
