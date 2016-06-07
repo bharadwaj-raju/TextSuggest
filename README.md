@@ -2,7 +2,7 @@
 
 Simple Linux utility to autocomplete words in the GUI.
 
-![TextSuggest in action](http://i.imgur.com/qHCXgsE.gif)
+![TextSuggest in action](http://i.imgur.com/BU0wFk1.gif)
 
 **NOTE:** If you have not installed `dmenu2` (an extended fork of `dmenu`), you will see the suggestion bar at the bottom of the screen. To get the menu in the video, see [note](#note-on-dmenu).
 
