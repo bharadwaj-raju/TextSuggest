@@ -244,11 +244,11 @@ def apply_suggestion(suggestion):
             command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
             command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
 
-            sp.Popen(['xdotool type \'%s\'' % command_suggestion_out], shell=True)
+            sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
 
         else:
 
-            sp.Popen(['xdotool type \'%s\'' % expand_suggestion], shell=True)
+            sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
 
     elif '#' in suggestion:
 
@@ -262,6 +262,6 @@ def apply_suggestion(suggestion):
 
     else:
 
-        sp.Popen(['xdotool type \'%s\'' % suggestion], shell=True)
+        sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
 
 apply_suggestion(display_dialog_list(get_suggestions(current_word)))
