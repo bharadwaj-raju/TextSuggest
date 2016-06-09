@@ -25,6 +25,8 @@ Assign keyboard shortcuts to
 - `python3 /path/to/TextSuggest.py`
 - `python3 /path/to/TextSuggest.py --noselect`
 
+**NOTE:** If you installed TextSuggest through the `deb` package, replace `python3 /path/to/TextSuggest.py` with just `textsuggest`.
+
 The first one gives you suggestions on the currently highlighted word.
 The second one simply gives you a list of all word, you can search through them.
 
