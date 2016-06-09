@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding=utf-8
 
 # Copyright © 2016 Bharadwaj Raju <bharadwaj.raju777@gmail.com>
 
