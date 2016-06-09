@@ -163,18 +163,17 @@ def display_dialog_list(item_list):
         # Make use of advanced dmenu2 features. Requires dmenu2 (fork of dmenu)
         # to be installed. (https://bitbucket.org/melek/dmenu2)
 
-        mouse_loc_p = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE)
-        mouse_loc_raw, err_mouse_loc = mouse_loc_p.communicate()
+        mouse_loc_raw, err_mouse_loc = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE).communicate()
         mouse_loc_raw = mouse_loc_raw.decode('utf-8')
 
         x = mouse_loc_raw.split('\n')[0].replace('X=', '')
         y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
 
-        dmenu_cmd_str = r'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
+        dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
 
     else:
 
-        dmenu_cmd_str = r'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -b -i -p "Type to search >"'
+        dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -b -i -p "Type to search >"'
 
     if suggest_method == 'insert':
 
@@ -222,8 +221,6 @@ def apply_suggestion(suggestion):
 
             suggestion = suggestion.capitalize()
 
-            print(suggestion)
-
     # Write to history
     with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
@@ -247,9 +244,13 @@ def apply_suggestion(suggestion):
 
             sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
 
+            sys.exit(0)
+
         else:
 
             sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+
+            sys.exit(0)
 
     elif '#' in suggestion:
 
@@ -261,8 +262,12 @@ def apply_suggestion(suggestion):
 
         sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
 
+        sys.exit(0)
+
     else:
 
         sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
+
+        sys.exit(0)
 
 apply_suggestion(display_dialog_list(get_suggestions(current_word)))
