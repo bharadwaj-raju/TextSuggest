@@ -66,13 +66,9 @@ Simply do:
 
 # Note on dmenu
 
-`dmenu` is contained in the `suckless-tools` package in Debian/Ubuntu.
+`dmenu` is contained in the `suckless-tools` package in Debian/Ubuntu. The `.deb` package automatically installs the better `dmenu2` instead of the older `dmenu` in `suckless-tools`
 
-For a better search menu, with:
-
-- Position at mouse cursor instead of bottom
-- Compact size
-
+For a better search menu, with position at mouse cursor instead of bottom and compact size,
 Install `dmenu2`, an extended fork of `dmenu`, by Michał Lemke at [melek/dmenu2](https://bitbucket.org/melek/dmenu2).
 
-To enable `dmenu2`-specific features in `TextSuggest`, add the `--dmenu2` flag to the `TextSuggest.py` command.
+TextSuggest assumes that you have `dmenu2` installed. If you want to use the old `dmenu`, pass the `--olddmenu` option.

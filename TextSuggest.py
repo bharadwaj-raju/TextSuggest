@@ -23,16 +23,16 @@ from collections import Counter
 
 if '--noselect' in sys.argv:
 
-    current_word = ''
-    suggest_method = 'insert'
+	current_word = ''
+	suggest_method = 'insert'
 
 else:
 
-    current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
-    current_word, err_curr_word = current_word_p.communicate()
-    current_word = current_word.decode('utf-8').strip()
+	current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
+	current_word, err_curr_word = current_word_p.communicate()
+	current_word = current_word.decode('utf-8').strip()
 
-    suggest_method = 'replace'
+	suggest_method = 'replace'
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
@@ -42,232 +42,235 @@ custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
 def remove_dups(s_list):
 
-    seen = set()
-    seen_add = seen.add
+	seen = set()
+	seen_add = seen.add
 
-    return [x for x in s_list if not (x in seen or seen_add(x))]
+	return [x for x in s_list if not (x in seen or seen_add(x))]
 
 def get_suggestions(string):
 
-    orig_string = string
-    string = string.lower()
+	orig_string = string
+	string = string.lower()
 
-    suggestions = []
+	suggestions = []
 
-    alphabet = str(current_word[:1]).upper()
+	alphabet = str(current_word[:1]).upper()
 
-    print(current_word)
-    print(alphabet)
+	print(current_word)
+	print(alphabet)
 
-    dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
 
-    print(dict_file)
+	print(dict_file)
 
-    if suggest_method == 'insert':
+	if suggest_method == 'insert':
 
-        for file in os.listdir(dict_dir):
+		for file in os.listdir(dict_dir):
 
-            file = os.path.join(dict_dir, file)
+			file = os.path.join(dict_dir, file)
 
-            with open(file) as f:
+			with open(file) as f:
 
-                for word in f:
+				for word in f:
 
-                    suggestions.append(word)
+					suggestions.append(word)
 
-            f.close()
+			f.close()
 
-    else:
+	else:
 
-        with open(dict_file) as f:
+		with open(dict_file) as f:
 
-            for word in f:
+			for word in f:
 
-                if string in word:
+				if string in word:
 
-                    suggestions.append(word)
+					suggestions.append(word)
 
-        f.close()
+		f.close()
 
-    with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
+	with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
 
-        for word in f:
+		for word in f:
 
-            if suggest_method == 'insert':
+			if suggest_method == 'insert':
 
-                suggestions.append(word)
+				suggestions.append(word)
 
-            elif string in word:
+			elif string in word:
 
-                suggestions.append(word)
+				suggestions.append(word)
 
-    f.close()
+	f.close()
 
-    # Apply history
+	# Apply history
 
-    if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+	if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
 
-        with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
+		with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
 
-            for hist_word in f:
+			for hist_word in f:
 
-                if suggest_method == 'insert':
+				if suggest_method == 'insert':
 
-                    suggestions.append(hist_word)
+					suggestions.append(hist_word)
 
-                if string in hist_word:
+				if string in hist_word:
 
-                    suggestions.append(hist_word)
+					suggestions.append(hist_word)
 
-        f.close()
+		f.close()
 
-    if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
+	if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
 
-        with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
+		with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
 
-            for word in f:
+			for word in f:
 
-                if suggest_method == 'insert':
+				if suggest_method == 'insert':
 
-                    suggestions.append(word)
+					suggestions.append(word)
 
-                    print(word)
+					print(word)
 
-                elif string in word:
+				elif string in word:
 
-                    suggestions.append(word)
+					suggestions.append(word)
 
-        f.close()
+		f.close()
 
-    # Sort by frequency, since commonly-used words would appear more
+	# Sort by frequency, since commonly-used words would appear more
 
-    suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
-    suggestions = remove_dups(suggestions)
+	suggestions = sorted(suggestions, key=Counter(suggestions).get, reverse=True)
+	suggestions = remove_dups(suggestions)
 
-    return suggestions
+	return suggestions
 
 def display_dialog_list(item_list):
 
-    dmenu_string = ''
+	dmenu_string = ''
 
-    if item_list == [] or item_list == ['']:
+	if item_list == [] or item_list == ['']:
 
-        return None
+		return None
 
-    for i in item_list:
+	for i in item_list:
 
-        dmenu_string += i
+		dmenu_string += i
 
-    if '--dmenu2' in sys.argv:
+	if '--olddmenu' in sys.argv:
 
-        # Make use of advanced dmenu2 features. Requires dmenu2 (fork of dmenu)
-        # to be installed. (https://bitbucket.org/melek/dmenu2)
+		# Compatibility with old dmenu
 
-        mouse_loc_raw, err_mouse_loc = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE).communicate()
-        mouse_loc_raw = mouse_loc_raw.decode('utf-8')
+		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -b -i -p "Type to search >"'
 
-        x = mouse_loc_raw.split('\n')[0].replace('X=', '')
-        y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
+	else:
 
-        dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
+		# Make use of advanced dmenu2 features. Requires dmenu2 (fork of dmenu)
+		# to be installed. (https://bitbucket.org/melek/dmenu2)
 
-    else:
+		mouse_loc_raw, err_mouse_loc = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE).communicate()
+		mouse_loc_raw = mouse_loc_raw.decode('utf-8')
 
-        dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -b -i -p "Type to search >"'
+		x = mouse_loc_raw.split('\n')[0].replace('X=', '')
+		y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
 
-    if suggest_method == 'insert':
+		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
 
-        # The argument list will be too long since it includes ALL dictionary
-        # words.
-        # subprocess can't handle it, and will raise OSError.
-        # So we will write it to a script file.
 
-        full_dict_dmenu_script_path = os.path.expanduser('~/.textsuggest_full.sh')
+	if suggest_method == 'insert':
 
-        with open(full_dict_dmenu_script_path, 'w') as f:
+		# The argument list will be too long since it includes ALL dictionary
+		# words.
+		# subprocess can't handle it, and will raise OSError.
+		# So we will write it to a script file.
 
-            f.write(dmenu_cmd_str)
+		full_dict_dmenu_script_path = os.path.expanduser('~/.textsuggest_full.sh')
 
-        f.close()
+		with open(full_dict_dmenu_script_path, 'w') as f:
 
-        full_dict_dmenu_script_p = sp.Popen(['sh %s' % full_dict_dmenu_script_path], shell=True, stdout=sp.PIPE)
-        choice, err_choice = full_dict_dmenu_script_p.communicate()
+			f.write(dmenu_cmd_str)
 
-        return choice
+		f.close()
 
-    dmenu_p = sp.Popen(dmenu_cmd_str, shell=True, stdout=sp.PIPE)
-    choice, err_choice = dmenu_p.communicate()
+		full_dict_dmenu_script_p = sp.Popen(['sh %s' % full_dict_dmenu_script_path], shell=True, stdout=sp.PIPE)
+		choice, err_choice = full_dict_dmenu_script_p.communicate()
 
-    return choice
+		return choice
+
+	dmenu_p = sp.Popen(dmenu_cmd_str, shell=True, stdout=sp.PIPE)
+	choice, err_choice = dmenu_p.communicate()
+
+	return choice
 
 def apply_suggestion(suggestion):
 
-    suggestion = suggestion.decode('utf-8')
+	suggestion = suggestion.decode('utf-8')
 
-    if suggestion == '':
+	if suggestion == '':
 
-        # User doesn't want any suggestion
-        # exit
+		# User doesn't want any suggestion
+		# exit
 
-        sys.exit(0)
+		sys.exit(0)
 
-    if suggest_method == 'replace':
+	if suggest_method == 'replace':
 
-        # Erase current word
+		# Erase current word
 
-        sp.Popen(['xdotool key BackSpace'], shell=True)
+		sp.Popen(['xdotool key BackSpace'], shell=True)
 
-        if current_word[:1].isupper():
+		if current_word[:1].isupper():
 
-            suggestion = suggestion.capitalize()
+			suggestion = suggestion.capitalize()
 
-    # Write to history
-    with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
+	# Write to history
+	with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
-        f.write(suggestion)
+		f.write(suggestion)
 
-    f.close()
+	f.close()
 
-    # Type suggestion
+	# Type suggestion
 
-    if '=' in suggestion:
+	if '=' in suggestion:
 
-        expand_suggestion = suggestion.split('=')[1]
+		expand_suggestion = suggestion.split('=')[1]
 
-        if '#' in expand_suggestion:
+		if '#' in expand_suggestion:
 
-            command_suggestion = str(expand_suggestion.replace('#', ''))
+			command_suggestion = str(expand_suggestion.replace('#', ''))
 
-            command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
-            command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
-            command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+			command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
+			command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
+			command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
 
-            sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
+			sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
 
-            sys.exit(0)
+			sys.exit(0)
 
-        else:
+		else:
 
-            sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+			sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
 
-            sys.exit(0)
+			sys.exit(0)
 
-    elif '#' in suggestion:
+	elif '#' in suggestion:
 
-        command_suggestion = str(suggestion.replace('#', ''))
+		command_suggestion = str(suggestion.replace('#', ''))
 
-        command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
-        command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
-        command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+		command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
+		command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
+		command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
 
-        sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
+		sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
 
-        sys.exit(0)
+		sys.exit(0)
 
-    else:
+	else:
 
-        sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
+		sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
 
-        sys.exit(0)
+		sys.exit(0)
 
 apply_suggestion(display_dialog_list(get_suggestions(current_word)))
