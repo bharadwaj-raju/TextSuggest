@@ -203,9 +203,9 @@ def display_dialog_list(item_list):
 
 	return choice
 
-def apply_suggestion(suggestion):
+def apply_suggestion(suggestion_we_got):
 
-	suggestion = suggestion.decode('utf-8')
+	suggestion = suggestion_we_got.decode('utf-8')
 
 	if suggestion == '':
 
