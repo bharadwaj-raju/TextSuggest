@@ -69,6 +69,8 @@ def get_dict_dir():
 
 	# Different dictionary for different language
 
+	language = get_language_name()
+
 	return os.path.join(script_cwd, '%sOpenWordList' % language)
 
 def remove_dups(s_list):
@@ -81,11 +83,18 @@ def remove_dups(s_list):
 def get_suggestions(string):
 
 	orig_string = string
-	string = string.lower()
-
 	suggestions = []
+	language = get_language_name()
 
-	alphabet = str(current_word[:1]).upper()
+	if language == 'English':
+
+		string = string.lower()
+
+		alphabet = str(current_word[:1]).upper()
+
+	else:
+
+		alphabet = str(current_word[:1])
 
 	dict_dir = get_dict_dir()
 
@@ -146,9 +155,11 @@ def get_suggestions(string):
 
 					suggestions.append(hist_word)
 
-	if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
+	# Apply Custom Words
 
-		with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
+	if os.path.isfile(custom_words_file):
+
+		with open(custom_words_file) as f:
 
 			for word in f:
 
