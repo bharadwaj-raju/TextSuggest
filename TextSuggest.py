@@ -205,72 +205,77 @@ def display_dialog_list(item_list):
 
 def apply_suggestion(suggestion):
 
-	suggestion = suggestion.decode('utf-8')
-
-	if suggestion == '':
+	if suggestion is None:
 
 		# User doesn't want any suggestion
 		# exit
 
 		sys.exit(0)
 
-	if suggest_method == 'replace':
+	else:
 
-		# Erase current word
+		# User wants any suggestion
+		# Decode the suggestion string in utf-8 format
 
-		sp.Popen(['xdotool key BackSpace'], shell=True)
+		suggestion = suggestion.decode('utf-8')
 
-		if current_word[:1].isupper():
+		if suggest_method == 'replace':
 
-			suggestion = suggestion.capitalize()
+			# Erase current word
 
-	# Write to history
-	with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
+			sp.Popen(['xdotool key BackSpace'], shell=True)
 
-		f.write(suggestion)
+			if current_word[:1].isupper():
 
-	f.close()
+				suggestion = suggestion.capitalize()
 
-	# Type suggestion
+		# Write to history
+		with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
-	if '=' in suggestion:
+			f.write(suggestion)
 
-		expand_suggestion = suggestion.split('=')[1]
+		f.close()
 
-		if '#' in expand_suggestion:
+		# Type suggestion
 
-			command_suggestion = str(expand_suggestion.replace('#', ''))
+		if '=' in suggestion:
+
+			expand_suggestion = suggestion.split('=')[1]
+
+			if '#' in expand_suggestion:
+
+				command_suggestion = str(expand_suggestion.replace('#', ''))
+
+				command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
+				command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
+				command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+
+				sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
+
+				sys.exit(0)
+
+			else:
+
+				sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+
+				sys.exit(0)
+
+		elif '#' in suggestion:
+
+			command_suggestion = str(suggestion.replace('#', ''))
 
 			command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
 			command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
 			command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
 
-			sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
+			sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
 
 			sys.exit(0)
 
 		else:
 
-			sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+			sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
 
 			sys.exit(0)
-
-	elif '#' in suggestion:
-
-		command_suggestion = str(suggestion.replace('#', ''))
-
-		command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
-		command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
-		command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
-
-		sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
-
-		sys.exit(0)
-
-	else:
-
-		sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
-
-		sys.exit(0)
 
 apply_suggestion(display_dialog_list(get_suggestions(current_word)))
