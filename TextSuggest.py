@@ -28,11 +28,18 @@ if '--noselect' in sys.argv:
 
 else:
 
-	current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
-	current_word, err_curr_word = current_word_p.communicate()
-	current_word = current_word.decode('utf-8').strip()
+	try:
 
-	suggest_method = 'replace'
+		current_word = sys.argv[1]
+		suggest_method = 'replace'
+
+	except:
+
+		current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
+		current_word, err_curr_word = current_word_p.communicate()
+		current_word = current_word.decode('utf-8').strip()
+
+		suggest_method = 'replace'
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
