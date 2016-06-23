@@ -36,9 +36,27 @@ else:
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
-dict_dir = os.path.join(script_cwd, 'EnglishOpenWordList')
-
 custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
+
+def get_dict_dir():
+
+	# Reading keyboard layout from shell command
+
+	keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
+	keyboard_layout = keyboard_layout[:2]
+
+	# Different dictionary for different language
+	# Language will be detected by layout
+
+	language_layout_file = os.path.join(script_cwd, 'Language_Layout.txt')
+
+	with open(language_layout_file,'r') as f:
+
+		languages = eval(f.read())
+
+	language = languages[keyboard_layout]
+
+	return os.path.join(script_cwd, '%sOpenWordList' % language)
 
 def remove_dups(s_list):
 
@@ -56,6 +74,8 @@ def get_suggestions(string):
 
 	alphabet = str(current_word[:1]).upper()
 
+	dict_dir = get_dict_dir()
+
 	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
 
 	if suggest_method == 'insert':
@@ -70,8 +90,6 @@ def get_suggestions(string):
 
 					suggestions.append(word)
 
-			f.close()
-
 	else:
 
 		try:
@@ -83,8 +101,6 @@ def get_suggestions(string):
 					if string in word:
 
 						suggestions.append(word)
-
-			f.close()
 
 		except:
 			pass
@@ -100,8 +116,6 @@ def get_suggestions(string):
 			elif string in word:
 
 				suggestions.append(word)
-
-	f.close()
 
 	# Apply history
 
@@ -119,8 +133,6 @@ def get_suggestions(string):
 
 					suggestions.append(hist_word)
 
-		f.close()
-
 	if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
 
 		with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
@@ -134,8 +146,6 @@ def get_suggestions(string):
 				elif string in word:
 
 					suggestions.append(word)
-
-		f.close()
 
 	# Sort by frequency, since commonly-used words would appear more
 
@@ -175,7 +185,6 @@ def display_dialog_list(item_list):
 
 		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
 
-
 	if suggest_method == 'insert':
 
 		# The argument list will be too long since it includes ALL dictionary
@@ -188,8 +197,6 @@ def display_dialog_list(item_list):
 		with open(full_dict_dmenu_script_path, 'w') as f:
 
 			f.write(dmenu_cmd_str)
-
-		f.close()
 
 		full_dict_dmenu_script_p = sp.Popen(['sh %s' % full_dict_dmenu_script_path], shell=True, stdout=sp.PIPE)
 		choice, err_choice = full_dict_dmenu_script_p.communicate()
@@ -231,8 +238,6 @@ def apply_suggestion(suggestion):
 		with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
 			f.write(suggestion)
-
-		f.close()
 
 		# Type suggestion
 
