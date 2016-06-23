@@ -19,6 +19,7 @@
 import os
 import subprocess as sp
 import sys
+import time
 from collections import Counter
 
 if '--noselect' in sys.argv:
@@ -65,29 +66,41 @@ def get_suggestions(string):
 
 	if suggest_method == 'insert':
 
-		for file in os.listdir(dict_dir):
+		try:
 
-			file = os.path.join(dict_dir, file)
+			for file in os.listdir(dict_dir):
 
-			with open(file) as f:
+				file = os.path.join(dict_dir, file)
 
-				for word in f:
+				with open(file) as f:
 
-					suggestions.append(word)
+					for word in f:
 
-			f.close()
+						suggestions.append(word)
+
+				f.close()
+
+		except FileNotFoundError:
+
+			pass
 
 	else:
 
-		with open(dict_file) as f:
+		try:
 
-			for word in f:
+			with open(dict_file) as f:
 
-				if string in word:
+				for word in f:
 
-					suggestions.append(word)
+					if string in word:
 
-		f.close()
+						suggestions.append(word)
+
+			f.close()
+
+		except FileNotFoundError:
+
+			pass
 
 	with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
 
@@ -148,11 +161,50 @@ def get_suggestions(string):
 
 def display_dialog_list(item_list):
 
+	# TODO: Port to Rofi
+
 	dmenu_string = ''
 
-	if item_list == [] or item_list == ['']:
+	mouse_loc_raw, err_mouse_loc = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE).communicate()
+	mouse_loc_raw = mouse_loc_raw.decode('utf-8')
 
-		return None
+	x = mouse_loc_raw.split('\n')[0].replace('X=', '')
+	y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
+
+	if '--font' in sys.argv:
+
+		# Font should be specified in XFT format: FontName-Size:Weight
+
+		font = str(sys.argv[int(sys.argv.index('--font') + 1)])
+
+	else:
+
+		font = 'Monospace-9:normal'
+
+
+	if item_list == [] or item_list == [''] or item_list is None:
+
+		if '--showerrors' in sys.argv:
+
+			if '--olddmenu' in sys.argv:
+
+				sp.Popen(['echo "Nothing found! " | dmenu -i -b &'] % (x, y, font), shell=True)
+
+			else:
+
+				sp.Popen(['echo "Nothing found! " | dmenu -i -l 5 -w 320 -h 20 -x %s -y %s -fn %s &' % (x, y, font)], shell=True)
+
+			time.sleep(0.5)
+
+			sp.Popen(['xdotool key Escape'], shell=True)
+
+			sys.exit(1)
+
+		else:
+
+			print('Suggestions list empty. Exiting.')
+
+			sys.exit(1)
 
 	for i in item_list:
 
@@ -169,13 +221,7 @@ def display_dialog_list(item_list):
 		# Make use of advanced dmenu2 features. Requires dmenu2 (fork of dmenu)
 		# to be installed. (https://bitbucket.org/melek/dmenu2)
 
-		mouse_loc_raw, err_mouse_loc = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE).communicate()
-		mouse_loc_raw = mouse_loc_raw.decode('utf-8')
-
-		x = mouse_loc_raw.split('\n')[0].replace('X=', '')
-		y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
-
-		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s' % (x, y)
+		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s -fn %s' % (x, y, font)
 
 
 	if suggest_method == 'insert':
