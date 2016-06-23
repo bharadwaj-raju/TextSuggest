@@ -169,7 +169,7 @@ def display_dialog_list(item_list):
 
 	# Colors inspired by Arc theme (Dark)
 
-	rofi_theme = '-lines 3 -p "> " -width 20 -bg "#2b2e37" -separator-style "none" -hlbg "#5294e2" -fg "#fdfdfe" -hlfg "#282f39" -hide-scrollbar -padding 1'
+	rofi_theme = '-lines 3 -width 20 -bg "#2b2e37" -separator-style "none" -hlbg "#5294e2" -fg "#fdfdfe" -hlfg "#282f39" -hide-scrollbar -padding 1'
 
 	if '--plainrofi' in sys.argv:
 
@@ -191,7 +191,7 @@ def display_dialog_list(item_list):
 
 		if '--showerrors' in sys.argv:
 
-			sp.Popen(['echo "Nothing found! " | rofi -dmenu -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (rofi_theme, font, x, y)], shell=True)
+			sp.Popen(['echo "Nothing found! " | rofi -dmenu -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (rofi_theme, font, x, y)], shell=True)
 
 			time.sleep(1)
 
@@ -199,9 +199,23 @@ def display_dialog_list(item_list):
 
 			sys.exit(1)
 
+		elif suggest_method == 'replace':
+
+			# Restart in --noselect mode
+
+			new_textsuggest_cmd = ''
+
+			for i in sys.argv:
+
+				new_textsuggest_cmd += ' ' + i
+
+			sp.Popen(['python3 %s --noselect' % new_textsuggest_cmd], shell=True)
+
+			sys.exit(0)
+
 		else:
 
-			print('Suggestions list empty. Exiting.')
+			print('No words found. Exiting.')
 
 			sys.exit(1)
 
@@ -209,7 +223,7 @@ def display_dialog_list(item_list):
 
 		items_string += i
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
 
 	if suggest_method == 'insert':
 
