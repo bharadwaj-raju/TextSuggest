@@ -56,12 +56,7 @@ def get_suggestions(string):
 
 	alphabet = str(current_word[:1]).upper()
 
-	print(current_word)
-	print(alphabet)
-
 	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
-
-	print(dict_file)
 
 	if suggest_method == 'insert':
 
@@ -79,15 +74,20 @@ def get_suggestions(string):
 
 	else:
 
-		with open(dict_file) as f:
+		try:
 
-			for word in f:
+			with open(dict_file) as f:
 
-				if string in word:
+				for word in f:
 
-					suggestions.append(word)
+					if string in word:
 
-		f.close()
+						suggestions.append(word)
+
+			f.close()
+
+		except:
+			pass
 
 	with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
 
@@ -130,8 +130,6 @@ def get_suggestions(string):
 				if suggest_method == 'insert':
 
 					suggestions.append(word)
-
-					print(word)
 
 				elif string in word:
 
