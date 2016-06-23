@@ -203,6 +203,12 @@ def display_dialog_list(item_list):
 
 		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -b -i -p "Type to search >"'
 
+	elif '--rofi' in sys.argv:
+
+		# Compatibility with Rofi, a drop-in replacement of dmenu
+
+		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | rofi -dmenu -b -i -p "Type to search >"'
+
 	else:
 
 		# Make use of advanced dmenu2 features. Requires dmenu2 (fork of dmenu)
