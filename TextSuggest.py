@@ -38,15 +38,16 @@ script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
 custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
-def get_dict_dir():
+def get_language_name():
 
+	# This function will return the language name
 	# Reading keyboard layout from shell command
 
 	keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
 	keyboard_layout = keyboard_layout[:2]
 
-	# Different dictionary for different language
-	# Language will be detected by layout
+	# Language Layout file contains languages and layouts in
+	# python dictionary format.
 
 	language_layout_file = os.path.join(script_cwd, 'Language_Layout.txt')
 
@@ -54,7 +55,19 @@ def get_dict_dir():
 
 		languages = eval(f.read())
 
-	language = languages[keyboard_layout]
+	# Language will be detected by layout
+
+	if keyboard_layout in languages:
+
+		return languages[keyboard_layout]
+
+	else:
+
+		return 'English'
+
+def get_dict_dir():
+
+	# Different dictionary for different language
 
 	return os.path.join(script_cwd, '%sOpenWordList' % language)
 
