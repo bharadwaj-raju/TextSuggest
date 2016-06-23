@@ -162,7 +162,7 @@ def get_suggestions(string):
 
 					suggestions.append(hist_word)
 
-	# Apply Custom Words
+	# Applying Custom Words
 
 	if os.path.isfile(custom_words_file):
 
