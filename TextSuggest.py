@@ -61,7 +61,9 @@ def get_dict_dir():
 
     language = get_language_name()
 
-    return os.path.join(script_cwd, '%sOpenWordList' % language)
+    dict_dir = os.path.expanduser('~/.TextSuggest_Dictionaries')
+
+    return os.path.join(dict_dir, '%s' % language)
 
 def get_suggestions(string):
 
@@ -75,13 +77,17 @@ def get_suggestions(string):
 
 		alphabet = str(current_word[:1]).upper()
 
+		dict_dir = get_dict_dir()
+
+		dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+
 	else:
 
 		alphabet = str(current_word[:1])
 
-	dict_dir = get_dict_dir()
+		dict_dir = get_dict_dir()
 
-	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+		dict_file = os.path.join(dict_dir, 'dict.txt')
 
 	if suggest_method == 'insert':
 
