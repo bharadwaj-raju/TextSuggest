@@ -22,7 +22,7 @@ import sys
 import time
 from collections import Counter
 from fonts import get_font_name
-from language_layout import get_language_name
+from languages import get_language_name
 
 if '--noselect' in sys.argv:
 
