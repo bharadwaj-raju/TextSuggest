@@ -21,6 +21,8 @@ import subprocess as sp
 import sys
 import time
 from collections import Counter
+from fonts import get_font_name
+from languages import get_language_name
 
 if '--noselect' in sys.argv:
 
@@ -29,15 +31,20 @@ if '--noselect' in sys.argv:
 
 else:
 
-	current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
-	current_word, err_curr_word = current_word_p.communicate()
-	current_word = current_word.decode('utf-8').strip()
+	try:
 
-	suggest_method = 'replace'
+		current_word = sys.argv[1]
+		suggest_method = 'replace'
+
+	except:
+
+		current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
+		current_word, err_curr_word = current_word_p.communicate()
+		current_word = current_word.decode('utf-8').strip()
+
+		suggest_method = 'replace'
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
-dict_dir = os.path.join(script_cwd, 'EnglishOpenWordList')
 
 custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
@@ -48,21 +55,33 @@ def remove_dups(s_list):
 
 	return [x for x in s_list if not (x in seen or seen_add(x))]
 
+def get_dict_dir():
+
+    # Different dictionary for different language
+
+    language = get_language_name()
+
+    return os.path.join(script_cwd, '%sOpenWordList' % language)
+
 def get_suggestions(string):
 
 	orig_string = string
-	string = string.lower()
-
 	suggestions = []
+	language = get_language_name()
 
-	alphabet = str(current_word[:1]).upper()
+	if language == 'English':
 
-	print(current_word)
-	print(alphabet)
+		string = string.lower()
+
+		alphabet = str(current_word[:1]).upper()
+
+	else:
+
+		alphabet = str(current_word[:1])
+
+	dict_dir = get_dict_dir()
 
 	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
-
-	print(dict_file)
 
 	if suggest_method == 'insert':
 
@@ -77,8 +96,6 @@ def get_suggestions(string):
 					for word in f:
 
 						suggestions.append(word)
-
-				f.close()
 
 		except FileNotFoundError:
 
@@ -96,8 +113,6 @@ def get_suggestions(string):
 
 						suggestions.append(word)
 
-			f.close()
-
 		except FileNotFoundError:
 
 			pass
@@ -113,8 +128,6 @@ def get_suggestions(string):
 			elif string in word:
 
 				suggestions.append(word)
-
-	f.close()
 
 	# Apply history
 
@@ -132,11 +145,11 @@ def get_suggestions(string):
 
 					suggestions.append(hist_word)
 
-		f.close()
+	# Applying Custom Words
 
-	if os.path.isfile(os.path.expanduser('~/.Custom_Words.txt')):
+	if os.path.isfile(custom_words_file):
 
-		with open(os.path.expanduser('~/.Custom_Words.txt')) as f:
+		with open(custom_words_file) as f:
 
 			for word in f:
 
@@ -147,8 +160,6 @@ def get_suggestions(string):
 				elif string in word:
 
 					suggestions.append(word)
-
-		f.close()
 
 	# Sort by frequency, since commonly-used words would appear more
 
@@ -184,7 +195,17 @@ def display_dialog_list(item_list):
 
 	else:
 
-		font = 'Monospace 10'
+		language = get_language_name()
+
+		if language == 'English':
+
+			font = 'Monospace 10'
+
+		else:
+
+			language = get_language_name()
+
+			font = get_font_name(language)
 
 
 	if item_list == [] or item_list == [''] or item_list is None:
@@ -238,8 +259,6 @@ def display_dialog_list(item_list):
 
 			f.write(popup_menu_cmd_str)
 
-		f.close()
-
 		full_dict_script_p = sp.Popen(['sh %s' % full_dict_script_path], shell=True, stdout=sp.PIPE)
 		choice, err_choice = full_dict_script_p.communicate()
 
@@ -252,72 +271,81 @@ def display_dialog_list(item_list):
 
 def apply_suggestion(suggestion):
 
-	suggestion = suggestion.decode('utf-8')
-
-	if suggestion == '':
+	if suggestion is None:
 
 		# User doesn't want any suggestion
 		# exit
 
 		sys.exit(0)
 
-	if suggest_method == 'replace':
+	else:
 
-		# Erase current word
+		# User wants any suggestion
+		# Decode the suggestion string in utf-8 format
 
-		sp.Popen(['xdotool key BackSpace'], shell=True)
+		suggestion = suggestion.decode('utf-8')
 
-		if current_word[:1].isupper():
+		if suggest_method == 'replace':
 
-			suggestion = suggestion.capitalize()
+			# Erase current word
 
-	# Write to history
-	with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
+			sp.Popen(['xdotool key BackSpace'], shell=True)
 
-		f.write(suggestion)
+			if current_word[:1].isupper():
 
-	f.close()
+				suggestion = suggestion.capitalize()
 
-	# Type suggestion
+		# Write to history
+		with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
 
-	if '=' in suggestion:
+			f.write(suggestion)
 
-		expand_suggestion = suggestion.split('=')[1]
+		# Type suggestion
 
-		if '#' in expand_suggestion:
+		if '=' in suggestion:
 
-			command_suggestion = str(expand_suggestion.replace('#', ''))
+			expand_suggestion = suggestion.split('=')[1]
+
+			if '#' in expand_suggestion:
+
+				command_suggestion = str(expand_suggestion.replace('#', ''))
+
+				command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
+				command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
+				command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+
+				sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
+
+				sys.exit(0)
+
+			else:
+
+				sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+
+				sys.exit(0)
+
+		elif '#' in suggestion:
+
+			command_suggestion = str(suggestion.replace('#', ''))
 
 			command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
 			command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
 			command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
 
-			sp.Popen(['xdotool type \'%s\'' % command_suggestion_out.rstrip()], shell=True)
+			sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
 
 			sys.exit(0)
 
 		else:
 
-			sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+			sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
 
 			sys.exit(0)
 
-	elif '#' in suggestion:
+def main(current_word):
 
-		command_suggestion = str(suggestion.replace('#', ''))
+	apply_suggestion(display_dialog_list(get_suggestions(current_word)))
 
-		command_suggestion_p = sp.Popen([command_suggestion], shell=True, stdout=sp.PIPE)
-		command_suggestion_out, command_suggestion_err = command_suggestion_p.communicate()
-		command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+if __name__ == '__main__':
 
-		sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
-
-		sys.exit(0)
-
-	else:
-
-		sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
-
-		sys.exit(0)
-
-apply_suggestion(display_dialog_list(get_suggestions(current_word)))
+	main(current_word)
