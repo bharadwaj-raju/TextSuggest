@@ -6,6 +6,6 @@ def get_font_name(langugae):
                 'Bangla' : 'SolaimanLipi 10',
             }
 
-    if font in fonts:
+    if langugae in fonts:
 
         return fonts[langugae]
