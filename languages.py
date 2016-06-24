@@ -23,11 +23,3 @@ def get_language_name():
     else:
 
         return 'English'
-
-def get_dict_dir(script_cwd):
-
-    # Different dictionary for different language
-
-    language = get_language_name()
-
-    return os.path.join(script_cwd, '%sOpenWordList' % language)

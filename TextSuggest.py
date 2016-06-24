@@ -21,7 +21,7 @@ import subprocess as sp
 import sys
 import time
 from collections import Counter
-from language_layout import get_dict_dir, get_language_name
+from language_layout import get_language_name
 
 if '--noselect' in sys.argv:
 
@@ -54,6 +54,14 @@ def remove_dups(s_list):
 
 	return [x for x in s_list if not (x in seen or seen_add(x))]
 
+def get_dict_dir():
+
+    # Different dictionary for different language
+
+    language = get_language_name()
+
+    return os.path.join(script_cwd, '%sOpenWordList' % language)
+
 def get_suggestions(string):
 
 	orig_string = string
@@ -70,7 +78,7 @@ def get_suggestions(string):
 
 		alphabet = str(current_word[:1])
 
-	dict_dir = get_dict_dir(script_cwd)
+	dict_dir = get_dict_dir()
 
 	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
 
@@ -186,7 +194,15 @@ def display_dialog_list(item_list):
 
 	else:
 
-		font = 'Monospace 10'
+		language = get_language_name()
+
+		if language == 'English':
+
+			font = 'Monospace 10'
+
+		else:
+
+			pass
 
 
 	if item_list == [] or item_list == [''] or item_list is None:
