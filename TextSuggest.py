@@ -357,7 +357,7 @@ def apply_suggestion(suggestion):
 
 			sys.exit(0)
 
-def main():
+def main(current_word):
 
 	apply_suggestion(display_dialog_list(get_suggestions(current_word)))
 
