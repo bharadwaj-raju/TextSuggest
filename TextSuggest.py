@@ -274,8 +274,6 @@ def display_dialog_list(item_list):
 
 			f.write(popup_menu_cmd_str)
 
-		f.close()
-
 		full_dict_script_p = sp.Popen(['sh %s' % full_dict_script_path], shell=True, stdout=sp.PIPE)
 		choice, err_choice = full_dict_script_p.communicate()
 
