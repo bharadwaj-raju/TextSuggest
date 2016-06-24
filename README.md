@@ -4,7 +4,7 @@ Simple Linux utility to autocomplete words in the GUI.
 
 ![TextSuggest in action](http://i.imgur.com/BU0wFk1.gif)
 
-**NOTE:** If you have not installed `dmenu2` (an extended fork of `dmenu`), you will see the suggestion bar at the bottom of the screen. To get the menu in the video, see [note](#note-on-dmenu).
+Uses [Rofi](https://davedavenport.github.io/rofi/) for a simple popup menu.
 
 Uses the [English Open Word List](http://dreamsteep.com/projects/the-english-open-word-list.html) for a basic dictionary. You can define custom words, see [the note](#custom-words).
 
@@ -12,13 +12,25 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
 # Installation
 
-`deb` package: [bharadwaj-raju/packages/TextSuggest/textsuggest_1.0_all.deb](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest_1.0_all.deb)
+## Packages
+
+Debian/Ubuntu `deb` package: [bharadwaj-raju/packages/TextSuggest/textsuggest_1.0_all.deb](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest_1.0_all.deb)
+
+AUR (Arch User Repository): `textsuggest-git` (https://aur.archlinux.org/packages/textsuggest-git/, maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr))
+
+Now, see [Post-install](#post-install)
+
+## Manual
 
 Make sure you have all the requirements:
 
  - `xdotool`
  - `xclip`
- - `dmenu` (See [note](#note-on-dmenu))
+ - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
+
+Now, see [Post-install](#post-install)
+
+## Post-install
 
 Assign keyboard shortcuts to
 
@@ -36,6 +48,20 @@ are at the top of list.
 **TIP:** You can search for words by their parts by
 typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
+# Options
+
+- `--showerrors`
+
+Instead of exiting silently when a word is not found, display a message for ~1 second.
+
+- `--font "Font"`
+
+Specify font to use in menu. Font name *must* be double-quoted. Format: `FontName (Weight (optional) FontSize)`. Example: `--font "Monaco Bold 10"` or `Monaco 10`
+
+- `--plainrofi`
+
+Read Rofi settings from `~/.Xresources` (see Rofi documentation) or default.
+
 # Custom words
 
 Simply add them to a `~/.Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
@@ -50,25 +76,10 @@ and will show up as `short=really_lon...` in the menu and when selected, will ty
 
 ## Command outputs
 
-You can also make it type shell command outputs, define them in `~/.Custom_Words.txt` like this:
-
-    #shell_command
-
-For example, a `#date` definition will type out the ouput of Unix `/bin/date`.
-
-If you want the output of a shell command *not* defined, then simply type `#command` at the `Type to search >` prompt.
+Simply type `#command --options`, for example `#date -u`.
 
 ### Combining command outputs and expansions
 
 Simply do:
 
     short_cmd=#long_command and --options
-
-# Note on dmenu
-
-`dmenu` is contained in the `suckless-tools` package in Debian/Ubuntu. The `.deb` package automatically installs the better `dmenu2` instead of the older `dmenu` in `suckless-tools`
-
-For a better search menu, with position at mouse cursor instead of bottom and compact size,
-Install `dmenu2`, an extended fork of `dmenu`, by Michał Lemke at [melek/dmenu2](https://bitbucket.org/melek/dmenu2).
-
-TextSuggest assumes that you have `dmenu2` installed. If you want to use the old `dmenu`, pass the `--olddmenu` option.
