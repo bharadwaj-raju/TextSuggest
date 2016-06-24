@@ -6,7 +6,7 @@ def get_language_name():
     # Reading keyboard layout from shell command
 
     languages = {
-                    'probhat' : 'Bangla',
+                    'bd(probhat)' : 'Bangla',
                     'us' : 'English',
                     'uk' : 'English',
                 }
