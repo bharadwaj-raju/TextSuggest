@@ -21,6 +21,7 @@ import subprocess as sp
 import sys
 import time
 from collections import Counter
+from fonts import get_font_name
 from language_layout import get_language_name
 
 if '--noselect' in sys.argv:
@@ -202,7 +203,9 @@ def display_dialog_list(item_list):
 
 		else:
 
-			pass
+			language = get_language_name()
+
+			font = get_font_name(language)
 
 
 	if item_list == [] or item_list == [''] or item_list is None:
