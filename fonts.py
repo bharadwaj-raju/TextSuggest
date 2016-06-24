@@ -1,4 +1,4 @@
-def get_font_name(langugae):
+def get_font_name(language):
 
     # This function will return the font name depending on the language
 
@@ -6,6 +6,6 @@ def get_font_name(langugae):
                 'Bangla' : 'SolaimanLipi 10',
             }
 
-    if langugae in fonts:
+    if language in fonts:
 
-        return fonts[langugae]
+        return fonts[language]
