@@ -21,8 +21,6 @@ import subprocess as sp
 import sys
 import time
 from collections import Counter
-from fonts import get_font_name
-from languages import get_language_name
 
 if '--noselect' in sys.argv:
 
@@ -48,20 +46,47 @@ script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
 custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
+def get_language_name():
+
+	# This function will return the language name
+	# Reading keyboard layout from shell command
+
+	keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
+	keyboard_layout = keyboard_layout[:2]
+
+	# Language Layout file contains languages and layouts in
+	# python dictionary format.
+
+	language_layout_file = os.path.join(script_cwd, 'Language_Layout.txt')
+
+	with open(language_layout_file,'r') as f:
+
+		languages = eval(f.read())
+
+	# Language will be detected by layout
+
+	if keyboard_layout in languages:
+
+		return languages[keyboard_layout]
+
+	else:
+
+		return 'English'
+
+def get_dict_dir():
+
+	# Different dictionary for different language
+
+	language = get_language_name()
+
+	return os.path.join(script_cwd, '%sOpenWordList' % language)
+
 def remove_dups(s_list):
 
 	seen = set()
 	seen_add = seen.add
 
 	return [x for x in s_list if not (x in seen or seen_add(x))]
-
-def get_dict_dir():
-
-    # Different dictionary for different language
-
-    language = get_language_name()
-
-    return os.path.join(script_cwd, '%sOpenWordList' % language)
 
 def get_suggestions(string):
 
@@ -195,17 +220,7 @@ def display_dialog_list(item_list):
 
 	else:
 
-		language = get_language_name()
-
-		if language == 'English':
-
-			font = 'Monospace 10'
-
-		else:
-
-			language = get_language_name()
-
-			font = get_font_name(language)
+		font = 'Monospace 10'
 
 
 	if item_list == [] or item_list == [''] or item_list is None:
@@ -258,6 +273,8 @@ def display_dialog_list(item_list):
 		with open(full_dict_script_path, 'w') as f:
 
 			f.write(popup_menu_cmd_str)
+
+		f.close()
 
 		full_dict_script_p = sp.Popen(['sh %s' % full_dict_script_path], shell=True, stdout=sp.PIPE)
 		choice, err_choice = full_dict_script_p.communicate()
@@ -342,10 +359,4 @@ def apply_suggestion(suggestion):
 
 			sys.exit(0)
 
-def main(current_word):
-
-	apply_suggestion(display_dialog_list(get_suggestions(current_word)))
-
-if __name__ == '__main__':
-
-	main(current_word)
+apply_suggestion(display_dialog_list(get_suggestions(current_word)))
