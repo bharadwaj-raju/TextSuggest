@@ -195,9 +195,7 @@ def get_suggestions(string):
 
 def display_dialog_list(item_list):
 
-	# TODO: Port to Rofi
-
-	dmenu_string = ''
+	items_string = ''
 
 	mouse_loc_raw, err_mouse_loc = sp.Popen(['xdotool getmouselocation --shell'], shell=True, stdout=sp.PIPE).communicate()
 	mouse_loc_raw = mouse_loc_raw.decode('utf-8')
@@ -205,63 +203,63 @@ def display_dialog_list(item_list):
 	x = mouse_loc_raw.split('\n')[0].replace('X=', '')
 	y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
 
+	# Colors inspired by Arc theme (Dark)
+
+	rofi_theme = '-lines 3 -width 20 -bg "#2b2e37" -separator-style "none" -hlbg "#5294e2" -fg "#fdfdfe" -hlfg "#282f39" -hide-scrollbar -padding 1'
+
+	if '--plainrofi' in sys.argv:
+
+		rofi_theme = ''
+
 	if '--font' in sys.argv:
 
-		# Font should be specified in XFT format: FontName-Size:Weight
+		# Font should be specified in Pango format: FontName {(optional) FontWeight} FontSize
+		# must be double-quoted in shell arguments
 
 		font = str(sys.argv[int(sys.argv.index('--font') + 1)])
 
 	else:
 
-		font = 'Monospace-9:normal'
+		font = 'Monospace 10'
 
 
 	if item_list == [] or item_list == [''] or item_list is None:
 
 		if '--showerrors' in sys.argv:
 
-			if '--olddmenu' in sys.argv:
+			sp.Popen(['echo "Nothing found! " | rofi -dmenu -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (rofi_theme, font, x, y)], shell=True)
 
-				sp.Popen(['echo "Nothing found! " | dmenu -i -b &'] % (x, y, font), shell=True)
-
-			else:
-
-				sp.Popen(['echo "Nothing found! " | dmenu -i -l 5 -w 320 -h 20 -x %s -y %s -fn %s &' % (x, y, font)], shell=True)
-
-			time.sleep(0.5)
+			time.sleep(1)
 
 			sp.Popen(['xdotool key Escape'], shell=True)
 
 			sys.exit(1)
 
+		elif suggest_method == 'replace':
+
+			# Restart in --noselect mode
+
+			new_textsuggest_cmd = ''
+
+			for i in sys.argv:
+
+				new_textsuggest_cmd += ' ' + i
+
+			sp.Popen(['python3 %s --noselect' % new_textsuggest_cmd], shell=True)
+
+			sys.exit(0)
+
 		else:
 
-			print('Suggestions list empty. Exiting.')
+			print('No words found. Exiting.')
 
 			sys.exit(1)
 
 	for i in item_list:
 
-		dmenu_string += i
+		items_string += i
 
-	if '--olddmenu' in sys.argv:
-
-		# Compatibility with old dmenu
-
-		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -b -i -p "Type to search >"'
-
-	elif '--rofi' in sys.argv:
-
-		# Compatibility with Rofi, a drop-in replacement of dmenu
-
-		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | rofi -dmenu -b -i -p "Type to search >"'
-
-	else:
-
-		# Make use of advanced dmenu2 features. Requires dmenu2 (fork of dmenu)
-		# to be installed. (https://bitbucket.org/melek/dmenu2)
-
-		dmenu_cmd_str = 'echo ' + str('"%s"' % dmenu_string) + ' | dmenu -i -p "Type to search >" -l 5 -w 320 -h 20 -x %s -y %s -fn %s' % (x, y, font)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
 
 	if suggest_method == 'insert':
 
@@ -270,19 +268,21 @@ def display_dialog_list(item_list):
 		# subprocess can't handle it, and will raise OSError.
 		# So we will write it to a script file.
 
-		full_dict_dmenu_script_path = os.path.expanduser('~/.textsuggest_full.sh')
+		full_dict_script_path = os.path.expanduser('~/.textsuggest_full.sh')
 
-		with open(full_dict_dmenu_script_path, 'w') as f:
+		with open(full_dict_script_path, 'w') as f:
 
-			f.write(dmenu_cmd_str)
+			f.write(popup_menu_cmd_str)
 
-		full_dict_dmenu_script_p = sp.Popen(['sh %s' % full_dict_dmenu_script_path], shell=True, stdout=sp.PIPE)
-		choice, err_choice = full_dict_dmenu_script_p.communicate()
+		f.close()
+
+		full_dict_script_p = sp.Popen(['sh %s' % full_dict_script_path], shell=True, stdout=sp.PIPE)
+		choice, err_choice = full_dict_script_p.communicate()
 
 		return choice
 
-	dmenu_p = sp.Popen(dmenu_cmd_str, shell=True, stdout=sp.PIPE)
-	choice, err_choice = dmenu_p.communicate()
+	popup_menu_p = sp.Popen(popup_menu_cmd_str, shell=True, stdout=sp.PIPE)
+	choice, err_choice = popup_menu_p.communicate()
 
 	return choice
 
