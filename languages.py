@@ -30,7 +30,7 @@ def get_language_name():
 
 	keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
 
-	keyboard_layout = keyboard_layout.strip()
+	keyboard_layout = keyboard_layout[:2]
 
 	# Language will be detected by layout
 

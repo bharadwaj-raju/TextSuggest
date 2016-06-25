@@ -2,6 +2,7 @@
 # coding=utf-8
 
 # Copyright © 2016 Bharadwaj Raju <bharadwaj.raju777@gmail.com>
+# Contributor: Maksudur Rahman Maateen <ugcoderbd@gmail.com>
 
 # Licensed under the GNU General Public License 3 (https://www.gnu.org/licenses/gpl.txt)
 
@@ -22,6 +23,7 @@ import sys
 import time
 from collections import Counter
 from languages import get_language_name
+from fonts import get_font_name
 import argparse
 
 # Arguments
@@ -74,7 +76,7 @@ if args.noselect:
 
 else:
 
-	if args.word is not None:
+	if args.word:
 
 		current_word = ' '.join(args.word)
 		suggest_method = 'replace'
@@ -89,8 +91,6 @@ else:
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
-custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
-
 config_dir = os.path.expanduser('~/.config/textsuggest')
 
 base_dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
@@ -98,6 +98,8 @@ base_dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 
 extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+
+custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
 if not os.path.isdir(config_dir):
 
@@ -107,7 +109,7 @@ if not os.path.isdir(config_dir):
 
 		os.mkdir(base_dict_dir)
 
-if args.language is not None:
+if args.language:
 
 	language = args.language
 
@@ -139,13 +141,17 @@ def get_suggestions(string):
 
 		alphabet = str(current_word[:1]).upper()
 
+		dict_dir = get_dict_dir()
+
+		dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+
 	else:
 
 		alphabet = str(current_word[:1])
 
-	dict_dir = get_dict_dir()
+		dict_dir = get_dict_dir()
 
-	dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+		dict_file = os.path.join(dict_dir, 'dict.txt')
 
 	if suggest_method == 'insert':
 
@@ -327,7 +333,7 @@ def display_dialog_list(item_list):
 
 		rofi_theme = ''
 
-	if args.font is not None:
+	if args.font:
 
 		# Font should be specified in Pango format: FontName {(optional) FontWeight} FontSize
 
@@ -335,7 +341,15 @@ def display_dialog_list(item_list):
 
 	else:
 
-		font = 'Monospace 10'
+		language = get_language_name()
+
+		if language == 'English':
+
+			font = 'Monospace 10'
+
+		else:
+
+			font = get_font_name(language)
 
 	if item_list == [] or item_list == [''] or item_list is None:
 
