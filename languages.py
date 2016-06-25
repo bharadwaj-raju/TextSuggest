@@ -2,24 +2,42 @@ import os
 
 def get_language_name():
 
-    # This function will return the language name
-    # Reading keyboard layout from shell command
+	# This function will return the language name
+	# Reading keyboard layout from shell command
 
-    languages = {
-                    'bd' : 'Bangla',
-                    'us' : 'English',
-                    'uk' : 'English',
-                }
+	# TODO: Add more definitions
 
-    keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
-    keyboard_layout = keyboard_layout[:2]
+	languages = {
+					'bd'	  : 'Bangla',
+					'us'	  : 'English',
+					'uk'	  : 'English',
+					'gb'	  : 'English',
+					'ara'	  : 'Arabic',
+					'cn'	  : 'Chinese',
+					'de'	  : 'German',
+					'jp'	  : 'Japanese',
+					'ru'	  : 'Russian',
+					'es'	  : 'Spanish',
+					'se'	  : 'Swedish',
+					'fi'	  : 'Finnish',
+					'kr'	  : 'Korean',
+					'pk'	  : 'Urdu',
+					'fr'	  : 'French',
+					'gr'	  : 'Greek',
+					'tw'	  : 'Chinese',
+					'ua'	  : 'Ukrainian'
+				}
 
-    # Language will be detected by layout
+	keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
 
-    if keyboard_layout in languages:
+	keyboard_layout = keyboard_layout.strip()
 
-        return languages[keyboard_layout]
+	# Language will be detected by layout
 
-    else:
+	if keyboard_layout in languages:
 
-        return 'English'
+		return languages[keyboard_layout]
+
+	else:
+
+		return 'English'
