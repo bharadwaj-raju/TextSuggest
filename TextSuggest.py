@@ -23,6 +23,7 @@ import sys
 import time
 from collections import Counter
 from languages import get_language_name
+from fonts import font
 import argparse
 
 # Arguments
@@ -338,7 +339,15 @@ def display_dialog_list(item_list):
 
 	else:
 
-		font = 'Monospace 10'
+		language = get_language_name()
+
+		if language == 'English':
+
+			font = 'Monospace 10'
+
+		else:
+
+			font = get_font_name(language)
 
 	if item_list == [] or item_list == [''] or item_list is None:
 
