@@ -23,7 +23,7 @@ import sys
 import time
 from collections import Counter
 from languages import get_language_name
-from fonts import font
+from fonts import get_font_name
 import argparse
 
 # Arguments
@@ -76,7 +76,7 @@ if args.noselect:
 
 else:
 
-	if args.word is not None:
+	if args.word:
 
 		current_word = ' '.join(args.word)
 		suggest_method = 'replace'
@@ -109,7 +109,7 @@ if not os.path.isdir(config_dir):
 
 		os.mkdir(base_dict_dir)
 
-if args.language is not None:
+if args.language:
 
 	language = args.language
 
@@ -146,6 +146,8 @@ def get_suggestions(string):
 		dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
 
 	else:
+
+		alphabet = str(current_word[:1])
 
 		dict_dir = get_dict_dir()
 
@@ -331,7 +333,7 @@ def display_dialog_list(item_list):
 
 		rofi_theme = ''
 
-	if args.font is not None:
+	if args.font:
 
 		# Font should be specified in Pango format: FontName {(optional) FontWeight} FontSize
 
