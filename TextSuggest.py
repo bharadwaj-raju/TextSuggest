@@ -21,22 +21,65 @@ import subprocess as sp
 import sys
 import time
 from collections import Counter
-from fonts import get_font_name
 from languages import get_language_name
+import argparse
 
-if '--noselect' in sys.argv:
+# Arguments
+
+arg_parser = argparse.ArgumentParser(
+	description='''TextSuggest - Simple Linux utility to autocomplete words in the GUI''',
+	formatter_class=argparse.RawTextHelpFormatter)
+
+arg_parser.add_argument(
+	'--word', metavar='word', type=str,
+	help='Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --noselect. \n \n',
+	nargs='+', required=False)
+
+arg_parser.add_argument(
+	'--noselect', action='store_true',
+	help='Give all words as suggestions, which you can then filter. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--plainrofi', action='store_true',
+	help='Do not apply custom Rofi theme. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--font', type=str,
+	help='Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). \n \n',
+	nargs='+', required=False)
+
+arg_parser.add_argument(
+	'--showerrors', action='store_true',
+	help='Show a "Nothing found!" message for ~1 second, instead of falling back to --noselect mode if no suggestions found. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--nohistory', action='store_true',
+	help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--language', type=str,
+	help='Manually set language, in case script fails to auto-detect from keyboard layout. \n \n',
+	required=False)
+
+args = arg_parser.parse_args()
+
+if args.noselect:
 
 	current_word = ''
 	suggest_method = 'insert'
 
 else:
 
-	try:
+	if args.word is not None:
 
-		current_word = sys.argv[1]
+		current_word = ' '.join(args.word)
 		suggest_method = 'replace'
 
-	except:
+	else:
 
 		current_word_p = sp.Popen(['xclip', '-o', '-sel'], stdout=sp.PIPE)
 		current_word, err_curr_word = current_word_p.communicate()
@@ -48,6 +91,30 @@ script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
 custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
+config_dir = os.path.expanduser('~/.config/textsuggest')
+
+base_dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
+
+hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
+
+extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+
+if not os.path.isdir(config_dir):
+
+	os.mkdir(config_dir)
+
+	if not os.path.isdir(base_dict_dir):
+
+		os.mkdir(base_dict_dir)
+
+if args.language is not None:
+
+	language = args.language
+
+else:
+
+	language = get_language_name()
+
 def remove_dups(s_list):
 
 	seen = set()
@@ -57,17 +124,14 @@ def remove_dups(s_list):
 
 def get_dict_dir():
 
-    # Different dictionary for different language
+	# Different dictionary for different language
 
-    language = get_language_name()
-
-    return os.path.join(script_cwd, '%sOpenWordList' % language)
+	return os.path.join(base_dict_dir, language)
 
 def get_suggestions(string):
 
 	orig_string = string
 	suggestions = []
-	language = get_language_name()
 
 	if language == 'English':
 
@@ -115,9 +179,25 @@ def get_suggestions(string):
 
 		except FileNotFoundError:
 
-			pass
+			try:
 
-	with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
+				for file in os.listdir(dict_dir):
+
+					with open(os.path.join(dict_dir, file)) as f:
+
+						for word in f:
+
+							if word.startswith(alphabet) or word.startswith(alphabet.lower):
+
+								if string in word:
+
+									suggestions.append(word)
+
+			except FileNotFoundError:
+
+				pass
+
+	with open(extra_words_file) as f:
 
 		for word in f:
 
@@ -129,21 +209,82 @@ def get_suggestions(string):
 
 				suggestions.append(word)
 
+	# If language != English, display English and language suggestions
+
+	if not language == 'English':
+
+		eng_dict_dir = os.path.join(base_dict_dir, 'English')
+
+		dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+
+		if suggest_method == 'insert':
+
+			try:
+
+				for file in os.listdir(dict_dir):
+
+					file = os.path.join(dict_dir, file)
+
+					with open(file) as f:
+
+						for word in f:
+
+							suggestions.append(word)
+
+			except FileNotFoundError:
+
+				pass
+
+		else:
+
+			try:
+
+				with open(dict_file) as f:
+
+					for word in f:
+
+						if string in word:
+
+							suggestions.append(word)
+
+			except FileNotFoundError:
+
+				try:
+
+					for file in os.listdir(dict_dir):
+
+						with open(os.path.join(dict_dir, file)) as f:
+
+							for word in f:
+
+								if word.startswith(alphabet) or word.startswith(alphabet.lower):
+
+									if string in word:
+
+										suggestions.append(word)
+
+				except FileNotFoundError:
+
+					pass
+
+
 	# Apply history
 
-	if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+	if not args.nohistory:
 
-		with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
+		if os.path.isfile(hist_file):
 
-			for hist_word in f:
+			with open(hist_file) as f:
 
-				if suggest_method == 'insert':
+				for hist_word in f:
 
-					suggestions.append(hist_word)
+					if suggest_method == 'insert':
 
-				if string in hist_word:
+						suggestions.append(hist_word)
 
-					suggestions.append(hist_word)
+					if string in hist_word:
+
+						suggestions.append(hist_word)
 
 	# Applying Custom Words
 
@@ -180,37 +321,25 @@ def display_dialog_list(item_list):
 
 	# Colors inspired by Arc theme (Dark)
 
-	rofi_theme = '-lines 3 -width 20 -bg "#2b2e37" -separator-style "none" -hlbg "#5294e2" -fg "#fdfdfe" -hlfg "#282f39" -hide-scrollbar -padding 1'
+	rofi_theme = '-lines 3 -width 20 -bg "#2b2e37" -separator-style "none" -hlbg "#5294e2" -fg "#fdfdfe" -hlfg "#fdfdfe" -hide-scrollbar -padding 1'
 
-	if '--plainrofi' in sys.argv:
+	if args.plainrofi:
 
 		rofi_theme = ''
 
-	if '--font' in sys.argv:
+	if args.font is not None:
 
 		# Font should be specified in Pango format: FontName {(optional) FontWeight} FontSize
-		# must be double-quoted in shell arguments
 
-		font = str(sys.argv[int(sys.argv.index('--font') + 1)])
+		font = ' '.join(args.font)
 
 	else:
 
-		language = get_language_name()
-
-		if language == 'English':
-
-			font = 'Monospace 10'
-
-		else:
-
-			language = get_language_name()
-
-			font = get_font_name(language)
-
+		font = 'Monospace 10'
 
 	if item_list == [] or item_list == [''] or item_list is None:
 
-		if '--showerrors' in sys.argv:
+		if args.showerrors:
 
 			sp.Popen(['echo "Nothing found! " | rofi -dmenu -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (rofi_theme, font, x, y)], shell=True)
 
@@ -222,7 +351,7 @@ def display_dialog_list(item_list):
 
 		elif suggest_method == 'replace':
 
-			# Restart in --noselect mode
+			# Restart in --noselect mode, preserving all original arguments
 
 			new_textsuggest_cmd = ''
 
@@ -267,11 +396,13 @@ def display_dialog_list(item_list):
 	popup_menu_p = sp.Popen(popup_menu_cmd_str, shell=True, stdout=sp.PIPE)
 	choice, err_choice = popup_menu_p.communicate()
 
+	print('THIS: %s' % choice)
+
 	return choice
 
 def apply_suggestion(suggestion):
 
-	if suggestion is None:
+	if suggestion is None or suggestion == b'' or suggestion == []:
 
 		# User doesn't want any suggestion
 		# exit
@@ -295,10 +426,12 @@ def apply_suggestion(suggestion):
 
 				suggestion = suggestion.capitalize()
 
-		# Write to history
-		with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
+		if not args.nohistory:
 
-			f.write(suggestion)
+			# Write to history
+			with open(hist_file, 'a') as f:
+
+				f.write(suggestion)
 
 		# Type suggestion
 

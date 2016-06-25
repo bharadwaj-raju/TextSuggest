@@ -28,6 +28,8 @@ Make sure you have all the requirements:
  - `xclip`
  - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
 
+Move `English/` into `~/.config/textsuggest/dictionaries/` and `Extra_Words.txt` into `~/.config/textsuggest/` directory.
+
 Now, see [Post-install](#post-install)
 
 ## Post-install
@@ -42,7 +44,7 @@ Assign keyboard shortcuts to
 The first one gives you suggestions on the currently highlighted word.
 The second one simply gives you a list of all word, you can search through them.
 
-The script stores frequently used words in a history file (`~/.textsuggest_history.txt`). Suggestions more often used
+The script stores frequently used words in a history file (`~/.config/textsuggest/history.txt`). Suggestions more often used
 are at the top of list.
 
 **TIP:** You can search for words by their parts by
@@ -56,16 +58,28 @@ Instead of exiting silently when a word is not found, display a message for ~1 s
 
 - `--font "Font"`
 
-Specify font to use in menu. Font name *must* be double-quoted. Format: `FontName (Weight (optional) FontSize)`. Example: `--font "Monaco Bold 10"` or `Monaco 10`
+Specify font to use in menu. Format: `FontName (Weight (optional) FontSize)`. Example: `--font Monaco Bold 10` or `--font Monaco 10`
 
 - `--plainrofi`
 
 Read Rofi settings from `~/.Xresources` (see Rofi documentation) or default.
 
+- `--word "Word"`
+
+Give suggestions for "Word" specified. Ignored if `--noselect`.
+
+- `--nohistory`
+
+Disable the history of frequently-used words (stored in `~/.config/textsuggest/history.txt`)
+
+- `--language`
+
+Manually set language, in case script fails to auto-detect from keyboard layout.
+
 # Custom words
 
 Simply add them to a `~/.Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
-few jargon, abbreviations and words (total 1653 by default) not included in the EOWL.
+few jargon, abbreviations and words (total 1653) not included in the EOWL.
 
 You can also define expansions, in `~/.Custom_Words.txt`.
 An entry for an expansion in the `~/.Custom_Words.txt` looks like:
@@ -83,3 +97,15 @@ Simply type `#command --options`, for example `#date -u`.
 Simply do:
 
     short_cmd=#long_command and --options
+
+# Other langauges
+
+Follow these steps:
+
+- Get a suitable dictionary/wordlist for your language
+
+- Move said dictionary into a new directory in `~/.config/textsuggest/dictionaries` with its name being your language's name.
+
+- Pass a suitable font with the `--font` option
+
+- Language should be auto-detected. If not, manually set language using the `--language` option.
