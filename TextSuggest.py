@@ -26,6 +26,18 @@ from languages import get_language_name
 from fonts import get_font_name
 import argparse
 
+script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
+
+config_dir = os.path.expanduser('~/.config/textsuggest')
+
+base_dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
+
+hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
+
+extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+
+custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
+
 # Arguments
 
 arg_parser = argparse.ArgumentParser(
@@ -89,18 +101,6 @@ else:
 
 		suggest_method = 'replace'
 
-script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
-config_dir = os.path.expanduser('~/.config/textsuggest')
-
-base_dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
-
-hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
-
-extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
-
-custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
-
 if not os.path.isdir(config_dir):
 
 	os.mkdir(config_dir)
@@ -108,6 +108,14 @@ if not os.path.isdir(config_dir):
 	if not os.path.isdir(base_dict_dir):
 
 		os.mkdir(base_dict_dir)
+
+# Moving ~/.Custom_Words.txt to config_dir
+
+prev_custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
+
+if os.path.isdir(prev_custom_words_file):
+
+	os.rename(prev_custom_words_file, custom_words_file)
 
 if args.language:
 
