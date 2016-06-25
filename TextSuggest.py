@@ -373,7 +373,7 @@ def display_dialog_list(item_list):
 
 		items_string += i
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
 
 	if suggest_method == 'insert':
 
@@ -382,7 +382,7 @@ def display_dialog_list(item_list):
 		# subprocess can't handle it, and will raise OSError.
 		# So we will write it to a script file.
 
-		full_dict_script_path = os.path.expanduser('~/.textsuggest_full.sh')
+		full_dict_script_path = os.path.expanduser('/tmp/textsuggest_full.sh')
 
 		with open(full_dict_script_path, 'w') as f:
 
