@@ -30,13 +30,7 @@ Make sure you have all the requirements:
  - `xclip`
  - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
 
-Run the included install script with `sudo sh install.sh`. Or:
-
-Move `textsuggest/` into `~/.config/` directory.
-
-Move TextSuggest.py to `/usr/bin/textsuggest` file and make sure it is executable `chmod +x /usr/bin/textsuggest`
-
-Move `languages.py` and `fonts.py` into `/usr/lib/python3/dist-packages/` directory.
+Run the included install script with `sudo sh install.sh`.
 
 Now, see [Post-install](#post-install)
 
