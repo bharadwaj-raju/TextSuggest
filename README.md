@@ -14,9 +14,11 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
 ## Packages
 
-Debian/Ubuntu `deb` package: [bharadwaj-raju/packages/TextSuggest/textsuggest_1.0_all.deb](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest_1.0_all.deb)
+Debian/Ubuntu `deb` package: [`textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
 
 AUR (Arch User Repository): `textsuggest-git` (https://aur.archlinux.org/packages/textsuggest-git/, maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr))
+
+Both packages build from this Git repository.
 
 Now, see [Post-install](#post-install)
 
@@ -28,7 +30,13 @@ Make sure you have all the requirements:
  - `xclip`
  - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
 
-Move `English/` into `~/.config/textsuggest/dictionaries/` and `Extra_Words.txt` into `~/.config/textsuggest/` directory.
+Run the included install script with `sudo sh install.sh`. Or:
+
+Move `textsuggest/` into `~/.config/` directory.
+
+Move TextSuggest.py to `/usr/bin/textsuggest` file and make sure it is executable `chmod +x /usr/bin/textsuggest`
+
+Move `languages.py` and `fonts.py` into `/usr/lib/python3/dist-packages/` directory.
 
 Now, see [Post-install](#post-install)
 
@@ -36,10 +44,8 @@ Now, see [Post-install](#post-install)
 
 Assign keyboard shortcuts to
 
-- `python3 /path/to/TextSuggest.py`
-- `python3 /path/to/TextSuggest.py --noselect`
-
-**NOTE:** If you installed TextSuggest through the `deb` package, replace `python3 /path/to/TextSuggest.py` with just `textsuggest`.
+- `textsuggest`
+- `textsuggest --noselect`
 
 The first one gives you suggestions on the currently highlighted word.
 The second one simply gives you a list of all word, you can search through them.
