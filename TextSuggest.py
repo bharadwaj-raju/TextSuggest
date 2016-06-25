@@ -46,7 +46,7 @@ else:
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
-custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
+custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
 def remove_dups(s_list):
 
@@ -61,7 +61,7 @@ def get_dict_dir():
 
     language = get_language_name()
 
-    dict_dir = os.path.expanduser('~/.TextSuggest_Dictionaries')
+    dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
 
     return os.path.join(dict_dir, '%s' % language)
 
@@ -123,7 +123,7 @@ def get_suggestions(string):
 
 			pass
 
-	with open(os.path.join(script_cwd, 'Extra_Words.txt')) as f:
+	with open(os.path.join(script_cwd, '~/.config/textsuggest/Extra_Words.txt')) as f:
 
 		for word in f:
 
@@ -137,9 +137,9 @@ def get_suggestions(string):
 
 	# Apply history
 
-	if os.path.isfile(os.path.expanduser('~/.textsuggest_history.txt')):
+	if os.path.isfile(os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt')):
 
-		with open(os.path.expanduser('~/.textsuggest_history.txt')) as f:
+		with open(os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt')) as f:
 
 			for hist_word in f:
 
@@ -302,7 +302,7 @@ def apply_suggestion(suggestion):
 				suggestion = suggestion.capitalize()
 
 		# Write to history
-		with open(os.path.expanduser('~/.textsuggest_history.txt'), 'a') as f:
+		with open(os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt'), 'a') as f:
 
 			f.write(suggestion)
 
