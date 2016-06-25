@@ -2,6 +2,7 @@
 # coding=utf-8
 
 # Copyright © 2016 Bharadwaj Raju <bharadwaj.raju777@gmail.com>
+# Contributor: Maksudur Rahman Maateen <ugcoderbd@gmail.com>
 
 # Licensed under the GNU General Public License 3 (https://www.gnu.org/licenses/gpl.txt)
 
@@ -47,6 +48,10 @@ else:
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
+
+extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+
+textsuggest_history_file = os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt')
 
 def remove_dups(s_list):
 
@@ -123,7 +128,7 @@ def get_suggestions(string):
 
 			pass
 
-	with open(os.path.join(script_cwd, '~/.config/textsuggest/Extra_Words.txt')) as f:
+	with open(extra_words_file) as f:
 
 		for word in f:
 
@@ -137,9 +142,9 @@ def get_suggestions(string):
 
 	# Apply history
 
-	if os.path.isfile(os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt')):
+	if os.path.isfile(textsuggest_history_file):
 
-		with open(os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt')) as f:
+		with open(textsuggest_history_file) as f:
 
 			for hist_word in f:
 
@@ -302,7 +307,7 @@ def apply_suggestion(suggestion):
 				suggestion = suggestion.capitalize()
 
 		# Write to history
-		with open(os.path.expanduser('~/.config/textsuggest/textsuggest_history.txt'), 'a') as f:
+		with open(textsuggest_history_file, 'a') as f:
 
 			f.write(suggestion)
 
