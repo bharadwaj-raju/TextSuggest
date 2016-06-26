@@ -14,8 +14,8 @@ echo "Copying configuration files"
 mkdir -p ~/.config/textsuggest
 
 echo "Installing libraries"
-cp languages.py /usr/lib/python3.5/site-packages/languages.py
-cp fonts.py /usr/lib/python3.5/site-packages/languages.py
+cp languages.py /usr/lib/python3.5/dist-packages/languages.py
+cp fonts.py /usr/lib/python3/dist-packages/fonts.py
 
 echo "Installing textsuggest script to /usr/bin/textsuggest"
 cp TextSuggest.py /usr/bin/textsuggest
