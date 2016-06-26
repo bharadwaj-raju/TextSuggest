@@ -21,3 +21,6 @@ cp fonts.py /usr/lib/python3.5/site-packages/
 echo "Installing textsuggest script to /usr/bin/textsuggest"
 cp TextSuggest.py /usr/bin/textsuggest
 chmod +x /usr/bin/textsuggest
+
+echo "Installing manual page"
+cp textsuggest.1 /usr/local/man/

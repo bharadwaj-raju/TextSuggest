@@ -6,7 +6,7 @@ Simple Linux utility to autocomplete words in the GUI.
 
 Uses [Rofi](https://davedavenport.github.io/rofi/) for a simple popup menu.
 
-Uses the [English Open Word List](http://dreamsteep.com/projects/the-english-open-word-list.html) for a basic dictionary. You can define custom words, see [the note](#custom-words).
+Uses the [English Open Word List](http://dreamsteep.com/projects/the-english-open-word-list.html) for a basic English dictionary, plus a Bangla dictionary ported from [ibus-avro](https:github.com/sarim/ibus-avro). You can define custom words, see [the note](#custom-words).
 
 Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
@@ -16,7 +16,7 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
 Debian/Ubuntu `deb` package: [`textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
 
-AUR (Arch User Repository): `textsuggest-git` (https://aur.archlinux.org/packages/textsuggest-git/, maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr))
+AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
 Both packages build from this Git repository.
 
@@ -51,6 +51,8 @@ are at the top of list.
 typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 # Options
+
+Documented in the manual page: `man textsuggest`.
 
 - `--showerrors`
 
@@ -104,8 +106,8 @@ Follow these steps:
 
 - Get a suitable dictionary/wordlist for your language
 
-- Move said dictionary into a new directory in `~/.config/textsuggest/dictionaries` with its name being your language's name.
+- Move said dictionary into a new directory in `/usr/share/textsuggest/dictionaries` with its name being your language's name.
 
-- Pass a suitable font with the `--font` option
+- A suitable font should be auto-detected. If not, pass a suitable font with the `--font` option
 
 - Language should be auto-detected. If not, manually set language using the `--language` option.
