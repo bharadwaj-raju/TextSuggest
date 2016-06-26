@@ -2,7 +2,7 @@
 
 X11 utility to autocomplete words in the GUI.
 
-![TextSuggest in action](http://i.imgur.com/BU0wFk1.gif)
+<!--![TextSuggest in action](http://i.imgur.com/BU0wFk1.gif)-->
 
 Uses [Rofi](https://davedavenport.github.io/rofi/) for a simple popup menu.
 
@@ -14,9 +14,9 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
 ## Packages
 
-Debian/Ubuntu `deb` package: [`textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
+[![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) [![Debian](https://www.pylint.org/assets/img/debian.png)](https://debian.org) Debian/Ubuntu `deb` package: [`textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
 
-AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr)
+[![Arch Linux AUR package](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
 Both packages build from this Git repository.
 
