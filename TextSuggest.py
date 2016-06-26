@@ -29,7 +29,7 @@ import argparse
 # Arguments
 
 arg_parser = argparse.ArgumentParser(
-	description='''TextSuggest - Simple Linux utility to autocomplete words in the GUI''',
+	description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
 	formatter_class=argparse.RawTextHelpFormatter)
 
 arg_parser.add_argument(
@@ -89,7 +89,7 @@ base_dict_dir = os.path.expanduser('/usr/share/textsuggest/dictionaries')
 
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 
-extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+extra_words_file = os.path.expanduser('/usr/share/textsuggest/Extra_Words.txt')
 
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
@@ -397,7 +397,7 @@ def display_dialog_list(item_list):
 
 		return choice
 
-	choice = sp.check_output(popup_menu_cmd_str, shell=True)
+	choice = sp.check_output([popup_menu_cmd_str], shell=True)
 
 	return choice
 
@@ -412,7 +412,7 @@ def apply_suggestion(suggestion):
 
 	else:
 
-		# User wants any suggestion
+		# User wants a suggestion
 		# Decode the suggestion string in utf-8 format
 
 		suggestion = suggestion.decode('utf-8')

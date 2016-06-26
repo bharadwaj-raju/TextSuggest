@@ -1,6 +1,6 @@
 # TextSuggest
 
-Simple Linux utility to autocomplete words in the GUI.
+X11 utility to autocomplete words in the GUI.
 
 ![TextSuggest in action](http://i.imgur.com/BU0wFk1.gif)
 
