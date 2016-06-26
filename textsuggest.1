@@ -1,0 +1,60 @@
+.\" Generated with Ronnjs 0.3.8
+.\" http://github.com/kapouer/ronnjs/
+.
+.TH "TEXTSUGGEST" "1" "June 2016" "" ""
+.
+.SH "NAME"
+\fBtextsuggest\fR \-\- X11 utility to autocomplete words in the GUI
+.
+.SH "About"
+  https://github\.com/bharadwaj\-raju/TextSuggest
+.
+.P
+  textsuggest is a simple X11 utility that autocompletes, suggests and expands words in the GUI\.
+.
+.SH "Usage"
+  textsuggest has two modes:
+.
+.IP "\(bu" 4
+\'replace\' mode: Suggests word completions based on current X11 selection contents\. Default\.
+.
+.IP "\(bu" 4
+\'insert\' mode : Gives a list of all known words, allowing you to search them and choose one\. Activated with \fB\-\-noselect\fR option\.
+.
+.IP
+Thus, assign two keyboard shortcuts:
+.
+.IP "\(bu" 4
+\fBtextsuggest\fR for replace mode
+.
+.IP "\(bu" 4
+\fBtextsuggest \-\-noselect\fR for insert mode
+.
+.IP "" 0
+.
+.SH "Additional options"
+  \fB\-\-help\fR, \fB\-h\fR
+   View a short summary of options
+.
+.P
+   \fB\-\-word [word]\fR
+   Instead of suggesting words based on X11 selection contents, suggest based on \fB[word]\fR specified\. Ignored if \fB\-\-noselect\fR\|\.
+.
+.P
+   \fB\-\-plainrofi\fR
+   Do not apply custom Rofi theme\.
+.
+.P
+   \fB\-\-font [font]\fR
+   Instead of selecting font based on language (default: Monospace 10), use \fB[font]\fR specified\. \fB[font]\fR must be in Pango format: \fBFontName (Weight) Size\fR
+.
+.P
+   \fB\-\-nohistory\fR
+   Disable frequently\-used words history (stored in \fB~/\.config/textsuggest/history\.txt\fR)
+.
+.P
+   \fB\-\-language [language]\fR
+   Instead of auto\-detecting language based on keyboard layout, use \fB[language]\fR specified\.
+.
+.SH "Bugs and Requests"
+  Please file bug reports and feature requests at the GitHub repository: https://github\.com/bharadwaj\-raju/TextSuggest
