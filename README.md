@@ -2,7 +2,7 @@
 
 X11 utility to autocomplete words in the GUI.
 
-<!--![TextSuggest in action](http://i.imgur.com/BU0wFk1.gif)-->
+![TextSuggest in action](http://i.imgur.com/qa2PExH.gif)
 
 Uses [Rofi](https://davedavenport.github.io/rofi/) for a simple popup menu.
 
@@ -14,9 +14,13 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt).
 
 ## Packages
 
-[![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) [![Debian](https://www.pylint.org/assets/img/debian.png)](https://debian.org) Debian/Ubuntu `deb` package: [`textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
+[![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com)
 
-[![Arch Linux AUR package](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr)
+Debian/Ubuntu `deb` package: [`textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
+
+[![Arch Linux AUR package](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org)
+
+AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
 Both packages build from this Git repository.
 
@@ -80,7 +84,7 @@ Manually set language, in case script fails to auto-detect from keyboard layout.
 
 # Custom words
 
-Simply add them to a `~/.Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
+Simply add them to a `~/.config/textsuggest/Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
 few jargon, abbreviations and words (total 1653) not included in the EOWL.
 
 You can also define expansions, in `~/.Custom_Words.txt`.
