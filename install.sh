@@ -7,12 +7,11 @@ set -e
 # Should be run with sudo
 
 echo "Copying dictionaries"
-mkdir -p /usr/share/textsuggest/dictionaries/
-cp -R textsuggest/dictionaries/* /usr/share/textsuggest/dictionaries/
+mkdir -p /usr/share/textsuggest/
+cp -R textsuggest/* /usr/share/textsuggest/
 
 echo "Copying configuration files"
 mkdir -p ~/.config/textsuggest
-cp -R textsuggest/*.txt ~/.config/textsuggest/
 
 echo "Installing libraries"
 cp languages.py /usr/lib/python3.5/site-packages/
