@@ -87,8 +87,8 @@ Manually set language, in case script fails to auto-detect from keyboard layout.
 Simply add them to a `~/.config/textsuggest/Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
 few jargon, abbreviations and words (total 1653) not included in the EOWL.
 
-You can also define expansions, in `~/.Custom_Words.txt`.
-An entry for an expansion in the `~/.Custom_Words.txt` looks like:
+You can also define expansions, in `~/.config/textsuggest/Custom_Words.txt`.
+An entry for an expansion in the `~/.config/textsuggest/Custom_Words.txt` looks like:
 
     short=really_long_text_you_want_to_type
 
@@ -110,7 +110,7 @@ Follow these steps:
 
 - Get a suitable dictionary/wordlist for your language
 
-- Move said dictionary into a new directory in `/usr/share/textsuggest/dictionaries` with its name being your language's name.
+- Move said dictionary into a new directory in `/usr/share/textsuggest/dictionaries` with its name being your language's name (English name, like "German" instead of "Deutsch").
 
 - A suitable font should be auto-detected. If not, pass a suitable font with the `--font` option
 

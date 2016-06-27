@@ -28,9 +28,7 @@ def get_language_name():
 					'ua'	  : 'Ukrainian'
 				}
 
-	keyboard_layout = os.popen("setxkbmap -print | awk -F\"+\" '/xkb_symbols/ {print $2}'").read()
-
-	keyboard_layout = keyboard_layout[:2]
+	keyboard_layout = os.popen(r"setxkbmap -print | awk -F '(+|\\()' '/xkb_symbols/ {print $2}'").read()
 
 	# Language will be detected by layout
 

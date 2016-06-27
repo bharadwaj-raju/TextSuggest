@@ -6,13 +6,16 @@
 .SH "NAME"
 \fBtextsuggest\fR \-\- X11 utility to autocomplete words in the GUI
 .
-.SH "About"
+.SH "SYNOPSIS"
+  \fBtextsuggest\fR [\fB\-\-help\fR] [\fB\-\-word\fR \fIword\fR] [\fB\-\-plainrofi\fR] [\fB\-\-font\fR \fIfont\fR] [\fB\-\-nohistory\fR] [\fB\-\-language\fR \fIfont\fR] [\fB\-\-noselect\fR]
+.
+.SH "DESCRIPTION"
   https://github\.com/bharadwaj\-raju/TextSuggest
 .
 .P
   textsuggest is a simple X11 utility that autocompletes, suggests and expands words in the GUI\.
 .
-.SH "Usage"
+.SH "USAGE"
   textsuggest has two modes:
 .
 .IP "\(bu" 4
@@ -32,29 +35,29 @@ Thus, assign two keyboard shortcuts:
 .
 .IP "" 0
 .
-.SH "Additional options"
+.SH "OPTIONS"
   \fB\-\-help\fR, \fB\-h\fR
    View a short summary of options
 .
 .P
-   \fB\-\-word [word]\fR
-   Instead of suggesting words based on X11 selection contents, suggest based on \fB[word]\fR specified\. Ignored if \fB\-\-noselect\fR\|\.
+   \fB\-\-word\fR \fIword\fR
+   Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-noselect\fR\|\.
 .
 .P
    \fB\-\-plainrofi\fR
    Do not apply custom Rofi theme\.
 .
 .P
-   \fB\-\-font [font]\fR
-   Instead of selecting font based on language (default: Monospace 10), use \fB[font]\fR specified\. \fB[font]\fR must be in Pango format: \fBFontName (Weight) Size\fR
+   \fB\-\-font\fR \fIfont\fR
+   Instead of selecting font based on language (default: Monospace 10), use \fIfont\fR specified\. \fIfont\fR must be in Pango format: \fBFontName (Weight) Size\fR
 .
 .P
    \fB\-\-nohistory\fR
    Disable frequently\-used words history (stored in \fB~/\.config/textsuggest/history\.txt\fR)
 .
 .P
-   \fB\-\-language [language]\fR
-   Instead of auto\-detecting language based on keyboard layout, use \fB[language]\fR specified\.
+   \fB\-\-language\fR \fIlanguage\fR
+   Instead of auto\-detecting language based on keyboard layout, use \fIlanguage\fR specified\.
 .
-.SH "Bugs and Requests"
+.SH "BUGS AND FEATURE REQUESTS"
   Please file bug reports and feature requests at the GitHub repository: https://github\.com/bharadwaj\-raju/TextSuggest

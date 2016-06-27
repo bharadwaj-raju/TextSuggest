@@ -126,9 +126,31 @@ def get_dict_dir():
 
 	return os.path.join(base_dict_dir, language)
 
+def type_command_output(command):
+
+	command_out = sp.check_output([command], shell=True)
+	command_out = command_out.decode('utf-8').rstrip()
+
+	if '\n' in command_out:
+
+		command_out_newl_list = command_out.split('\n')
+
+		print(command_out_newl_list)
+
+		for i in command_out_newl_list:
+
+			print(i)
+
+			sp.Popen(['xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip('\'').strip('"')], shell=True)
+
+			time.sleep(0.5)
+
+	else:
+
+		sp.Popen(['xdotool type \'%s\'' % command_out], shell=True)
+
 def get_suggestions(string):
 
-	orig_string = string
 	suggestions = []
 
 	if language == 'English':
@@ -175,7 +197,11 @@ def get_suggestions(string):
 
 				for word in f:
 
-					if string in word:
+					if word.startswith(string):
+
+						suggestions.append(word)
+
+					elif string in word:
 
 						suggestions.append(word)
 
@@ -190,7 +216,6 @@ def get_suggestions(string):
 						for word in f:
 
 							if word.startswith(alphabet) or word.startswith(alphabet.lower) and string in word:
-
 
 								suggestions.append(word)
 
@@ -216,15 +241,15 @@ def get_suggestions(string):
 
 		eng_dict_dir = os.path.join(base_dict_dir, 'English')
 
-		dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
+		dict_file = os.path.join(eng_dict_dir, '%s.txt' % alphabet)
 
 		if suggest_method == 'insert':
 
 			try:
 
-				for file in os.listdir(dict_dir):
+				for file in os.listdir(eng_dict_dir):
 
-					file = os.path.join(dict_dir, file)
+					file = os.path.join(eng_dict_dir, file)
 
 					with open(file) as f:
 
@@ -252,9 +277,9 @@ def get_suggestions(string):
 
 				try:
 
-					for file in os.listdir(dict_dir):
+					for file in os.listdir(eng_dict_dir):
 
-						with open(os.path.join(dict_dir, file)) as f:
+						with open(os.path.join(eng_dict_dir, file)) as f:
 
 							for word in f:
 
@@ -444,26 +469,9 @@ def apply_suggestion(suggestion):
 
 				command_suggestion = str(expand_suggestion.replace('#', ''))
 
-				command_suggestion_out = sp.check_output([command_suggestion], shell=True)
-				command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
+				type_command_output(command_suggestion)
 
-				if '\\n' in command_suggestion_out:
-
-					command_suggestion_out_newl_list = command_suggestion_out.split('\\n')
-
-					print(command_suggestion_out_newl_list)
-
-					for i in command_suggestion_out_newl_list:
-
-						print(i)
-
-						sp.Popen(['xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip('\'').strip('"')], shell=True)
-
-						time.sleep(0.5)
-
-				else:
-
-					sp.Popen(['xdotool type \'%s\'' % command_suggestion_out], shell=True)
+				sys.exit(0)
 
 			else:
 
@@ -475,28 +483,7 @@ def apply_suggestion(suggestion):
 
 			command_suggestion = str(suggestion.replace('#', ''))
 
-			command_suggestion_out = sp.check_output([command_suggestion], shell=True)
-			print(str(command_suggestion_out.strip()))
-
-			command_suggestion_out = str(command_suggestion_out.strip()).replace('b', '', 1)
-
-			if '\\n' in str(command_suggestion_out):
-
-				command_suggestion_out_newl_list = command_suggestion_out.split('\\n')
-
-				print(command_suggestion_out_newl_list)
-
-				for i in command_suggestion_out_newl_list:
-
-					print(i)
-
-					sp.Popen(['xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip('\'').strip('"')], shell=True)
-
-					time.sleep(0.5)
-
-			else:
-
-				sp.Popen(['xdotool type %s' % command_suggestion_out], shell=True)
+			type_command_output(command_suggestion)
 
 			sys.exit(0)
 
