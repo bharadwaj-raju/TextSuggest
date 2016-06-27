@@ -371,7 +371,7 @@ def display_dialog_list(item_list):
 
 			font = get_font_name(language)
 
-			if font == '':
+			if not font:
 
 				# If returned empty, use default
 
