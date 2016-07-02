@@ -25,6 +25,7 @@ from collections import Counter
 from languages import get_language_name
 from fonts import get_font_name
 import argparse
+import string
 
 # Arguments
 
@@ -33,7 +34,7 @@ arg_parser = argparse.ArgumentParser(
 	formatter_class=argparse.RawTextHelpFormatter)
 
 arg_parser.add_argument(
-	'--word', metavar='word', type=str,
+	'--word', type=str,
 	help='Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --noselect. \n \n',
 	nargs='+', required=False)
 
@@ -62,7 +63,70 @@ arg_parser.add_argument(
 	help='Manually set language, in case script fails to auto-detect from keyboard layout. \n \n',
 	required=False)
 
+arg_parser.add_argument(
+	'--autosel', type=str, nargs='?',
+	help='Automatically select word under cursor and suggest. See --help-autosel for details. Ignored if --noselect. \n \n',
+	choices=['beginning', 'middle', 'end'], const='end', required=False)
+
+arg_parser.add_argument(
+	'--help-autosel', action='store_true',
+	help='See help and documentation on the --autosel option.',
+	required=False)
+
 args = arg_parser.parse_args()
+
+if args.help_autosel:
+
+	print('''This is the help and documentation for the --autosel option.
+
+Automatically select word under cursor for you before suggestion, saving time and keystrokes. Ignored if --noselect.
+
+--autosel has three modes:
+
+- 'beginning': Assumes text-cursor is at beginning of word.
+- 'middle'   : Assumes text-cursor is somewhere in the middle of word.
+- 'end'      : Assumes text-cursor is at end of word. Default.
+
+The three choices help choose the keyboard shortcut to be pressed. It would be good to auto-detect the option
+according to the text-cursor's position, but X11 does not provide this.
+
+NOTE: The normal "you select text and textsuggests suggests on that" will not work with this enabled.''')
+
+	sys.exit(0)
+
+def restart_program(additional_args=[], remove_args=[]):
+
+	# Restart, preserving all original arguments and optionally adding more
+
+	new_cmd = ''
+
+	for i in sys.argv:
+
+		new_cmd += ' ' + i
+
+	if not remove_args == []:
+
+		for arg in remove_args:
+
+			if arg in new_cmd:
+
+				new_cmd = new_cmd.replace(arg, '')
+
+	if not additional_args == []:
+
+		for arg in additional_args:
+
+			new_cmd += ' ' + arg
+
+	with open('/tmp/restart.sh', 'w') as f:
+
+		f.write('python3 %s &' % new_cmd)
+
+	sp.Popen(['sh /tmp/restart.sh'], shell=True)
+
+	time.sleep(1.5)  # Allow restart.sh to fully execute
+
+	sys.exit(0)
 
 if args.noselect:
 
@@ -78,7 +142,29 @@ else:
 
 	else:
 
+		if args.autosel:
+
+			if args.autosel == 'beginning':
+
+				# Ctrl + Shift + ->
+				sp.Popen(['xdotool keydown Ctrl keydown Shift key Right keyup Shift keyup Ctrl > /dev/null'], shell=True)
+
+			elif args.autosel == 'middle':
+
+				# Ctrl + <- then Ctrl + Shift + ->
+				sp.Popen(['sleep 0.5; xdotool key Ctrl+Left; xdotool key Ctrl+Shift+Right > /dev/null'], shell=True)
+
+			else:
+
+				# Ctrl + Shift + <-
+				sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'], shell=True)
+
+			time.sleep(1.5)  # Otherwise restart_program() restarts before selection is complete
+
+			restart_program(remove_args=['--autosel'])
+
 		current_word = sp.check_output(['xclip', '-o', '-sel'])
+
 		current_word = current_word.decode('utf-8').strip()
 
 		suggest_method = 'replace'
@@ -135,11 +221,7 @@ def type_command_output(command):
 
 		command_out_newl_list = command_out.split('\n')
 
-		print(command_out_newl_list)
-
 		for i in command_out_newl_list:
-
-			print(i)
 
 			sp.Popen(['xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip('\'').strip('"')], shell=True)
 
@@ -149,17 +231,29 @@ def type_command_output(command):
 
 		sp.Popen(['xdotool type \'%s\'' % command_out], shell=True)
 
-def get_suggestions(string):
+def get_suggestions(suggestion_string):
 
 	suggestions = []
 
 	if language == 'English':
 
-		string = string.lower()
-
-		alphabet = str(current_word[:1]).upper()
+		suggestion_string = suggestion_string.lower()
 
 		dict_dir = get_dict_dir()
+
+		# Check for special characters
+
+		suggestion_string_list_to_mod = list(suggestion_string)
+
+		for i in list(suggestion_string):
+
+			if i in string.punctuation:
+
+				suggestion_string_list_to_mod.remove(i)
+
+		suggestion_string = ''.join(suggestion_string_list_to_mod)
+
+		alphabet = suggestion_string[:1].upper()
 
 		dict_file = os.path.join(dict_dir, '%s.txt' % alphabet)
 
@@ -197,11 +291,11 @@ def get_suggestions(string):
 
 				for word in f:
 
-					if word.startswith(string):
+					if word.startswith(suggestion_string):
 
 						suggestions.append(word)
 
-					elif string in word:
+					elif suggestion_string in word:
 
 						suggestions.append(word)
 
@@ -231,7 +325,7 @@ def get_suggestions(string):
 
 				suggestions.append(word)
 
-			elif string in word:
+			elif suggestion_string in word:
 
 				suggestions.append(word)
 
@@ -269,7 +363,7 @@ def get_suggestions(string):
 
 					for word in f:
 
-						if string in word:
+						if suggestion_string in word:
 
 							suggestions.append(word)
 
@@ -285,7 +379,7 @@ def get_suggestions(string):
 
 								if word.startswith(alphabet) or word.startswith(alphabet.lower):
 
-									if string in word:
+									if suggestion_string in word:
 
 										suggestions.append(word)
 
@@ -308,7 +402,7 @@ def get_suggestions(string):
 
 						suggestions.append(hist_word)
 
-					elif string in hist_word:
+					elif suggestion_string in hist_word:
 
 						suggestions.append(hist_word)
 
@@ -324,7 +418,7 @@ def get_suggestions(string):
 
 					suggestions.append(word)
 
-				elif string in word:
+				elif suggestion_string in word:
 
 					suggestions.append(word)
 
@@ -381,17 +475,7 @@ def display_dialog_list(item_list):
 
 		if suggest_method == 'replace':
 
-			# Restart in --noselect mode, preserving all original arguments
-
-			new_textsuggest_cmd = ''
-
-			for i in sys.argv:
-
-				new_textsuggest_cmd += ' ' + i
-
-			sp.Popen(['python3 %s --noselect' % new_textsuggest_cmd], shell=True)
-
-			sys.exit(0)
+			restart_program(additional_args=['--noselect'])
 
 		else:
 
@@ -405,24 +489,17 @@ def display_dialog_list(item_list):
 
 	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
 
-	if suggest_method == 'insert':
+	# The argument list will sometimes be too long (too many words)
+	# subprocess can't handle it, and will raise OSError.
+	# So we will write it to a script file.
 
-		# The argument list will be too long since it includes ALL dictionary
-		# words.
-		# subprocess can't handle it, and will raise OSError.
-		# So we will write it to a script file.
+	full_dict_script_path = os.path.expanduser('/tmp/textsuggest_full.sh')
 
-		full_dict_script_path = os.path.expanduser('/tmp/textsuggest_full.sh')
+	with open(full_dict_script_path, 'w') as f:
 
-		with open(full_dict_script_path, 'w') as f:
+		f.write(popup_menu_cmd_str)
 
-			f.write(popup_menu_cmd_str)
-
-		choice = sp.check_output(['sh %s' % full_dict_script_path], shell=True)
-
-		return choice
-
-	choice = sp.check_output([popup_menu_cmd_str], shell=True)
+	choice = sp.check_output(['sh %s' % full_dict_script_path], shell=True)
 
 	return choice
 

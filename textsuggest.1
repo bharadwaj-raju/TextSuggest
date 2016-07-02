@@ -1,7 +1,7 @@
 .\" Generated with Ronnjs 0.3.8
 .\" http://github.com/kapouer/ronnjs/
 .
-.TH "TEXTSUGGEST" "1" "June 2016" "" ""
+.TH "TEXTSUGGEST" "1" "July 2016" "" ""
 .
 .SH "NAME"
 \fBtextsuggest\fR \-\- X11 utility to autocomplete words in the GUI
@@ -44,6 +44,33 @@ Thus, assign two keyboard shortcuts:
    Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-noselect\fR\|\.
 .
 .P
+  \fB\-\-autosel *[beginning|middle|end]*\fR
+.
+.P
+  Automatically select words for you before suggestion, saving time and (your) keystrokes\. Ignored if \fB\-\-noselect\fR\|\.
+.
+.P
+  \fB\-\-autosel\fR has three modes:
+.
+.IP "\(bu" 4
+\'beginning\': Assumes text\-cursor is at beginning of word\.
+.
+.IP "\(bu" 4
+\'middle\'   : Assumes text\-cursor is somewhere in the middle of word\.
+.
+.IP "\(bu" 4
+\'end\'      : Assumes text\-cursor is at end of word\. Default\.
+.
+.IP
+The three choices help choose the keyboard shortcut to be pressed\. It would be good to auto\-detect the option
+according to the text\-cursor\'s position, but X11 does not provide this\.
+.
+.IP "" 0
+.
+.P
+\fBNOTE:\fR The normal "you select text and textsuggests suggests on that" will \fBnot\fR work with this enabled\.
+.
+.P
    \fB\-\-plainrofi\fR
    Do not apply custom Rofi theme\.
 .
@@ -58,6 +85,20 @@ Thus, assign two keyboard shortcuts:
 .P
    \fB\-\-language\fR \fIlanguage\fR
    Instead of auto\-detecting language based on keyboard layout, use \fIlanguage\fR specified\.
+.
+.SH "OTHER LANGUAGES"
+  By default, English and Bangla dictionaries are provided\. To add support for other languages, follow these steps:
+.
+.IP "\(bu" 4
+Get a suitable dictionary/wordlist for your language\. Search for \'<your language> wordlist\' online\.
+.
+.IP "\(bu" 4
+After downloading said dictionary (which should be in this format: a \fB<your language>\fR directory, with one or more text files with words in them), move it into \fB/usr/share/textsuggest\fR directory\.
+.
+.IP
+You\'re done\. The language should be auto\-detected, otherwise set langauge with \fB\-\-language\fR\|\. A suitable font should also be auto\-detected, otherwise set font with \fB\-\-font\fR\|\.
+.
+.IP "" 0
 .
 .SH "BUGS AND FEATURE REQUESTS"
   Please file bug reports and feature requests at the GitHub repository: https://github\.com/bharadwaj\-raju/TextSuggest
