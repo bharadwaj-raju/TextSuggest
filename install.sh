@@ -4,7 +4,12 @@ set -e
 
 # Script to install TextSuggest
 # Assumes all dependencies are installed
-# Should be run with sudo
+
+# Check if running as root user
+if [ `id -u` -ne 0 ]; then
+    echo "You have to run this script as root. Please enter your password."
+    sudo $0
+fi
 
 echo "Copying dictionaries"
 mkdir -p /usr/share/textsuggest/
