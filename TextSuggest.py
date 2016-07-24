@@ -120,7 +120,7 @@ def restart_program(additional_args=[], remove_args=[]):
 
 	with open('/tmp/restart.sh', 'w') as f:
 
-		f.write('python3 %s &' % new_cmd)
+		f.write('%s %s &' % (sys.executable, new_cmd))
 
 	sp.Popen(['sh /tmp/restart.sh'], shell=True)
 
@@ -496,10 +496,12 @@ def display_dialog_list(item_list):
 	full_dict_script_path = os.path.expanduser('/tmp/textsuggest_full.sh')
 
 	with open(full_dict_script_path, 'w') as f:
-
 		f.write(popup_menu_cmd_str)
 
-	choice = sp.check_output(['sh %s' % full_dict_script_path], shell=True)
+	try:
+		choice = sp.check_output(['sh %s' % full_dict_script_path], shell=True)
+	except sp.CalledProcessError:
+		sys.exit(2)
 
 	return choice
 
@@ -510,7 +512,7 @@ def apply_suggestion(suggestion):
 		# User doesn't want any suggestion
 		# exit
 
-		sys.exit(0)
+		sys.exit(2)
 
 	else:
 
