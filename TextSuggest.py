@@ -27,6 +27,18 @@ from fonts import get_font_name
 import argparse
 import string
 
+script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
+
+config_dir = os.path.expanduser('~/.config/textsuggest')
+
+base_dict_dir = os.path.expanduser('~/.config/textsuggest/dictionaries')
+
+hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
+
+extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+
+custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
+
 # Arguments
 
 arg_parser = argparse.ArgumentParser(
@@ -76,7 +88,6 @@ arg_parser.add_argument(
 args = arg_parser.parse_args()
 
 if args.help_autosel:
-
 	print('''This is the help and documentation for the --autosel option.
 
 Automatically select word under cursor for you before suggestion, saving time and keystrokes. Ignored if --noselect.
@@ -94,14 +105,13 @@ NOTE: The normal "you select text and textsuggests suggests on that" will not wo
 
 	sys.exit(0)
 
-def restart_program(additional_args=[], remove_args=[]):
 
+def restart_program(additional_args=[], remove_args=[]):
 	# Restart, preserving all original arguments and optionally adding more
 
 	new_cmd = ''
 
 	for i in sys.argv:
-
 		new_cmd += ' ' + i
 
 	if not remove_args == []:
@@ -109,13 +119,11 @@ def restart_program(additional_args=[], remove_args=[]):
 		for arg in remove_args:
 
 			if arg in new_cmd:
-
 				new_cmd = new_cmd.replace(arg, '')
 
 	if not additional_args == []:
 
 		for arg in additional_args:
-
 			new_cmd += ' ' + arg
 
 	with open('/tmp/restart.sh', 'w') as f:
@@ -147,19 +155,25 @@ else:
 			if args.autosel == 'beginning':
 
 				# Ctrl + Shift + ->
-				sp.Popen(['xdotool keydown Ctrl keydown Shift key Right keyup Shift keyup Ctrl > /dev/null'], shell=True)
+				sp.Popen([
+					'xdotool keydown Ctrl keydown Shift key Right keyup Shift keyup Ctrl > /dev/null'],
+					shell=True)
 
 			elif args.autosel == 'middle':
 
 				# Ctrl + <- then Ctrl + Shift + ->
-				sp.Popen(['sleep 0.5; xdotool key Ctrl+Left; xdotool key Ctrl+Shift+Right > /dev/null'], shell=True)
+				sp.Popen([
+					'sleep 0.5; xdotool key Ctrl+Left; xdotool key Ctrl+Shift+Right > /dev/null'],
+					shell=True)
 
 			else:
 
 				# Ctrl + Shift + <-
-				sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'], shell=True)
+				sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'],
+						 shell=True)
 
-			time.sleep(1.5)  # Otherwise restart_program() restarts before selection is complete
+			time.sleep(
+				1.5)  # Otherwise restart_program() restarts before selection is complete
 
 			restart_program(remove_args=['--autosel'])
 
@@ -169,22 +183,11 @@ else:
 
 		suggest_method = 'replace'
 
-config_dir = os.path.expanduser('~/.config/textsuggest')
-
-base_dict_dir = os.path.expanduser('/usr/share/textsuggest/dictionaries')
-
-hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
-
-extra_words_file = os.path.expanduser('/usr/share/textsuggest/Extra_Words.txt')
-
-custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
-
 if not os.path.isdir(config_dir):
 
 	os.mkdir(config_dir)
 
 # Moving ~/.Custom_Words.txt to config_dir
-
 prev_custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
 
 if os.path.isfile(prev_custom_words_file):
@@ -212,8 +215,8 @@ def get_dict_dir():
 
 	return os.path.join(base_dict_dir, language)
 
-def type_command_output(command):
 
+def type_command_output(command):
 	command_out = sp.check_output([command], shell=True)
 	command_out = command_out.decode('utf-8').rstrip()
 
@@ -222,14 +225,16 @@ def type_command_output(command):
 		command_out_newl_list = command_out.split('\n')
 
 		for i in command_out_newl_list:
-
-			sp.Popen(['xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip('\'').strip('"')], shell=True)
+			sp.Popen([
+				'xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip(
+					'\'').strip('"')], shell=True)
 
 			time.sleep(0.5)
 
 	else:
 
 		sp.Popen(['xdotool type \'%s\'' % command_out], shell=True)
+
 
 def get_suggestions(suggestion_string):
 
@@ -248,7 +253,6 @@ def get_suggestions(suggestion_string):
 		for i in list(suggestion_string):
 
 			if i in string.punctuation:
-
 				suggestion_string_list_to_mod.remove(i)
 
 		suggestion_string = ''.join(suggestion_string_list_to_mod)
