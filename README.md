@@ -5,6 +5,7 @@ X11 utility to autocomplete words in the GUI.
 [![TextSuggest in action](http://i.imgur.com/qa2PExH.gif)](http://i.imgur.com/qa2PExH.gif)
 
 Uses [Rofi](https://davedavenport.github.io/rofi/) for a simple popup menu.
+Uses a few libraries (in `libscreenkey/`) from [Screenkey](https://github.com/wavexx/Screenkey).
 
 Uses the [English Open Word List](http://dreamsteep.com/projects/the-english-open-word-list.html) for a basic English dictionary, plus a Bangla dictionary ported from [ibus-avro](https:github.com/sarim/ibus-avro). For other languages, see the [Other languages](#other-languages) section.
 
@@ -33,7 +34,7 @@ Now, see [Post-install](#post-install)
 Make sure you have all the requirements:
 
  - `xdotool`
- - `xclip`
+ - `xsel`
  - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
 
 Run the included install script with `sudo sh install.sh`.
@@ -45,7 +46,7 @@ Now, see [Post-install](#post-install)
 Assign keyboard shortcuts to
 
 - `textsuggest`
-- `textsuggest --noselect`
+- `textsuggest --no-selection`
 
 The first one gives you suggestions on the currently highlighted word.
 The second one simply gives you a list of all word, you can search through them.
@@ -53,7 +54,7 @@ The second one simply gives you a list of all word, you can search through them.
 The two commands offer the most basic of TextSuggest features. For more, see [options](#options)
 
 The script stores frequently used words in a history file (`~/.config/textsuggest/history.txt`). Suggestions more often used
-are at the top of list. History can be disabled: use the `--nohistory` option.
+are at the top of list. History can be disabled: use the `--no-history` option.
 
 **TIP:** You can search for words by their parts by
 typing `part1 part2 ... partN` at the `Type to search >` prompt.
@@ -66,15 +67,15 @@ Documented in the manual page: `man textsuggest`.
 
 Specify font to use in menu. Format: `FontName (Weight (optional) FontSize)`. Example: `--font Monaco Bold 10` or `--font Monaco 10`
 
-- `--plainrofi`
+- `--no-rofi-customization`
 
 Read Rofi settings from `~/.Xresources` (see Rofi documentation) or default.
 
 - `--word "Word"`
 
-Give suggestions for "Word" specified. Ignored if `--noselect`.
+Give suggestions for "Word" specified. Ignored if `--no-selection`.
 
-- `--nohistory`
+- `--no-history`
 
 Disable the history of frequently-used words (stored in `~/.config/textsuggest/history.txt`)
 
@@ -82,11 +83,11 @@ Disable the history of frequently-used words (stored in `~/.config/textsuggest/h
 
 Manually set language, in case script fails to auto-detect from keyboard layout.
 
-- `--autosel [beginning | middle | end]`
+- `--auto-selection [beginning | middle | end]`
 
-Automatically select word under cursor for you before suggestion, saving time and keystrokes. Ignored if `--noselect`.
+Automatically select word under cursor for you before suggestion, saving time and keystrokes. Ignored if `--no-selection`.
 
-`--autosel` has three modes:
+`--auto-selection` has three modes:
 
 - 'beginning': Assumes text-cursor is at beginning of word.
 - 'middle'   : Assumes text-cursor is somewhere in the middle of word.

@@ -1,3 +1,14 @@
+# coding: utf-8
+
+# Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
+# Contributor: Maksudur Rahman Maateen <ugcoderbd@gmail.com>
+
+# This file is part of TextSuggest.
+
+# TextSuggest is free software.
+# Licensed under the GNU General Public License 3
+# See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
+
 def get_font_name(language):
 
 	# This function will return the font name depending on the language
@@ -19,7 +30,8 @@ def get_font_name(language):
 				'Urdu'	  	: 'Lateef 10',
 			}
 
-	# NOTE: Why so many 'Monospace 10's? Because it supports all the unicode characters needed for them.
+	# NOTE: Why so many 'Monospace 10's?
+	# Because it supports all the unicode characters needed for them.
 
 	if language in fonts:
 

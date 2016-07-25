@@ -7,7 +7,7 @@
 \fBtextsuggest\fR \-\- X11 utility to autocomplete words in the GUI
 .
 .SH "SYNOPSIS"
-  \fBtextsuggest\fR [\fB\-\-help\fR] [\fB\-\-word\fR \fIword\fR] [\fB\-\-plainrofi\fR] [\fB\-\-font\fR \fIfont\fR] [\fB\-\-nohistory\fR] [\fB\-\-language\fR \fIfont\fR] [\fB\-\-noselect\fR]
+  \fBtextsuggest\fR [\fB\-\-help\fR] [\fB\-\-word\fR \fIword\fR] [\fB\-\-no-rofi-customization\fR] [\fB\-\-font\fR \fIfont\fR] [\fB\-\-no-history\fR] [\fB\-\-language\fR \fIfont\fR] [\fB\-\-no-selection\fR]
 .
 .SH "DESCRIPTION"
   https://github\.com/bharadwaj\-raju/TextSuggest
@@ -22,7 +22,7 @@
 \'replace\' mode: Suggests word completions based on current X11 selection contents\. Default\.
 .
 .IP "\(bu" 4
-\'insert\' mode : Gives a list of all known words, allowing you to search them and choose one\. Activated with \fB\-\-noselect\fR option\.
+\'insert\' mode : Gives a list of all known words, allowing you to search them and choose one\. Activated with \fB\-\-no-selection\fR option\.
 .
 .IP
 Thus, assign two keyboard shortcuts:
@@ -31,7 +31,7 @@ Thus, assign two keyboard shortcuts:
 \fBtextsuggest\fR for replace mode
 .
 .IP "\(bu" 4
-\fBtextsuggest \-\-noselect\fR for insert mode
+\fBtextsuggest \-\-no-selection\fR for insert mode
 .
 .IP "" 0
 .
@@ -41,16 +41,16 @@ Thus, assign two keyboard shortcuts:
 .
 .P
    \fB\-\-word\fR \fIword\fR
-   Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-noselect\fR\|\.
+   Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-no-selection\fR\|\.
 .
 .P
-  \fB\-\-autosel *[beginning|middle|end]*\fR
+  \fB\-\-auto-selection *[beginning|middle|end]*\fR
 .
 .P
-  Automatically select words for you before suggestion, saving time and (your) keystrokes\. Ignored if \fB\-\-noselect\fR\|\.
+  Automatically select words for you before suggestion, saving time and (your) keystrokes\. Ignored if \fB\-\-no-selection\fR\|\.
 .
 .P
-  \fB\-\-autosel\fR has three modes:
+  \fB\-\-auto-selection\fR has three modes:
 .
 .IP "\(bu" 4
 \'beginning\': Assumes text\-cursor is at beginning of word\.
@@ -71,7 +71,7 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
 \fBNOTE:\fR The normal "you select text and textsuggests suggests on that" will \fBnot\fR work with this enabled\.
 .
 .P
-   \fB\-\-plainrofi\fR
+   \fB\-\-no-rofi-customization\fR
    Do not apply custom Rofi theme\.
 .
 .P
@@ -79,7 +79,7 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
    Instead of selecting font based on language (default: Monospace 10), use \fIfont\fR specified\. \fIfont\fR must be in Pango format: \fBFontName (Weight) Size\fR
 .
 .P
-   \fB\-\-nohistory\fR
+   \fB\-\-no-history\fR
    Disable frequently\-used words history (stored in \fB~/\.config/textsuggest/history\.txt\fR)
 .
 .P

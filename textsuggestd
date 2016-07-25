@@ -13,9 +13,51 @@ import gi
 from gi.repository import GLib as glib
 from libscreenkey import inputlistener
 
+arg_parser = argparse.ArgumentParser(
+	description='''textsuggestd - Background daemon for TextSuggest''',
+	formatter_class=argparse.RawTextHelpFormatter,
+	epilog='More information in the manual page: textsuggestd(1)')
+
+arg_parser.add_argument(
+	'--exclude-apps', type=str,
+	help='Specify apps excluded from suggestions. \n \n',
+	nargs='+', required=False)
+
+arg_parser.add_argument(
+	'--include-apps', action='store_true',
+	help='Override specified app in default list of excluded apps. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--textsuggest-executable', type=str,
+	help='Specify path to TextSuggest executable. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--no-rofi-customization', action='store_true',
+	help='Do not apply custom Rofi theme. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--font', type=str,
+	help='Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). \n \n',
+	nargs='+', required=False)
+
+arg_parser.add_argument(
+	'--no-history', action='store_true',
+	help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--language', type=str,
+	help='Manually set language, in case script fails to auto-detect from keyboard layout. \n \n',
+	required=False)
+
+args = arg_parser.parse_args()
+
 print('[INFO] (%s): Started textsuggestd.' % time.strftime('%X'))
 
-def textsuggest_should_start(additional_exclude=None, not_exlude=None):
+def textsuggest_should_start(additional_exclude=None, include=None):
 
 	# Check if it is appropriate to run TextSuggest
 
@@ -23,21 +65,39 @@ def textsuggest_should_start(additional_exclude=None, not_exlude=None):
 	# - Is current app a code editor/IDE?
 	# - Is current app a terminal?
 	# - Is current app a password entry?
+	# - Is current app in additional_exclude?
 
 	# TODO: Add more checks
 
-	active_window = sp.check_output(['xdotool getwindowfocus getwindowname'], shell=True)
+	if include is None:
+		include = []
+
+	if additional_exclude is None:
+		additional_exclude = []
+
+	active_window = sp.check_output(['xdotool getwindowfocus getwindowname'],
+	 								shell=True)
 	active_window = active_window.decode('utf-8').rstrip().lower()
 
-	exclude_apps_list = ['guake', 'term', 'auth', 'password', 'gksu', 'atom', 'sublime', 'vim', 'sh', 'emacs', 'ide', 'komodo', 'jet', 'eclipse', 'beans', 'pycharm', 'webstorm', 'phpstorm']
+	excluded_apps = ['guake', 'term', 'auth', 'password', 'gksu', 'atom',
+					 'sublime', 'vim', 'sh', 'emacs', 'ide', 'komodo', 'jet',
+					 'eclipse', 'beans', 'pycharm', 'webstorm', 'phpstorm']
 
-	for app in exclude_apps_list:
+	for app in additional_exclude:
+		if app not in excluded_apps:
+			excluded_apps.append(app)
+
+	for app in include:
+		if app in excluded_apps:
+			excluded_apps.remove(app)
+
+	for app in excluded_apps:
 		if app in active_window:
 			return False
 
 	return True
 
-def start_textsuggest(textsuggest_args=None, textsuggest_exec=None):
+def start_textsuggest():
 
 	if textsuggest_exec is None:
 		if os.path.isfile(os.path.join(os.getcwd(), 'TextSuggest.py')):
@@ -52,14 +112,37 @@ def start_textsuggest(textsuggest_args=None, textsuggest_exec=None):
 			print('[ERROR] (%s): Specified TextSuggest executable does not exist. Exiting...' % time.strftime('%X'))
 			sys.exit(1)
 
-	if textsuggest_args is None:
-		textsuggest_args = ''
+	textsuggest_args = []
 
-	textsuggest_proc = sp.Popen(['python3 ' + textsuggest_exec + ' ' + textsuggest_args], shell=True, stdout=sp.PIPE)
+	if args.no_rofi_customization:
+		textsuggest_args.append('--no-rofi-customization')
 
-	textsuggest_proc.communicate()
+	if args.language is not None:
+		textsuggest_args.append(
+			'--no-rofi-customization ' + ' '.join(args.language))
 
-	return textsuggest_proc.returncode
+	if args.no_history:
+		textsuggest_args.append('--no-history')
+
+	if args.font is not None:
+		textsuggest_args.append(
+			'--font ' + ' '.join(args.font))
+
+	textsuggest_exec = 'python3 ' + textsuggest_exec
+
+	textsuggest_exec += ' ' + ' '.join(textsuggest_args)
+
+	textsuggest_proc = sp.Popen([textsuggest_exec],
+	 							shell=True, stdout=sp.PIPE)
+
+	textsuggest_out, textsuggest_err = textsuggest_proc.communicate()
+
+	if textsuggest_proc.returncode == 2 or textsuggest_out == '':
+		return 'ERR_REJECTED'
+	elif textsuggest_proc.returncode == 1:
+		return 'ERR_NOWORDS'
+	else:
+		return 'OK'
 
 # Start inputlistener
 
@@ -71,11 +154,13 @@ def callback(data):
 		if k[0] == '_': continue
 		values[k] = getattr(data, k)
 
-	if values['string'] is not None or values['string'] in ['\t', ' ', '  ', '\n', '\r', '\r\n', '']:
+	excluded_strs = ['\t', ' ', '  ', '\n', '\r', '\r\n', '']
+
+	if values['string'] is not None or values['string'] not in excluded_strs:
 		if textsuggest_should_start():
-			if not start_textsuggest() == 0:
+			if start_textsuggest() in ['ERR_NOWORDS', 'ERR_REJECTED']:
 				print('[INFO] (%s): TextSuggest was cancelled by user or found no words. Waiting until next word...' % time.strftime('%X'))
-				time.sleep(6)
+				#time.sleep(6)
 				# FIXME: Implement *actual* detection of end-of-word
 
 

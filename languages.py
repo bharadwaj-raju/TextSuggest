@@ -1,3 +1,14 @@
+# coding: utf-8
+
+# Copyright © 2016 Bharadwaj Raju <bharadwaj.raju777@gmail.com>
+# Contributor: Maksudur Rahman Maateen <ugcoderbd@gmail.com>
+
+# This file is part of TextSuggest.
+
+# TextSuggest is free software.
+# Licensed under the GNU General Public License 3
+# See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
+
 import os
 
 def get_language_name():
