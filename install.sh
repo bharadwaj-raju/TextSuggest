@@ -12,7 +12,6 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 echo "Verifying dependencies..."
-echo "-------------------------"
 if hash rofi 2>/dev/null; then
 	echo "Rofi\tOK"
 else
@@ -38,23 +37,13 @@ echo "\nAll dependencies OK!"
 
 echo "\n"
 echo "Installing..."
-echo "--------------"
 
-echo "Copying dictionaries..."
-mkdir -p /usr/share/textsuggest/
-cp -R textsuggest/* /usr/share/textsuggest/
-
-echo "Copying configuration files..."
-mkdir -p ~/.config/textsuggest
-
-echo "Installing libraries..."
-cp languages.py /usr/lib/python3.5/languages.py
-cp fonts.py /usr/lib/python3.5/fonts.py
-cp suggestions.py /usr/lib/python3.5/suggestions.py
-
-echo "Installing textsuggest script to /usr/bin/textsuggest..."
-cp TextSuggest.py /usr/bin/textsuggest
-chmod a+x /usr/bin/textsuggest
-
-echo "Installing manual page..."
-cp docs/textsuggest.1 /usr/local/man/textsuggest.1
+install -d /usr/share/
+cp -rf textsuggest/ /usr/share/
+install -D -m755 TextSuggest.py /usr/bin/textsuggest
+install -D -m644 languages.py -t /usr/lib/python3.5/site-packages/
+install -D -m644 fonts.py -t /usr/lib/python3.5/site-packages/
+install -D -m644 suggestions.py /usr/lib/python3.5/site-packages/
+install -D -m644 docs/textsuggest.1 -t /usr/share/man/man1/
+install -D -m644 README.md /usr/share/doc/textsuggest/README
+install -D -m644 LICENSE /usr/share/licenses/textsuggest/COPYING

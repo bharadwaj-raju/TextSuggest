@@ -23,14 +23,17 @@ def get_suggestions(word, dict_files):
 	word = word.lower()
 
 	for dictionary in dict_files:
-		with open(dictionary) as f:
-			for dict_word in f:
-				if word == '':
-					suggestions.append(dict_word)
-				else:
-					if word in dict_word:
-						suggestions.append(dict_word.rstrip('\r\n'))
-					elif dict_word.startswith(word):
-						suggestions.append(dict_word.rstrip('\r\n'))
+		try:
+			with open(dictionary) as f:
+				for dict_word in f:
+					if word == '':
+						suggestions.append(dict_word)
+					else:
+						if word in dict_word:
+							suggestions.append(dict_word.rstrip('\r\n'))
+						elif dict_word.startswith(word):
+							suggestions.append(dict_word.rstrip('\r\n'))
+		except FileNotFoundError:
+			pass
 
 	return suggestions
