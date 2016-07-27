@@ -214,8 +214,10 @@ def get_dictionaries():
 		for file in os.listdir(os.path.join(base_dict_dir, lang)):
 			dictionaries.append(os.path.join(base_dict_dir, lang, file))
 
-	dictionaries.append(custom_words_file)
-	dictionaries.append(extra_words_file)
+	if os.path.isfile(custom_words_file):
+		dictionaries.append(custom_words_file)
+	if os.path.isfile(extra_words_file):
+		dictionaries.append(extra_words_file)
 
 	return dictionaries
 
@@ -360,11 +362,14 @@ def main():
 	# duplicated in the suggestions list.
 	# Then we sort the suggestions list by frequency of elements.
 	# Thus the word frequently-used is more towards the top of suggestions
-
-	with open(hist_file) as f:
-		for hist_word in f:
-			if hist_word.rstrip('\r\n') in words_list:
-				words_list.append(hist_word.rstrip('\r\n'))
+	if not args.no_history:
+		try:
+			with open(hist_file) as f:
+				for hist_word in f:
+					if hist_word.rstrip('\r\n') in words_list:
+						words_list.append(hist_word.rstrip('\r\n'))
+		except FileNotFoundError:
+			pass
 
 	words_list = sorted(words_list, key=Counter(words_list).get, reverse=True)
 
