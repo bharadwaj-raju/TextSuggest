@@ -40,11 +40,11 @@ script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 
 config_dir = os.path.expanduser('~/.config/textsuggest')
 
-base_dict_dir = os.path.expanduser('/usr/share/textsuggest/dictionaries')
+base_dict_dir = '/usr/share/textsuggest/dictionaries'
 
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 
-extra_words_file = os.path.expanduser('/usr/share/textsuggest/Extra_Words.txt')
+extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
@@ -368,7 +368,9 @@ def main():
 
 	words_list = sorted(words_list, key=Counter(words_list).get, reverse=True)
 
-	apply_suggestion(display_dialog_list('|'.join(get_suggestions(current_word, get_dictionaries()))))
+	words_list = '|'.join(words_list)
+
+	apply_suggestion(display_dialog_list(words_list))
 
 if __name__ == '__main__':
 	main()
