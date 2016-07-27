@@ -44,7 +44,7 @@ base_dict_dir = os.path.expanduser('/usr/share/textsuggest/dictionaries')
 
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 
-extra_words_file = os.path.expanduser('~/.config/textsuggest/Extra_Words.txt')
+extra_words_file = os.path.expanduser('/usr/share/textsuggest/Extra_Words.txt')
 
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
