@@ -19,7 +19,7 @@ else
 	exit 1
 fi
 
-if hash xclip 2>/dev/null; then
+if hash xsel 2>/dev/null; then
 	echo "xsel\tOK..."
 else
 	echo "xsel not installed!"

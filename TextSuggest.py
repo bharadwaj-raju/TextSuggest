@@ -366,8 +366,9 @@ def main():
 		try:
 			with open(hist_file) as f:
 				for hist_word in f:
-					if hist_word.rstrip('\r\n') in words_list:
-						words_list.append(hist_word.rstrip('\r\n'))
+					hist_word = hist_word.rstrip('\r\n')
+					if hist_word in words_list:
+						words_list.append(hist_word)
 		except FileNotFoundError:
 			pass
 
