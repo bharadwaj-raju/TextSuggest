@@ -352,6 +352,14 @@ def main():
 
 	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
 
+	# History loop appends to hist_list instead of words_list to prevent an
+	# infinite loop in:
+	# for hist_word in words_list:
+	# 	words_list.append(hist_word)
+	hist_list = []
+
+	# Afterwards we just place every hist_list element into words_list
+
 	# Apply history
 
 	# How the history application works:
@@ -368,9 +376,12 @@ def main():
 				for hist_word in f:
 					hist_word = hist_word.rstrip('\r\n')
 					if hist_word in words_list:
-						words_list.append(hist_word)
+						hist_list.append(hist_word)
 		except FileNotFoundError:
 			pass
+
+		for hist_word in hist_list:
+			words_list.append(hist_word)
 
 	words_list = sorted(words_list, key=Counter(words_list).get, reverse=True)
 
