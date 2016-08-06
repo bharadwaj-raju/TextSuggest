@@ -39,7 +39,6 @@ import argparse
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
 base_dict_dir = '/usr/share/textsuggest/dictionaries'
-hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
@@ -281,7 +280,13 @@ def display_dialog_list(item_list):
 	for i in item_list:
 		items_string += i
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -disable-history -fuzzy -sep "|" -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
+	if args.no_history:
+		history = '-disable-history'
+
+	else:
+		history = '-no-disable-history'
+
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -sep "|" -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, history, rofi_theme, font, x, y)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
@@ -318,11 +323,6 @@ def apply_suggestion(suggestion):
 			if current_word[:1].isupper():
 				suggestion = suggestion.capitalize()
 
-		if not args.no_history:
-			# Write to history
-			with open(hist_file, 'a') as f:
-				f.write(suggestion)
-
 		# Type suggestion
 		if '=' in suggestion:
 			expand_suggestion = suggestion.split('=')[1]
@@ -350,37 +350,6 @@ def apply_suggestion(suggestion):
 def main():
 
 	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
-
-	# History loop appends to hist_list instead of words_list to prevent an
-	# infinite loop in:
-	# for hist_word in words_list:
-	# 	words_list.append(hist_word)
-	hist_list = []
-
-	# Afterwards we just place every hist_list element into words_list
-
-	# Apply history
-
-	# How the history application works:
-	# History is stored as plaintext
-	# For each word in the history file,
-	# we'll add it if it's already in the suggestions list (yes, duplicates)
-	# The more times a word occurs in history, the more it will be
-	# duplicated in the suggestions list.
-	# Then we sort the suggestions list by frequency of elements.
-	# Thus the word frequently-used is more towards the top of suggestions
-	if not args.no_history:
-		try:
-			with open(hist_file) as f:
-				for hist_word in f:
-					if hist_word.rstrip('\r\n') in words_list:
-						hist_list.append(hist_word.rstrip('\r\n'))
-		except FileNotFoundError:
-			pass
-
-		words_list.extend(hist_list)
-
-	words_list = sorted(words_list, key=Counter(words_list).get, reverse=True)
 
 	words_list = '|'.join(words_list)
 
