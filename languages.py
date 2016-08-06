@@ -41,7 +41,7 @@ def get_language_name():
 
 	keyboard_layout_cmd_str = "setxkbmap -print | awk -F '(+|\\()' '/xkb_symbols/ {print $2}'"
 
-	keyboard_layout = sp.check_output(keyboard_layout_cmd_str).decode('utf-8').rstrip()
+	keyboard_layout = sp.check_output(keyboard_layout_cmd_str, shell=True).decode('utf-8').rstrip()
 
 	# Language will be detected by layout
 
