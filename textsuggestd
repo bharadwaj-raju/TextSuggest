@@ -24,9 +24,9 @@ arg_parser.add_argument(
 	nargs='+', required=False)
 
 arg_parser.add_argument(
-	'--include-apps', action='store_true',
+	'--include-apps', type=str,
 	help='Override specified app in default list of excluded apps. \n \n',
-	required=False)
+	nargs='+', required=False)
 
 arg_parser.add_argument(
 	'--textsuggest-executable', type=str,
@@ -55,7 +55,10 @@ arg_parser.add_argument(
 
 args = arg_parser.parse_args()
 
-print('[INFO] (%s): Started textsuggestd.' % time.strftime('%X'))
+def log(message, level):
+	print('[%s] (%s): %s' % (level, time.strftime('%X'), message))
+
+log('Started textsuggestd.', 'INFO')
 
 def textsuggest_should_start(additional_exclude=None, include=None):
 
@@ -105,11 +108,11 @@ def start_textsuggest():
 		elif os.path.isfile('/usr/bin/textsuggest'):
 			textsuggest_exec = '/usr/bin/textsuggest'
 		else:
-			print('[ERROR] (%s): No TextSuggest executable found. Specify with --textsuggest-executable. Exiting...' % time.strftime('%X'))
+			log('No TextSuggest executable found.', 'ERROR')
 			sys.exit(1)
 	else:
 		if not os.path.isfile(textsuggest_exec):
-			print('[ERROR] (%s): Specified TextSuggest executable does not exist. Exiting...' % time.strftime('%X'))
+			log('Specified TextSuggest executable does not exist.', 'ERROR')
 			sys.exit(1)
 
 	textsuggest_args = []
@@ -158,8 +161,14 @@ def callback(data):
 
 	if values['string'] is not None or values['string'] not in excluded_strs:
 		if textsuggest_should_start():
-			if start_textsuggest() in ['ERR_NOWORDS', 'ERR_REJECTED']:
-				print('[INFO] (%s): TextSuggest was cancelled by user or found no words. Waiting until next word...' % time.strftime('%X'))
+			textsuggest_retval = start_textsuggest()
+			if textsuggest_retval in ['ERR_NOWORDS', 'ERR_REJECTED']:
+				if textsuggest_retval == 'ERR_REJECTED':
+					log('TextSuggest was cancelled. Waiting until next word.',
+						'WARNING')
+				else:
+					log('Textsuggest found no words. Waiting until next word.',
+						'WARNING')
 				#time.sleep(6)
 				# FIXME: Implement *actual* detection of end-of-word
 

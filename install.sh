@@ -11,32 +11,45 @@ if [ $(id -u) -ne 0 ]; then
 	exit
 fi
 
+case "$1" in
+	"--uninstall")
+		echo "Uninstalling..."
+		rm -rf /usr/share/textsuggest
+		rm /usr/bin/textsuggest
+		rm /usr/lib/python3.5/site-packages/fonts.py
+		rm /usr/lib/python3.5/site-packages/suggestions.py
+		rm /usr/share/man/man1/textsuggest.1
+		rm -rf /usr/share/doc/textsuggest
+		rm -rf /usr/share/licenses/textsuggest
+		exit
+		;;
+	"--uninstall-full")
+		echo "Uninstalling..."
+		rm -rf /usr/share/textsuggest
+		rm /usr/bin/textsuggest
+		rm /usr/lib/python3.5/site-packages/fonts.py
+		rm /usr/lib/python3.5/site-packages/suggestions.py
+		rm /usr/share/man/man1/textsuggest.1
+		rm -rf /usr/share/doc/textsuggest
+		rm -rf /usr/share/licenses/textsuggest
+
+		echo "Removing configuration files..."
+		rm -rf ~/.config/textsuggest
+		exit
+		;;
+esac
+
 echo "Verifying dependencies..."
-if hash rofi 2>/dev/null; then
-	echo "Rofi\tOK"
-else
-	echo "Rofi not installed!"
-	exit 1
-fi
+deps=(rofi xsel xdotool)
 
-if hash xsel 2>/dev/null; then
-	echo "xsel\tOK..."
-else
-	echo "xsel not installed!"
-	exit 1
-fi
+for dep in "$deps"; do
+	if ! command -v "$dep" > /dev/null 2>&1; then
+		echo "$dep not installed!"
+		exit 1
+	fi
+done
 
-if hash xdotool 2>/dev/null; then
-	echo "xdotool\tOK..."
-else
-	echo "xdotool not installed!"
-	exit 1
-fi
-
-echo "\nAll dependencies OK!"
-
-echo "\n"
-echo "Installing..."
+echo -e "Installing..."
 
 install -d /usr/share/
 cp -rf textsuggest/ /usr/share/

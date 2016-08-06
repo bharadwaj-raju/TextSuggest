@@ -19,24 +19,24 @@ def get_language_name():
 	# TODO: Add more definitions
 
 	languages = {
-					'bd'	  : 'Bangla',
-					'us'	  : 'English',
-					'uk'	  : 'English',
-					'gb'	  : 'English',
-					'ara'	  : 'Arabic',
-					'cn'	  : 'Chinese',
-					'de'	  : 'German',
-					'jp'	  : 'Japanese',
-					'ru'	  : 'Russian',
-					'es'	  : 'Spanish',
-					'se'	  : 'Swedish',
-					'fi'	  : 'Finnish',
-					'kr'	  : 'Korean',
-					'pk'	  : 'Urdu',
-					'fr'	  : 'French',
-					'gr'	  : 'Greek',
-					'tw'	  : 'Chinese',
-					'ua'	  : 'Ukrainian'
+					'bd' : 'Bangla',
+					'us' : 'English',
+					'uk' : 'English',
+					'gb' : 'English',
+					'ara': 'Arabic',
+					'cn' : 'Chinese',
+					'tw' : 'Chinese',
+					'de' : 'German',
+					'jp' : 'Japanese',
+					'ru' : 'Russian',
+					'es' : 'Spanish',
+					'se' : 'Swedish',
+					'fi'  : 'Finnish',
+					'kr' : 'Korean',
+					'pk' : 'Urdu',
+					'fr' : 'French',
+					'gr' : 'Greek',
+					'ua' : 'Ukrainian'
 				}
 
 	keyboard_layout = os.popen(r"setxkbmap -print | awk -F '(+|\\()' '/xkb_symbols/ {print $2}'").read()

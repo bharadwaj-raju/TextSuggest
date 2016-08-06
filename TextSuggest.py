@@ -37,15 +37,10 @@ from suggestions import get_suggestions
 import argparse
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
-
 config_dir = os.path.expanduser('~/.config/textsuggest')
-
 base_dict_dir = '/usr/share/textsuggest/dictionaries'
-
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
-
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
-
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 
 # Arguments
@@ -53,7 +48,11 @@ custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 arg_parser = argparse.ArgumentParser(
 	description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
 	formatter_class=argparse.RawTextHelpFormatter,
-	epilog='More information in the manual page: textsuggest(1)')
+	epilog='''More information in the manual page: textsuggest(1). \n
+	Return codes:
+	0 : Success
+	1 : No words found
+	2 : Cancelled by user'''.replace('\t', ''))
 
 arg_parser.add_argument(
 	'--word', type=str,
@@ -282,7 +281,7 @@ def display_dialog_list(item_list):
 	for i in item_list:
 		items_string += i
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -sep "|" -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -disable-history -fuzzy -sep "|" -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, rofi_theme, font, x, y)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
@@ -302,7 +301,7 @@ def display_dialog_list(item_list):
 
 def apply_suggestion(suggestion):
 
-	if suggestion is None or suggestion == b'' or suggestion == []:
+	if not suggestion:
 		# User doesn't want any suggestion
 		# exit
 		sys.exit(2)
@@ -374,14 +373,12 @@ def main():
 		try:
 			with open(hist_file) as f:
 				for hist_word in f:
-					hist_word = hist_word.rstrip('\r\n')
-					if hist_word in words_list:
-						hist_list.append(hist_word)
+					if hist_word.rstrip('\r\n') in words_list:
+						hist_list.append(hist_word.rstrip('\r\n'))
 		except FileNotFoundError:
 			pass
 
-		for hist_word in hist_list:
-			words_list.append(hist_word)
+		words_list.extend(hist_list)
 
 	words_list = sorted(words_list, key=Counter(words_list).get, reverse=True)
 
