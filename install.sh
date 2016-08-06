@@ -60,3 +60,6 @@ install -D -m644 suggestions.py /usr/lib/python3.5/site-packages/
 install -D -m644 docs/textsuggest.1 -t /usr/share/man/man1/
 install -D -m644 README.md /usr/share/doc/textsuggest/README
 install -D -m644 LICENSE /usr/share/licenses/textsuggest/COPYING
+
+chmod -R a+r /usr/share/textsuggest
+chmod a+x /usr/bin/textsuggest

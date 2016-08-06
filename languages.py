@@ -9,7 +9,7 @@
 # Licensed under the GNU General Public License 3
 # See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
 
-import os
+import subprocess as sp
 
 def get_language_name():
 
@@ -39,14 +39,14 @@ def get_language_name():
 					'ua' : 'Ukrainian'
 				}
 
-	keyboard_layout = os.popen(r"setxkbmap -print | awk -F '(+|\\()' '/xkb_symbols/ {print $2}'").read()
+	keyboard_layout_cmd_str = "setxkbmap -print | awk -F '(+|\\()' '/xkb_symbols/ {print $2}'"
+
+	keyboard_layout = sp.check_output(keyboard_layout_cmd_str).decode('utf-8').rstrip()
 
 	# Language will be detected by layout
 
 	if keyboard_layout in languages:
-
 		return languages[keyboard_layout]
 
 	else:
-
 		return 'English'

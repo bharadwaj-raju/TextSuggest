@@ -1,13 +1,13 @@
 .\" Generated with Ronnjs 0.3.8
 .\" http://github.com/kapouer/ronnjs/
 .
-.TH "TEXTSUGGEST" "1" "July 2016" "" ""
+.TH "TEXTSUGGEST" "1" "August 2016" "" ""
 .
 .SH "NAME"
 \fBtextsuggest\fR \-\- X11 utility to autocomplete words in the GUI
 .
 .SH "SYNOPSIS"
-  \fBtextsuggest\fR [\fB\-\-help\fR] [\fB\-\-word\fR \fIword\fR] [\fB\-\-no-rofi-customization\fR] [\fB\-\-font\fR \fIfont\fR] [\fB\-\-no-history\fR] [\fB\-\-language\fR \fIfont\fR] [\fB\-\-no-selection\fR]
+  \fBtextsuggest\fR [\fB\-\-help\fR] [\fB\-\-word\fR \fIword\fR] [\fB\-\-no\-rofi\-customization\fR] [\fB\-\-font\fR \fIfont\fR] [\fB\-\-no\-history\fR] [\fB\-\-language\fR \fIfont\fR] [\fB\-\-no\-selection\fR]
 .
 .SH "DESCRIPTION"
   https://github\.com/bharadwaj\-raju/TextSuggest
@@ -22,7 +22,7 @@
 \'replace\' mode: Suggests word completions based on current X11 selection contents\. Default\.
 .
 .IP "\(bu" 4
-\'insert\' mode : Gives a list of all known words, allowing you to search them and choose one\. Activated with \fB\-\-no-selection\fR option\.
+\'insert\' mode : Gives a list of all known words, allowing you to search them and choose one\. Activated with \fB\-\-no\-selection\fR option\.
 .
 .IP
 Thus, assign two keyboard shortcuts:
@@ -31,26 +31,26 @@ Thus, assign two keyboard shortcuts:
 \fBtextsuggest\fR for replace mode
 .
 .IP "\(bu" 4
-\fBtextsuggest \-\-no-selection\fR for insert mode
+\fBtextsuggest \-\-no\-selection\fR for insert mode
 .
 .IP "" 0
 .
 .SH "OPTIONS"
   \fB\-\-help\fR, \fB\-h\fR
-   View a short summary of options
+   View a short summary of options\.
 .
 .P
    \fB\-\-word\fR \fIword\fR
-   Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-no-selection\fR\|\.
+   Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-no\-selection\fR\|\.
 .
 .P
-  \fB\-\-auto-selection *[beginning|middle|end]*\fR
+  \fB\-\-auto\-selection *[beginning|middle|end]*\fR
 .
 .P
-  Automatically select words for you before suggestion, saving time and (your) keystrokes\. Ignored if \fB\-\-no-selection\fR\|\.
+  Automatically select words for you before suggestion, saving time and (your) keystrokes\. Ignored if \fB\-\-no\-selection\fR\|\.
 .
 .P
-  \fB\-\-auto-selection\fR has three modes:
+  \fB\-\-auto\-selection\fR has three modes:
 .
 .IP "\(bu" 4
 \'beginning\': Assumes text\-cursor is at beginning of word\.
@@ -71,7 +71,7 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
 \fBNOTE:\fR The normal "you select text and textsuggests suggests on that" will \fBnot\fR work with this enabled\.
 .
 .P
-   \fB\-\-no-rofi-customization\fR
+   \fB\-\-no\-rofi\-customization\fR
    Do not apply custom Rofi theme\.
 .
 .P
@@ -79,7 +79,7 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
    Instead of selecting font based on language (default: Monospace 10), use \fIfont\fR specified\. \fIfont\fR must be in Pango format: \fBFontName (Weight) Size\fR
 .
 .P
-   \fB\-\-no-history\fR
+   \fB\-\-no\-history\fR
    Disable frequently\-used words history (stored in \fB~/\.config/textsuggest/history\.txt\fR)
 .
 .P
@@ -100,5 +100,49 @@ You\'re done\. The language should be auto\-detected, otherwise set langauge wit
 .
 .IP "" 0
 .
+.SH "RETURN CODES"
+.
+.IP "\(bu" 4
+0 : Success
+.
+.IP "\(bu" 4
+1 : No words found
+.
+.IP "\(bu" 4
+2 : Cancelled by user
+.
+.IP "" 0
+.
+.SH "AUTO\-SELECTION"
+  Automatically select word under cursor for you before suggestion, saving time and keystrokes\.
+.
+.P
+  \fB\-\-auto\-selection\fR has three modes:
+.
+.IP "\(bu" 4
+\'beginning\': Assumes text\-cursor is at beginning of word\.
+.
+.IP "\(bu" 4
+\'middle\'   : Assumes text\-cursor is somewhere in the middle of word\.
+.
+.IP "\(bu" 4
+\'end\'      : Assumes text\-cursor is at end of word\. Default\.
+.
+.IP
+The three choices help choose the keyboard shortcut to be pressed\. It would be good to auto\-detect the option
+according to the text\-cursor\'s position, but X11 does not provide this\.
+.
+.IP
+\fBNOTE:\fR The normal "you select text and textsuggests suggests on that" will \fBnot\fR work with this enabled\.
+.
+.IP "" 0
+.
 .SH "BUGS AND FEATURE REQUESTS"
   Please file bug reports and feature requests at the GitHub repository: https://github\.com/bharadwaj\-raju/TextSuggest
+.
+.SH "SEE ALSO"
+.
+.IP "\(bu" 4
+\fBtextsuggestd(1)\fR
+.
+.IP "" 0

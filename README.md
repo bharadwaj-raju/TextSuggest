@@ -41,6 +41,8 @@ Run the included install script with `sudo sh install.sh`.
 
 Now, see [Post-install](#post-install)
 
+See also: [Uninstallation](#uninstallation)
+
 ## Post-install
 
 Assign keyboard shortcuts to
@@ -58,6 +60,20 @@ are at the top of list. History can be disabled: use the `--no-history` option.
 
 **TIP:** You can search for words by their parts by
 typing `part1 part2 ... partN` at the `Type to search >` prompt.
+
+### Uninstallation
+
+Run:
+
+```bash
+$ sudo sh install.sh --uninstall
+```
+
+To also remove configuration files, use
+
+```bash
+$ sudo sh install.sh --uninstall-full
+```
 
 # Options
 

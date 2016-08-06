@@ -55,8 +55,37 @@ arg_parser.add_argument(
 
 args = arg_parser.parse_args()
 
+def get_cmd_out(command_list):
+
+	return sp.check_output(command_list).decode('utf-8').rstrip('\r\n')
+
 def log(message, level):
-	print('[%s] (%s): %s' % (level, time.strftime('%X'), message))
+
+	colors = {
+				'info'  : get_cmd_out(['tput', 'setaf', '4']),
+				'warn'  : get_cmd_out(['tput', 'setaf', '3']),
+				'error' : get_cmd_out(['tput', 'setaf', '1']),
+				'reset' : get_cmd_out(['tput', 'sgr0'])
+			 }
+
+	if sys.stdout.isatty():
+		colorize = True
+	else:
+		colorize = False
+
+	if colorize:
+		if level.startswith('WARN'):
+			level = colors['warn'] + level + colors['reset']
+
+		elif level == 'ERROR':
+			level = colors['error'] + level + colors['reset']
+
+		else:
+			level = colors['info'] + level + colors['reset']
+
+	level = '[%s]' % level
+
+	print('%s (%s): %s' % (level, time.strftime('%X'), message))
 
 log('Started textsuggestd.', 'INFO')
 
