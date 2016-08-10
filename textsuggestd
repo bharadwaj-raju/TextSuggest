@@ -11,7 +11,7 @@ import os
 import argparse
 import gi
 from gi.repository import GLib as glib
-from libscreenkey import inputlistener
+import keysyms
 
 arg_parser = argparse.ArgumentParser(
 	description='''textsuggestd - Background daemon for TextSuggest''',
@@ -61,6 +61,8 @@ def get_cmd_out(command_list):
 
 def log(message, level):
 
+	# Simple logger
+
 	colors = {
 				'info'  : get_cmd_out(['tput', 'setaf', '4']),
 				'warn'  : get_cmd_out(['tput', 'setaf', '3']),
@@ -83,11 +85,31 @@ def log(message, level):
 		else:
 			level = colors['info'] + level + colors['reset']
 
-	level = '[%s]' % level
-
 	print('%s (%s): %s' % (level, time.strftime('%X'), message))
 
-log('Started textsuggestd.', 'INFO')
+def log_keys():
+
+	# Generator that yields each X11 keypress
+
+	logger_shell = '''xinput list | grep -Po 'id=\K\d+(?=.*slave\s*keyboard)' |
+xargs -P0 -n1 xinput test | awk 'BEGIN{while (("xmodmap -pke" | getline) > 0) k[$2]=$4}
+{print $0 "[" k[$NF] "]"; fflush(stdout)}' '''
+
+	# Basically gets list of xinput, searches for keyboard,
+	# runs xinput test on each line, then gets the actual press (keysym)
+	# though xmodmap + awk
+
+	logger_proc = sp.Popen(logger_shell, stdout=sp.PIPE, universal_newlines=True, shell=True)
+	stdout_lines = iter(logger_proc.stdout.readline, "")
+	logger_proc.stdout.flush()
+	for stdout_line in stdout_lines:
+		yield stdout_line
+	logger_proc.stdout.flush()
+
+	logger_proc.stdout.close()
+
+	# Example output:
+	# key press   34 [bracketleft]
 
 def textsuggest_should_start(additional_exclude=None, include=None):
 
@@ -129,22 +151,11 @@ def textsuggest_should_start(additional_exclude=None, include=None):
 
 	return True
 
-def start_textsuggest():
-
-	if textsuggest_exec is None:
-		if os.path.isfile(os.path.join(os.getcwd(), 'TextSuggest.py')):
-			textsuggest_exec = os.path.join(os.getcwd(), 'TextSuggest.py')
-		elif os.path.isfile('/usr/bin/textsuggest'):
-			textsuggest_exec = '/usr/bin/textsuggest'
-		else:
-			log('No TextSuggest executable found.', 'ERROR')
-			sys.exit(1)
-	else:
-		if not os.path.isfile(textsuggest_exec):
-			log('Specified TextSuggest executable does not exist.', 'ERROR')
-			sys.exit(1)
+def start_textsuggest(textsuggest_exec_path, return_cmd=False):
 
 	textsuggest_args = []
+
+	textsuggest_args.append('--auto-selection')
 
 	if args.no_rofi_customization:
 		textsuggest_args.append('--no-rofi-customization')
@@ -160,11 +171,12 @@ def start_textsuggest():
 		textsuggest_args.append(
 			'--font ' + ' '.join(args.font))
 
-	textsuggest_exec = 'python3 ' + textsuggest_exec
+	textsuggest_cmd = '%s %s %s' % (sys.executable, textsuggest_exec_path, ' '.join(textsuggest_args))
 
-	textsuggest_exec += ' ' + ' '.join(textsuggest_args)
+	if return_cmd:
+		return textsuggest_cmd
 
-	textsuggest_proc = sp.Popen([textsuggest_exec],
+	textsuggest_proc = sp.Popen([textsuggest_cmd],
 	 							shell=True, stdout=sp.PIPE)
 
 	textsuggest_out, textsuggest_err = textsuggest_proc.communicate()
@@ -178,38 +190,67 @@ def start_textsuggest():
 
 # Start inputlistener
 
-def callback(data):
+def main():
 
-	values = {}
+	log('Started textsuggestd.', 'INFO')
 
-	for k in dir(data):
-		if k[0] == '_': continue
-		values[k] = getattr(data, k)
+	if args.textsuggest_executable is None:
+		if os.path.isfile(os.path.join(os.getcwd(), 'TextSuggest.py')):
+			textsuggest_exec = os.path.join(os.getcwd(), 'TextSuggest.py')
+		elif os.path.isfile('/usr/bin/textsuggest'):
+			textsuggest_exec = '/usr/bin/textsuggest'
+		else:
+			log('No TextSuggest executable found.', 'ERROR')
+			sys.exit(1)
+	else:
+		if not os.path.isfile(args.textsuggest_executable):
+			log('Specified TextSuggest executable does not exist.', 'ERROR')
+			sys.exit(1)
 
-	excluded_strs = ['\t', ' ', '  ', '\n', '\r', '\r\n', '']
+	log('TextSuggest command: %s' % start_textsuggest(textsuggest_exec, return_cmd=True), 'INFO')
 
-	if values['string'] is not None or values['string'] not in excluded_strs:
-		if textsuggest_should_start():
-			textsuggest_retval = start_textsuggest()
-			if textsuggest_retval in ['ERR_NOWORDS', 'ERR_REJECTED']:
-				if textsuggest_retval == 'ERR_REJECTED':
-					log('TextSuggest was cancelled. Waiting until next word.',
-						'WARNING')
+	excluded_strs = ['\t', ' ', '  ', '\n', '\r', '\r\n', '', '<', '>', '[',
+					 ']']
+
+	modifiers = ['Shift', 'Control', 'Multi', 'Meta', 'Esc',
+				'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10',
+				'F11', 'F12']
+
+	word_separators = ['\t', ' ', '  ', '.', '\n', '\r\n']
+
+	for key_press in log_keys():
+		actual_key = key_press.split(' ')[-1]
+		key_string = keysyms.KEYSYMS.get(actual_key, None)
+		try:
+			if wait:
+				if key_string in word_separators:
+					print('Resuming')
+					wait = False
+
 				else:
-					log('Textsuggest found no words. Waiting until next word.',
-						'WARNING')
-				#time.sleep(6)
-				# FIXME: Implement *actual* detection of end-of-word
+					wait = True
+					continue
+		except UnboundLocalError:
+			# First run of loop
+			wait = False
 
+		if key_press in modifiers:
+			continue
 
-glib.threads_init()
-listener = inputlistener.InputListener(callback)
+		if 'press' in key_press:  # exclude key release
+			if key_string is not None or key_string not in excluded_strs:
+				if textsuggest_should_start():
+					textsuggest_retval = start_textsuggest(textsuggest_exec)
+					if textsuggest_retval in ['ERR_NOWORDS', 'ERR_REJECTED']:
+						if textsuggest_retval == 'ERR_REJECTED':
+							log('TextSuggest was cancelled. Waiting until next word.',
+								'WARNING')
 
-try:
-	listener.start()
-	glib.MainLoop().run()
-except KeyboardInterrupt:
-	pass
+						else:
+							log('Textsuggest found no words. Waiting until next word.',
+								'WARNING')
 
-listener.stop()
-listener.join()
+					wait = True
+
+if __name__ == '__main__':
+	main()

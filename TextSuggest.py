@@ -145,8 +145,10 @@ def restart_program(additional_args=[], remove_args=[]):
 
 	if remove_args != []:
 		for arg in remove_args:
-			if arg in new_cmd:
-				new_cmd = new_cmd.replace(arg, '')
+			for i in sys.argv:
+				if arg in i:
+					new_cmd = new_cmd.replace(i, '')
+					removed = True
 
 	if additional_args != []:
 		for arg in additional_args:
@@ -189,7 +191,7 @@ else:
 			time.sleep(1.5)
 			# Otherwise restart_program restarts before selection is complete
 
-			restart_program(remove_args=['auto-selection'])
+			restart_program(remove_args=['--auto-selection', 'beginning', 'middle', 'end'])
 
 		current_word = sp.check_output(['xsel'])
 
@@ -350,6 +352,9 @@ def apply_suggestion(suggestion):
 def main():
 
 	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
+
+	if not words_list or words_list == ['']:
+		restart_program(additional_args=['--no-selection'])
 
 	words_list = '|'.join(words_list)
 
