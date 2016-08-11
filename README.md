@@ -37,7 +37,7 @@ Make sure you have all the requirements:
  - `xsel`
  - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
 
-Run the included install script with `sudo sh install.sh`.
+Run the included install script with `sudo ./install.sh`.
 
 Now, see [Post-install](#post-install)
 
@@ -66,13 +66,13 @@ typing `part1 part2 ... partN` at the `Type to search >` prompt.
 Run:
 
 ```bash
-$ sudo sh install.sh --uninstall
+$ sudo ./install.sh --uninstall
 ```
 
 To also remove configuration files, use
 
 ```bash
-$ sudo sh install.sh --uninstall-full
+$ sudo ./install.sh --uninstall-full
 ```
 
 # Options
