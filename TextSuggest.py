@@ -28,7 +28,7 @@ import subprocess as sp
 import sys
 import time
 
-from collections import Counter
+import collections
 
 from languages import get_language_name
 from fonts import get_font_name
@@ -41,6 +41,7 @@ config_dir = os.path.expanduser('~/.config/textsuggest')
 base_dict_dir = '/usr/share/textsuggest/dictionaries'
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
+hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 
 # Arguments
 
@@ -134,6 +135,17 @@ else:
 	else:
 		language = ['English']
 
+def freq_sort(lst):
+	counts = collections.Counter(lst)
+	sorted_lst = sorted(lst, key=counts.get, reverse=True)
+
+	return sorted_lst
+
+def uniq(seq):
+	seen = set()
+	seen_add = seen.add
+	return [x for x in seq if not (x in seen or seen_add(x))]
+
 def restart_program(additional_args=[], remove_args=[]):
 
 	# Restart, preserving all original arguments and optionally adding more
@@ -176,7 +188,7 @@ else:
 			if args.auto_selection == 'beginning':
 				# Ctrl + Shift + ->
 				sp.Popen([
-					'xdotool keydown Ctrl keydown Shift key Right keyup Shift keyup Ctrl > /dev/null'],
+					'xdotool key Ctrl+Shift+Right > /dev/null'],
 					shell=True)
 			elif args.auto_selection == 'middle':
 				# Ctrl + <- then Ctrl + Shift + ->
@@ -193,9 +205,7 @@ else:
 
 			restart_program(remove_args=['--auto-selection', 'beginning', 'middle', 'end'])
 
-		current_word = sp.check_output(['xsel'])
-
-		current_word = current_word.decode('utf-8').strip()
+		current_word = sp.check_output(['xsel']).decode('utf-8').strip()
 
 		suggest_method = 'replace'
 
@@ -231,21 +241,22 @@ def type_command_output(command):
 		command_out_newl_list = command_out.split('\n')
 
 		for i in command_out_newl_list:
-			sp.Popen([
-				'xdotool type --clearmodifiers "%s"; xdotool keydown Shift key Return keyup Shift' % i.strip(
-					'\'').strip('"')], shell=True)
+			type_proc = sp.Popen(['xdotool', 'type', '--clearmodifiers', i])
+
+			type_proc.wait()
+			sp.Popen(['xdotool', 'key', 'Shift+Return'])
 
 			time.sleep(0.5)
 
 	else:
 
-		sp.Popen(['xdotool type \'%s\'' % command_out], shell=True)
+		sp.Popen(['xdotool', 'type', command_out])
 
 def display_dialog_list(item_list):
 
 	items_string = ''
 
-	mouse_loc_raw = sp.check_output(['xdotool getmouselocation --shell'], shell=True)
+	mouse_loc_raw = sp.check_output(['xdotool', 'getmouselocation', '--shell'])
 	mouse_loc_raw = mouse_loc_raw.decode('utf-8')
 
 	x = mouse_loc_raw.split('\n')[0].replace('X=', '')
@@ -318,34 +329,52 @@ def apply_suggestion(suggestion):
 
 		suggestion = suggestion.decode('utf-8')
 
+		if not args.no_history:
+			with open(hist_file, 'a') as f:
+				f.write(suggestion)
+
 		if suggest_method == 'replace':
 			# Erase current word
-			sp.Popen(['xdotool key BackSpace'], shell=True)
+			sp.Popen(['xdotool', 'key' 'BackSpace'])
 
 			if current_word[:1].isupper():
 				suggestion = suggestion.capitalize()
 
 		# Type suggestion
 		if '=' in suggestion:
+			# Alias
 			expand_suggestion = suggestion.split('=')[1]
+
 			if '#' in expand_suggestion:
+				# Aliased command
 				command_suggestion = str(expand_suggestion.replace('#', ''))
 				type_command_output(command_suggestion)
 
 				sys.exit(0)
 
 			else:
-				sp.Popen(['xdotool type \'%s\'' % expand_suggestion.rstrip()], shell=True)
+				sp.Popen(['xdotool', 'type', expand_suggestion.rstrip()])
 
 				sys.exit(0)
 
-		elif '#' in suggestion:
-			command_suggestion = str(suggestion.replace('#', ''))
+		elif suggestion.startswith('#'):
+			# Command
+			command_suggestion = suggestion[1:]
 			type_command_output(command_suggestion)
 
 			sys.exit(0)
+
+		elif suggestion.startswith('&'):
+			# Python expression
+			suggestion = suggestion[1:]
+			try:
+				suggestion = eval(suggestion)
+				sp.Popen(['xdotool', 'type', suggestion])
+			except SyntaxError:
+				pass
+
 		else:
-			sp.Popen(['xdotool type \'%s\'' % suggestion.rstrip()], shell=True)
+			sp.Popen(['xdotool', 'type', suggestion.rstrip()])
 
 			sys.exit(0)
 
@@ -355,6 +384,12 @@ def main():
 
 	if not words_list or words_list == ['']:
 		restart_program(additional_args=['--no-selection'])
+
+	if not args.no_history:
+		words_list.extend(get_suggestions(current_word, dict_files=[hist_file]))
+
+		# Frequency sort + Remove duplicates
+		words_list = uniq(freq_sort(words_list))
 
 	words_list = '|'.join(words_list)
 
