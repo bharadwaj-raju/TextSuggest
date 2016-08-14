@@ -58,6 +58,26 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
    `--language` *language*
    Instead of auto-detecting language based on keyboard layout, use *language* specified.
 
+## EXPANSIONS
+
+  
+  
+  **COMMANDS**
+
+  Use `#command` in TextSuggest to type out the output of `command`.
+
+  **MATH**
+    
+  Use `%2+3` in TextSuggest to insert the answer of `2+3`. Can be used with any math valid in Python 3.
+
+  **ALIASES**
+
+  Define them in `~/.config/textsuggest/Custom_Words.txt`:
+
+  short=really long text!
+
+  Can be combined with **COMMANDS** and **MATH** above.
+
 ## OTHER LANGUAGES
 
   By default, English and Bangla dictionaries are provided. To add support for other languages, follow these steps:

@@ -241,7 +241,7 @@ def type_command_output(command):
 		command_out_newl_list = command_out.split('\n')
 
 		for i in command_out_newl_list:
-			type_proc = sp.Popen(['xdotool', 'type', '--clearmodifiers', i])
+			type_proc = sp.Popen(['xdotool', 'type', '--clearmodifiers', '--', i])
 
 			type_proc.wait()
 			sp.Popen(['xdotool', 'key', 'Shift+Return'])
@@ -250,7 +250,7 @@ def type_command_output(command):
 
 	else:
 
-		sp.Popen(['xdotool', 'type', command_out])
+		sp.Popen(['xdotool', 'type', '--', command_out])
 
 def display_dialog_list(item_list):
 
@@ -345,7 +345,7 @@ def apply_suggestion(suggestion):
 			# Alias
 			expand_suggestion = suggestion.split('=')[1]
 
-			if '#' in expand_suggestion:
+			if expand_suggestion.startswith('#'):
 				# Aliased command
 				command_suggestion = str(expand_suggestion.replace('#', ''))
 				type_command_output(command_suggestion)
@@ -353,7 +353,7 @@ def apply_suggestion(suggestion):
 				sys.exit(0)
 
 			else:
-				sp.Popen(['xdotool', 'type', expand_suggestion.rstrip()])
+				sp.Popen(['xdotool', 'type', '--', expand_suggestion.rstrip()])
 
 				sys.exit(0)
 
@@ -364,17 +364,17 @@ def apply_suggestion(suggestion):
 
 			sys.exit(0)
 
-		elif suggestion.startswith('&'):
-			# Python expression
+		elif suggestion.startswith('%'):
+			# Math expression
 			suggestion = suggestion[1:]
 			try:
 				suggestion = eval(suggestion)
-				sp.Popen(['xdotool', 'type', suggestion])
+				sp.Popen(['xdotool', 'type', '--', suggestion])
 			except SyntaxError:
 				pass
 
 		else:
-			sp.Popen(['xdotool', 'type', suggestion.rstrip()])
+			sp.Popen(['xdotool', 'type', '--', suggestion.rstrip()])
 
 			sys.exit(0)
 

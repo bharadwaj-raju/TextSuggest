@@ -70,3 +70,7 @@ install -D -m644 LICENSE /usr/share/licenses/textsuggest/COPYING
 
 chmod -R a+r /usr/share/textsuggest
 chmod a+x /usr/bin/textsuggest
+
+mkdir -p ~/.config/textsuggest
+touch ~/.config/textsuggest/Custom_Words.txt
+touch ~/.config/textsuggest/history.txt

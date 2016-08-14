@@ -77,64 +77,51 @@ $ sudo ./install.sh --uninstall-full
 
 # Options
 
-Documented in the manual page: `man textsuggest`.
+Documented in the manual page: `man textsuggest` and `TextSuggest.py --help`.
 
-- `--font "Font"`
+# Expansions
 
-Specify font to use in menu. Format: `FontName (Weight (optional) FontSize)`. Example: `--font Monaco Bold 10` or `--font Monaco 10`
+TextSuggest can handle a range of expansions
 
-- `--no-rofi-customization`
+## Custom words
 
-Read Rofi settings from `~/.Xresources` (see Rofi documentation) or default.
+Simply add them to `~/.config/textsuggest/Custom_Words.txt` like this:
 
-- `--word "Word"`
+    custom=My custom Expansion!
 
-Give suggestions for "Word" specified. Ignored if `--no-selection`.
+and whenever `custom` is typed, 'My custom Expansion!' will be inserted.
 
-- `--no-history`
+## Command expansions
 
-Disable the history of frequently-used words (stored in `~/.config/textsuggest/history.txt`)
+Similar to `bash`'s `$()` syntax, it inserts the output of a command:
 
-- `--language`
+    #ls
 
-Manually set language, in case script fails to auto-detect from keyboard layout.
+when typed into a TextSuggest window, will insert output of `ls`
 
-- `--auto-selection [beginning | middle | end]`
+### Custom words + Command expansions
 
-Automatically select word under cursor for you before suggestion, saving time and keystrokes. Ignored if `--no-selection`.
+Add in `~/.config/textsuggest/Custom_Words.txt`:
 
-`--auto-selection` has three modes:
+    custom=#command --opts
 
-- 'beginning': Assumes text-cursor is at beginning of word.
-- 'middle'   : Assumes text-cursor is somewhere in the middle of word.
-- 'end'      : Assumes text-cursor is at end of word. Default.
+and whenever you type `custom` into TextSuggest, the output of `command --opts` will be inserted.
 
-The three choices help choose the keyboard shortcut to be pressed. It would be good to auto-detect the option
-according to the text-cursor's position, but X11 does not provide this.
+## Math
 
-**NOTE:** The normal "you select text and textsuggests suggests on that" will **not** work with this enabled.
+Simply type:
 
-# Custom words
+    %2 + 3
 
-Simply add them to a `~/.config/textsuggest/Custom_Words.txt` file. The `Extra_Words.txt` file included already has a
-few jargon, abbreviations and words (total 1653) not included in the EOWL.
+And '5' will be inserted. You can do any math expression that Python supports.
 
-You can also define expansions, in `~/.config/textsuggest/Custom_Words.txt`.
-An entry for an expansion in the `~/.config/textsuggest/Custom_Words.txt` looks like:
+### Custom Words + Math
 
-    short=really_long_text_you_want_to_type
+Add in `~/.config/textsuggest/Custom_Words.txt`:
 
-and will show up as `short=really_lon...` in the menu and when selected, will type `really_long_text_you_want_to_type`.
+    custom=%2+3
 
-## Command outputs
-
-Simply type `#command --options`, for example `#date -u`.
-
-### Combining command outputs and expansions
-
-Simply do:
-
-    short_cmd=#long_command and --options
+And whenever you type 'command' into TextSuggest, 5 will be inserted.
 
 # Other langauges
 
