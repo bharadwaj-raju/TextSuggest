@@ -89,7 +89,7 @@ Simply add them to `~/.config/textsuggest/Custom_Words.txt` like this:
 
     custom=My custom Expansion!
 
-and whenever `custom` is typed, 'My custom Expansion!' will be inserted.
+and whenever 'custom' is typed, 'My custom Expansion!' will be inserted.
 
 ## Command expansions
 
@@ -105,7 +105,7 @@ Add in `~/.config/textsuggest/Custom_Words.txt`:
 
     custom=#command --opts
 
-and whenever you type `custom` into TextSuggest, the output of `command --opts` will be inserted.
+and whenever you type 'custom' into TextSuggest, the output of `command --opts` will be inserted.
 
 ## Math
 
@@ -121,7 +121,7 @@ Add in `~/.config/textsuggest/Custom_Words.txt`:
 
     custom=%2+3
 
-And whenever you type 'command' into TextSuggest, 5 will be inserted.
+And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
 # Other langauges
 

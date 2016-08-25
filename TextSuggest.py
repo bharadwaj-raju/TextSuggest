@@ -27,7 +27,6 @@ import os
 import subprocess as sp
 import sys
 import time
-
 import collections
 
 from languages import get_language_name
@@ -347,11 +346,20 @@ def apply_suggestion(suggestion):
 
 			if expand_suggestion.startswith('#'):
 				# Aliased command
-				command_suggestion = str(expand_suggestion.replace('#', ''))
+				command_suggestion = expand_suggestion[1:]
 				type_command_output(command_suggestion)
 
 				sys.exit(0)
+				
+			elif expand_suggestion.startswith('%'):
+				# Aliased math
+				suggestion = expand_suggestion[1:]
 
+				suggestion = eval(suggestion)
+				sp.Popen(['xdotool', 'type', '--', str(suggestion)])
+					
+				sys.exit(0)	
+			
 			else:
 				sp.Popen(['xdotool', 'type', '--', expand_suggestion.rstrip()])
 
@@ -367,11 +375,11 @@ def apply_suggestion(suggestion):
 		elif suggestion.startswith('%'):
 			# Math expression
 			suggestion = suggestion[1:]
-			try:
-				suggestion = eval(suggestion)
-				sp.Popen(['xdotool', 'type', '--', suggestion])
-			except SyntaxError:
-				pass
+
+			suggestion = eval(suggestion)
+			sp.Popen(['xdotool', 'type', '--', str(suggestion)])
+			
+			sys.exit(0)
 
 		else:
 			sp.Popen(['xdotool', 'type', '--', suggestion.rstrip()])
