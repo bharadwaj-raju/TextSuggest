@@ -1,49 +1,50 @@
 # TextSuggest
 
-X11 utility to autocomplete words in the GUI.
+Save keystrokes, use [word expansions](#custom-words), type results of [math](#math), [commands](#commands) and more.
+
+A utility to autocomplete words in the GUI.
 
 [![TextSuggest in action](http://i.imgur.com/qa2PExH.gif)](http://i.imgur.com/qa2PExH.gif)
 
-Uses [Rofi](https://davedavenport.github.io/rofi/) for a simple popup menu.
-Uses a few libraries (in `libscreenkey/`) from [Screenkey](https://github.com/wavexx/Screenkey).
-
-Uses the [English Open Word List](http://dreamsteep.com/projects/the-english-open-word-list.html) for a basic English dictionary, plus a Bangla dictionary ported from [ibus-avro](https:github.com/sarim/ibus-avro). For other languages, see the [Other languages](#other-languages) section.
-
-You can define custom words, see [the note](#custom-words).
-
 Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSuggest is free as in freedom.
 
-# Installation
+## Overview
 
-## Packages
+TextSuggest is a script that, when a [keyboard shortcut](#post-install) is pressed, shows completions for the word selected or [currently being typed](#auto-selection).
 
-### [![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) Ubuntu and Debian
+Then you can efficiently search for the right word with smart search (thanks to [Rofi](https://github.com/DaveDavenport/Rofi)) and hit Enter to choose. Or Esc to exit.
 
-Debian/Ubuntu `deb` package: [Download `textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
+An [alternative background service](#textsuggestd) that intelligently offers completions when appropriate, without the need of pressing a shortcut is in development.
 
-### [![Arch Linux](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) Arch Linux
+## Installation
 
-AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), maintained by [Daniel Sandman (shellkr)](https://github.com/shellkr)
+### Packages
+
+#### [![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) Ubuntu and Debian
+
+[Download `textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
+
+#### [![Arch Linux](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) Arch Linux
+
+AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
 Both packages build from this Git repository.
 
 Now, see [Post-install](#post-install)
 
-## Manual
+### Manual
 
 Make sure you have all the requirements:
 
  - `xdotool`
  - `xsel`
- - `rofi` (Debian/Ubuntu and Arch package name: `rofi`)
+ - `rofi`
 
 Run the included install script with `sudo ./install.sh`.
 
 Now, see [Post-install](#post-install)
 
-See also: [Uninstallation](#uninstallation)
-
-## Post-install
+### Post-install
 
 Assign keyboard shortcuts to
 
@@ -63,7 +64,9 @@ typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 ### Uninstallation
 
-Run:
+If you installed it using [Packages](#packages), use your system's package manager.
+
+Otherwise:
 
 ```bash
 $ sudo ./install.sh --uninstall
@@ -75,15 +78,15 @@ To also remove configuration files, use
 $ sudo ./install.sh --uninstall-full
 ```
 
-# Options
+## Options
 
-Documented in the manual page: `man textsuggest` and `TextSuggest.py --help`.
+Documented in the manual page: `man textsuggest` and `--help`.
 
-# Expansions
+## Expansions
 
-TextSuggest can handle a range of expansions
+TextSuggest can handle a range of expansions:
 
-## Custom words
+### Custom words
 
 Simply add them to `~/.config/textsuggest/Custom_Words.txt` like this:
 
@@ -91,15 +94,15 @@ Simply add them to `~/.config/textsuggest/Custom_Words.txt` like this:
 
 and whenever 'custom' is typed, 'My custom Expansion!' will be inserted.
 
-## Command expansions
+### Commands
 
-Similar to `bash`'s `$()` syntax, it inserts the output of a command:
+Similar to `bash`'s `$()`, it inserts the output of a command:
 
     #ls
 
 when typed into a TextSuggest window, will insert output of `ls`
 
-### Custom words + Command expansions
+#### Custom words + Commands
 
 Add in `~/.config/textsuggest/Custom_Words.txt`:
 
@@ -107,15 +110,15 @@ Add in `~/.config/textsuggest/Custom_Words.txt`:
 
 and whenever you type 'custom' into TextSuggest, the output of `command --opts` will be inserted.
 
-## Math
+### Math
 
-Simply type:
+Simply type into TextSuggest:
 
     %2 + 3
 
 And '5' will be inserted. You can do any math expression that Python supports.
 
-### Custom Words + Math
+#### Custom Words + Math
 
 Add in `~/.config/textsuggest/Custom_Words.txt`:
 
@@ -123,7 +126,7 @@ Add in `~/.config/textsuggest/Custom_Words.txt`:
 
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
-# Other langauges
+## Other langauges
 
 English and Bangla dictionaries are provided by default.
 
@@ -136,3 +139,29 @@ For other langauges, follow these steps:
 - A suitable font should be auto-detected. If not, pass a suitable font with the `--font` option.
 
 - Language should be auto-detected. If not, manually set language using the `--language` option.
+
+## textsuggestd
+
+`textsuggestd` is a work-in-progress background service that automatically launches TextSuggest when appropriate.
+
+It is an effort to achieve TextSuggest's final goal: to be like the suggestions on mobile phones, which appear without stealing focus and disrupting typing, and without having to press shortcuts.
+
+### Running textsuggestd
+
+**WARNING**: It is almost unusable. See [escaping](#escaping-textsuggestd).
+
+Simply do:
+
+```bash
+$ ./textsuggestd &
+```
+
+### Escaping textsuggestd
+
+Get to a terminal somehow (TTY, maybe?) and run:
+
+```bash
+for i in $(pgrep python3); do
+    ps -fp $i | grep 'textsuggestd' && kill $i
+done
+```
