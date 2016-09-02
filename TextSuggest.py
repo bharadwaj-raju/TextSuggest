@@ -90,10 +90,25 @@ arg_parser.add_argument(
 
 arg_parser.add_argument(
 	'--help-auto-selection', action='store_true',
-	help='See help and documentation on the auto-selection option.',
+	help='See help and documentation on the auto-selection option. \n \n',
+	required=False)
+
+arg_parser.add_argument(
+	'--version', action='store_true',
+	help='Print version and license information.',
 	required=False)
 
 args = arg_parser.parse_args()
+
+if args.version:
+	# Using a git pre-commit hook, replace number with the value of git rev-list --count HEAD + 1
+	print('''TextSuggest 125
+			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
+			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+			This is free software; you are free to change and redistribute it.
+			There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('    ', ''))
+
+	sys.exit(0)
 
 if args.help_auto_selection:
 	print('''This is the help and documentation for the --auto-selection option.
@@ -112,7 +127,6 @@ according to the text-cursor's position, but X11 does not provide this.
 NOTE: The normal "you select text and textsuggests suggests on that" will not work with this enabled.''')
 
 	sys.exit(0)
-
 
 if not os.path.isdir(config_dir):
 	os.mkdir(config_dir)
