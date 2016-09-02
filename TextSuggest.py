@@ -64,11 +64,6 @@ arg_parser.add_argument(
 	required=False)
 
 arg_parser.add_argument(
-	'--no-rofi-customization', action='store_true',
-	help='Do not apply custom Rofi theme. \n \n',
-	required=False)
-
-arg_parser.add_argument(
 	'--font', type=str,
 	help='Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). \n \n',
 	nargs='+', required=False)
@@ -102,7 +97,7 @@ args = arg_parser.parse_args()
 
 if args.version:
 	# Using a git pre-commit hook, replace number with the value of git rev-list --count HEAD + 1
-	print('''TextSuggest 127.cfcb941
+	print('''TextSuggest 129
 			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
 			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 			This is free software; you are free to change and redistribute it.
@@ -138,12 +133,9 @@ if os.path.isfile(prev_custom_words_file):
 	os.rename(prev_custom_words_file, custom_words_file)
 
 if args.language:
-	if get_language_name != 'English':
-		language = [args.language, 'English']
-	else:
-		language = ['English']
+	language = [args.language, 'English']
 else:
-	if get_language_name != 'English':
+	if get_language_name() != 'English':
 		language = [get_language_name(), 'English']
 	else:
 		language = ['English']
@@ -265,22 +257,13 @@ def type_command_output(command):
 
 		sp.Popen(['xdotool', 'type', '--', command_out])
 
-def display_dialog_list(item_list):
-
-	items_string = ''
+def display_dialog_list(items_list):
 
 	mouse_loc_raw = sp.check_output(['xdotool', 'getmouselocation', '--shell'])
 	mouse_loc_raw = mouse_loc_raw.decode('utf-8')
 
 	x = mouse_loc_raw.split('\n')[0].replace('X=', '')
 	y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
-
-	# Colors inspired by Arc theme (Dark)
-
-	rofi_theme = '-lines 3 -width 20 -bg "#2b2e37" -separator-style "none" -hlbg "#5294e2" -fg "#fdfdfe" -hlfg "#fdfdfe" -hide-scrollbar -padding 1'
-
-	if args.no_rofi_customization:
-		rofi_theme = ''
 
 	if args.font:
 		# Font should be specified in Pango format: FontName {(optional) FontWeight} FontSize
@@ -296,23 +279,16 @@ def display_dialog_list(item_list):
 				# If returned empty, use default
 				font = 'Monospace 10'
 
-	if item_list == [] or item_list == [''] or item_list is None:
+	if items_list == [] or items_list == [''] or items_list is None:
 		if suggest_method == 'replace':
 			restart_program(additional_args=['--no-selection'])
 		else:
 			print('No words found. Exiting.')
 			sys.exit(1)
 
-	for i in item_list:
-		items_string += i
+	history = '-disable-history' if args.no_history else '-no-disable-history'
 
-	if args.no_history:
-		history = '-disable-history'
-
-	else:
-		history = '-no-disable-history'
-
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -sep "|" -p "> " -i %s -font "%s" -xoffset %s -yoffset %s -location 1' % (items_string, history, rofi_theme, font, x, y)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1' % (items_list, history, font, x, y)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
