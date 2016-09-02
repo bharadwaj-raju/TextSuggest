@@ -102,7 +102,7 @@ args = arg_parser.parse_args()
 
 if args.version:
 	# Using a git pre-commit hook, replace number with the value of git rev-list --count HEAD + 1
-	print('''TextSuggest 125
+	print('''TextSuggest 126.f7e71d2
 			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
 			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 			This is free software; you are free to change and redistribute it.
