@@ -10,7 +10,7 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSugges
 
 ## Overview
 
-TextSuggest is a script that, when a [keyboard shortcut](#post-install) is pressed, shows completions for the word selected or [currently being typed](#auto-selection).
+TextSuggest is a script that, when a [keyboard shortcut](#post-install) is pressed, shows completions for the word selected or (optionally) [currently being typed](#auto-selection).
 
 Then you can efficiently search for the right word with smart search (thanks to [Rofi](https://github.com/DaveDavenport/Rofi)) and hit Enter to choose. Or Esc to exit.
 
@@ -26,7 +26,7 @@ An [alternative background service, textsuggestd](#textsuggestd) that intelligen
 
 AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
-### [<img class="logo" style="height: 48px;" src="https://pylint.org/assets/img/git.png" alt="">](https://github.com/bharadwaj-raju/TextSuggest) Manual
+### [<img height=48px src="https://pylint.org/assets/img/git.png" alt="Source">](https://github.com/bharadwaj-raju/TextSuggest) Manual
 
 Make sure you have all the requirements (`xdotool`, `xsel` and `rofi`).
 
@@ -78,26 +78,26 @@ $ textsuggest --help
 optional arguments:
   -h, --help            show this help message and exit
   --word WORD [WORD ...]
-                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. 
-                         
-  --no-selection        Give all words as suggestions, which you can then filter. 
-                         
+                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection.
+
+  --no-selection        Give all words as suggestions, which you can then filter.
+
   --font FONT [FONT ...]
-                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). 
-                         
-  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
-                         
+                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize).
+
+  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt)
+
   --exit-on-no-words-found
-                        Exit if no words are found (instead of restarting in --no-selection mode) 
-                         
-  --language LANGUAGE   Manually set language, in case script fails to auto-detect from keyboard layout. 
-                         
+                        Exit if no words are found (instead of restarting in --no-selection mode)
+
+  --language LANGUAGE   Manually set language, in case script fails to auto-detect from keyboard layout.
+
   --auto-selection [{beginning,middle,end}]
-                        Automatically select word under cursor and suggest. See --help-auto-selection for details. Ignored if --no-selection. 
-                         
+                        Automatically select word under cursor and suggest. See --help-auto-selection for details. Ignored if --no-selection.
+
   --help-auto-selection
-                        See help and documentation on the auto-selection option. 
-                         
+                        See help and documentation on the auto-selection option.
+
   --version             Print version and license information.
 ...
 ```
@@ -116,7 +116,7 @@ and whenever 'custom' is typed, 'My custom Expansion!' will be inserted.
 
 ### Commands
 
-Similar to `bash`'s `$()`, it inserts the output of a command:
+Inserts the output of a command:
 
     #ls
 
@@ -188,7 +188,7 @@ It is an effort to achieve TextSuggest's final goal: to be like the suggestions 
 
 ### Running textsuggestd
 
-**WARNING**: It is almost unusable. See [escaping](#escaping-textsuggestd).
+**WARNING**: It is currently unusable. Run at risk. See [escaping](#escaping-textsuggestd).
 
 Simply do:
 
