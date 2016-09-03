@@ -1,6 +1,6 @@
 # TextSuggest
 
-Save keystrokes, use [word expansions](#custom-words), type results of [math](#math), [commands](#commands) and more.
+**Save keystrokes.** Get word completions and suggestions, use [word expansions](#custom-words), results of [math](#math), [command outputs](#commands) and more.
 
 A utility to autocomplete words in the GUI.
 
@@ -14,35 +14,25 @@ TextSuggest is a script that, when a [keyboard shortcut](#post-install) is press
 
 Then you can efficiently search for the right word with smart search (thanks to [Rofi](https://github.com/DaveDavenport/Rofi)) and hit Enter to choose. Or Esc to exit.
 
-An [alternative background service](#textsuggestd) that intelligently offers completions when appropriate, without the need of pressing a shortcut is in development.
+An [alternative background service, textsuggestd](#textsuggestd) that intelligently offers completions when appropriate, without the need of pressing a shortcut is in development.
 
 ## Installation
 
-### Packages
-
-#### [![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) Ubuntu and Debian
+### [![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) Ubuntu and Debian
 
 [Download `textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
 
-#### [![Arch Linux](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) Arch Linux
+### [![Arch Linux](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) Arch Linux
 
 AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
-Both packages build from this Git repository.
+### ![Git](https://www.pylint.org/assets/img/git.png) Manual
 
-Now, see [Post-install](#post-install)
-
-### Manual
-
-Make sure you have all the requirements:
-
- - `xdotool`
- - `xsel`
- - `rofi`
+Make sure you have all the requirements (`xdotool`, `xsel` and `rofi`).
 
 Run the included install script with `sudo ./install.sh`.
 
-Now, see [Post-install](#post-install)
+**Now, see [Post-install](#post-install)**
 
 ### Post-install
 
@@ -51,7 +41,7 @@ Assign keyboard shortcuts to
 - `textsuggest`
 - `textsuggest --no-selection`
 
-The first one gives you suggestions on the currently highlighted word.
+The first one gives you suggestions on the currently selected word (don't want to select? See [this](#auto-select-and-suggest)).
 The second one simply gives you a list of all word, you can search through them.
 
 The two commands offer the most basic of TextSuggest features. For more, see [options](#options)
@@ -64,7 +54,7 @@ typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 ### Uninstallation
 
-If you installed it using [Packages](#packages), use your system's package manager.
+If you installed it using packages, use your system's package manager.
 
 Otherwise:
 
@@ -80,7 +70,37 @@ $ sudo ./install.sh --uninstall-full
 
 ## Options
 
-Documented in the manual page: `man textsuggest` and `--help`.
+Also documented in the manual page: `man textsuggest` and `--help`.
+
+```bash
+$ textsuggest --help
+...
+optional arguments:
+  -h, --help            show this help message and exit
+  --word WORD [WORD ...]
+                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. 
+                         
+  --no-selection        Give all words as suggestions, which you can then filter. 
+                         
+  --font FONT [FONT ...]
+                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). 
+                         
+  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
+                         
+  --exit-on-no-words-found
+                        Exit if no words are found (instead of restarting in --no-selection mode) 
+                         
+  --language LANGUAGE   Manually set language, in case script fails to auto-detect from keyboard layout. 
+                         
+  --auto-selection [{beginning,middle,end}]
+                        Automatically select word under cursor and suggest. See --help-auto-selection for details. Ignored if --no-selection. 
+                         
+  --help-auto-selection
+                        See help and documentation on the auto-selection option. 
+                         
+  --version             Print version and license information.
+...
+```
 
 ## Expansions
 
@@ -90,7 +110,7 @@ TextSuggest can handle a range of expansions:
 
 Simply add them to `~/.config/textsuggest/Custom_Words.txt` like this:
 
-    custom=My custom Expansion!
+	custom=My custom Expansion!
 
 and whenever 'custom' is typed, 'My custom Expansion!' will be inserted.
 
@@ -140,11 +160,31 @@ For other langauges, follow these steps:
 
 - Language should be auto-detected. If not, manually set language using the `--language` option.
 
+## Auto-select and suggest
+
+This feature allows you to get suggestions for the word being typed, without having to select it. Save *more* keystrokes!
+
+### Using it
+
+Pass the `--auto-selection` option to TextSuggest.
+
+#### Additional options
+
+You can change the way `--auto-selection` selects words.
+
+- Add `beginning` to `--auto-selection` to assume that text-cursor is **at beginning of word**.
+
+- Add `middle` to `--auto-selection` to assume that text-cursor is **in the middle of word**.
+
+- Add `end` to `--auto-selection` to assume that text-cursor is **at end of the word**. *This is the default.*
+
 ## textsuggestd
 
 `textsuggestd` is a work-in-progress background service that automatically launches TextSuggest when appropriate.
 
 It is an effort to achieve TextSuggest's final goal: to be like the suggestions on mobile phones, which appear without stealing focus and disrupting typing, and without having to press shortcuts.
+
+**WARNING**: It is currently unusable. Do *not* run. However, if you want to alpha-test, see below.
 
 ### Running textsuggestd
 

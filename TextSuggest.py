@@ -74,6 +74,11 @@ arg_parser.add_argument(
 	required=False)
 
 arg_parser.add_argument(
+	'--exit-on-no-words-found', action='store_true',
+	help='Exit if no words are found (instead of restarting in --no-selection mode) \n \n',
+	required=False)
+
+arg_parser.add_argument(
 	'--language', type=str,
 	help='Manually set language, in case script fails to auto-detect from keyboard layout. \n \n',
 	required=False)
@@ -236,14 +241,10 @@ def get_dictionaries():
 
 	return dictionaries
 
-def type_command_output(command):
+def type_text(text):
 
-	command_out = sp.check_output([command], shell=True)
-	command_out = command_out.decode('utf-8').rstrip()
-
-	if '\n' in command_out:
-
-		command_out_newl_list = command_out.split('\n')
+	if '\n' in text:
+		newline_list = text.split('\n')
 
 		for i in command_out_newl_list:
 			type_proc = sp.Popen(['xdotool', 'type', '--clearmodifiers', '--', i])
@@ -254,8 +255,14 @@ def type_command_output(command):
 			time.sleep(0.5)
 
 	else:
+		sp.Popen(['xdotool', 'type', '--', text])
 
-		sp.Popen(['xdotool', 'type', '--', command_out])
+def type_command_output(command):
+
+	command_out = sp.check_output([command], shell=True)
+	command_out = command_out.decode('utf-8').rstrip()
+
+	type_text(command_out)
 
 def display_dialog_list(items_list):
 
@@ -279,13 +286,6 @@ def display_dialog_list(items_list):
 				# If returned empty, use default
 				font = 'Monospace 10'
 
-	if items_list == [] or items_list == [''] or items_list is None:
-		if suggest_method == 'replace':
-			restart_program(additional_args=['--no-selection'])
-		else:
-			print('No words found. Exiting.')
-			sys.exit(1)
-
 	history = '-disable-history' if args.no_history else '-no-disable-history'
 
 	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1' % (items_list, history, font, x, y)
@@ -302,7 +302,7 @@ def display_dialog_list(items_list):
 	try:
 		choice = sp.check_output(['sh %s' % full_dict_script_path], shell=True)
 	except sp.CalledProcessError:
-		sys.exit(2)
+		return []  # Will be handled by apply_suggestion()
 
 	return choice
 
@@ -311,6 +311,7 @@ def apply_suggestion(suggestion):
 	if not suggestion:
 		# User doesn't want any suggestion
 		# exit
+		sys.stderr.write('ERR_REJECTED: User doesn\'t want any suggestion.')
 		sys.exit(2)
 
 	else:
@@ -346,12 +347,12 @@ def apply_suggestion(suggestion):
 				suggestion = expand_suggestion[1:]
 
 				suggestion = eval(suggestion)
-				sp.Popen(['xdotool', 'type', '--', str(suggestion)])
+				type_text(str(suggestion))
 					
 				sys.exit(0)	
 			
 			else:
-				sp.Popen(['xdotool', 'type', '--', expand_suggestion.rstrip()])
+				type_text(expand_suggestion.rstrip())
 
 				sys.exit(0)
 
@@ -367,13 +368,12 @@ def apply_suggestion(suggestion):
 			suggestion = suggestion[1:]
 
 			suggestion = eval(suggestion)
-			sp.Popen(['xdotool', 'type', '--', str(suggestion)])
+			type_text(str(suggestion))
 			
 			sys.exit(0)
 
 		else:
-			sp.Popen(['xdotool', 'type', '--', suggestion.rstrip()])
-
+			type_text(suggestion.rstrip())
 			sys.exit(0)
 
 def main():
@@ -381,7 +381,11 @@ def main():
 	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
 
 	if not words_list or words_list == ['']:
-		restart_program(additional_args=['--no-selection'])
+		if not args.exit_on_no_words_found:
+			restart_program(additional_args=['--no-selection'])
+		else:
+			sys.stderr.write('ERR_NOWORDS: No words found.')
+			sys.exit(1)
 
 	if not args.no_history:
 		words_list.extend(get_suggestions(current_word, dict_files=[hist_file]))

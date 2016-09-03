@@ -1,7 +1,7 @@
 .\" Generated with Ronnjs 0.3.8
 .\" http://github.com/kapouer/ronnjs/
 .
-.TH "TEXTSUGGEST" "1" "August 2016" "" ""
+.TH "TEXTSUGGEST" "1" "September 2016" "" ""
 .
 .SH "NAME"
 \fBtextsuggest\fR \-\- X11 utility to autocomplete words in the GUI
@@ -85,6 +85,14 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
 .P
    \fB\-\-language\fR \fIlanguage\fR
    Instead of auto\-detecting language based on keyboard layout, use \fIlanguage\fR specified\.
+.
+.P
+   \fB\-\-exit\-on\-no\-words\-found\fR
+   Instead of restarting in \fB\-\-no\-select\fR mode, exit with an error (error code 2, \fBERR_NOWORDS\fR)
+.
+.P
+   \fB\-\-version\fR
+   Print version and license information
 .
 .SH "EXPANSIONS"
   \fBCOMMANDS\fR

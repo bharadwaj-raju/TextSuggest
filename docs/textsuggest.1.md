@@ -58,9 +58,13 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
    `--language` *language*
    Instead of auto-detecting language based on keyboard layout, use *language* specified.
 
-## EXPANSIONS
+   `--exit-on-no-words-found`
+   Instead of restarting in `--no-select` mode, exit with an error (error code 2, `ERR_NOWORDS`)
 
-  
+   `--version`
+   Print version and license information
+
+## EXPANSIONS
   
   **COMMANDS**
 
