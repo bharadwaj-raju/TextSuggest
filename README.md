@@ -26,7 +26,7 @@ An [alternative background service, textsuggestd](#textsuggestd) that intelligen
 
 AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
-### [![Git](https://www.pylint.org/assets/img/git.png)](https://github.com/bharadwaj-raju/TextSuggest) Manual
+### [<img class="logo" style="height: 48px;" src="https://pylint.org/assets/img/git.png" alt="">](https://github.com/bharadwaj-raju/TextSuggest) Manual
 
 Make sure you have all the requirements (`xdotool`, `xsel` and `rofi`).
 
