@@ -12,7 +12,7 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSugges
 
 TextSuggest is a script that, when a [keyboard shortcut](#post-install) is pressed, shows completions for the word selected or (optionally) [currently being typed](#auto-selection).
 
-Then you can efficiently search for the right word with smart search (thanks to [Rofi](https://github.com/DaveDavenport/Rofi)) and hit Enter to choose. Or Esc to exit.
+Then you can [efficiently search](#search) for the right word with smart search (thanks to [Rofi](https://github.com/DaveDavenport/Rofi)) and hit Enter to choose. Or Esc to exit.
 
 An [alternative background service, textsuggestd](#textsuggestd) that intelligently offers completions when appropriate, without the need of pressing a shortcut is in development.
 
@@ -22,9 +22,13 @@ An [alternative background service, textsuggestd](#textsuggestd) that intelligen
 
 [Download `textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
 
+**Now, see [Post-install](#post-install)**
+
 ### [![Arch Linux](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) Arch Linux
 
 AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
+
+**Now, see [Post-install](#post-install)**
 
 ### [<img height=48px src="https://pylint.org/assets/img/git.png" alt="Source">](https://github.com/bharadwaj-raju/TextSuggest) Manual
 
@@ -42,15 +46,12 @@ Assign keyboard shortcuts to
 - `textsuggest --no-selection`
 
 The first one gives you suggestions on the currently selected word (don't want to select? See [this](#auto-select-and-suggest)).
-The second one simply gives you a list of all word, you can search through them.
+The second one simply gives you a list of all words, you can search through them. These are TextSuggest's two [modes](#modes).
 
-The two commands offer the most basic of TextSuggest features. For more, see [options](#options)
+The two commands offer the most basic of TextSuggest features. For more, see [options](#options) and browse through the rest of this page.
 
 The script stores frequently used words in a history file (`~/.config/textsuggest/history.txt`). Suggestions more often used
 are at the top of list. History can be disabled: use the `--no-history` option.
-
-**TIP:** You can search for words by their parts by
-typing `part1 part2 ... partN` at the `Type to search >` prompt.
 
 ### Uninstallation
 
@@ -178,6 +179,15 @@ You can change the way `--auto-selection` selects words.
 
 - Add `end` to `--auto-selection` to assume that text-cursor is **at end of the word**. *This is the default.*
 
+## Search
+
+TextSuggest offers powerful search, thanks to [Rofi](https://github.com/DaveDavenport/Rofi).
+
+It has:
+
+- **Fuzzy search**: No need to type the complete word. Just type parts of it (separated by spaces).
+- **Globbing**: Use wildcards like `?`, `*` etc.
+
 ## Errors
 
 - `ERR_NOWORDS`: Caused when no suggestions are found. Return value: 1. *NOTE*: Suppressed and program restarted in `--no-selection` mode unless
@@ -186,6 +196,21 @@ You can change the way `--auto-selection` selects words.
 - `ERR_REJECTED`: Caused when TextSuggest is cancelled by user (for example, by pressing `Esc`). Return value: 2.
 
 - `ERR_EXPRESSION`: Caused when evaluating a [math expression](#math) results in a Python error. (Usually `SyntaxError`). Full traceback of said error is writted to stderr. Return value: 3.
+
+## Modes
+
+Internally, TextSuggest has two *modes*:
+
+1. Provides completion for a specific word: `replace` mode.
+2. Provides a list of all words: `insert` mode.
+
+You will see this in TextSuggest output:
+
+```bash
+$ textsuggest
+Running in replace mode.
+...
+```
 
 ## textsuggestd
 

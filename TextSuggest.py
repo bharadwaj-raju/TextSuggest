@@ -36,7 +36,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 133  # Updated using git pre-commit hook
+__version__ = 135  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -179,10 +179,12 @@ def restart_program(additional_args=[], remove_args=[]):
 		for arg in additional_args:
 			new_cmd += ' ' + arg
 
+	print(new_cmd)
+
 	with open('/tmp/restart.sh', 'w') as f:
 		f.write('%s %s' % (sys.executable, new_cmd))
 
-	restart_proc = sp.Popen(['sh /tmp/restart.sh'], shell=True)
+	restart_proc = sp.Popen(['sh', '/tmp/restart.sh'])
 	restart_proc.wait()  # Allow restart.sh to fully execute
 
 	sys.exit(restart_proc.returncode)
@@ -201,7 +203,7 @@ else:
 			if args.auto_selection == 'beginning':
 				# Ctrl + Shift + ->
 				sp.Popen([
-					'xdotool key Ctrl+Shift+Right > /dev/null'],
+					'sleep 0.5; xdotool key Ctrl+Shift+Right > /dev/null'],
 					shell=True)
 			elif args.auto_selection == 'middle':
 				# Ctrl + <- then Ctrl + Shift + ->
@@ -213,10 +215,7 @@ else:
 				sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'],
 						 shell=True)
 
-			time.sleep(1.5)
-			# Otherwise restart_program restarts before selection is complete
-
-			restart_program(remove_args=['--auto-selection', 'beginning', 'middle', 'end'])
+			time.sleep(1)
 
 		current_word = sp.check_output(['xsel']).decode('utf-8').strip()
 
@@ -312,7 +311,7 @@ def process_suggestion(suggestion):
 
 	if not args.no_history:
 		with open(hist_file, 'a') as f:
-			f.write(suggestion)
+			f.write('\n' + suggestion)
 
 	if suggest_method == 'replace':
 		# Erase current word

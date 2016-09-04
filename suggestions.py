@@ -23,18 +23,16 @@ def get_suggestions(word, dict_files):
 	for dictionary in dict_files:
 		try:
 			with open(dictionary) as f:
-				for dict_word in f:
-					if word == '':
-						suggestions.append(dict_word)
-					
-					else:
-						if word in dict_word:
-							suggestions.append(dict_word.rstrip('\r\n'))
-						
-						elif word.split(' ')[0] in dict_word:
-							suggestions.append(dict_word.rstrip('\r\n'))
-
+				dictionary_contents = f.read()
+			
 		except FileNotFoundError:
-			pass
+			dictionary_contents = ''
+
+		for dict_word in dictionary_contents.split('\n'):
+			if word in dict_word:
+				suggestions.append(dict_word.rstrip('\r\n'))
+			
+			elif word.split(' ')[0] in dict_word:
+				suggestions.append(dict_word.rstrip('\r\n'))
 
 	return suggestions
