@@ -28,12 +28,15 @@ import subprocess as sp
 import sys
 import time
 import collections
+import traceback
 
 from languages import get_language_name
 from fonts import get_font_name
 from suggestions import get_suggestions
 
 import argparse
+
+__version__ = 133  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -51,7 +54,8 @@ arg_parser = argparse.ArgumentParser(
 	Return codes:
 	0 : Success
 	1 : No words found
-	2 : Cancelled by user'''.replace('\t', ''))
+	2 : Cancelled by user
+	3 : Math expression error'''.replace('\t', ''))
 
 arg_parser.add_argument(
 	'--word', type=str,
@@ -101,12 +105,11 @@ arg_parser.add_argument(
 args = arg_parser.parse_args()
 
 if args.version:
-	# Using a git pre-commit hook, replace number with the value of git rev-list --count HEAD + 1
-	print('''TextSuggest 132
+	print('''TextSuggest %d
 			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
 			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 			This is free software; you are free to change and redistribute it.
-			There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('    ', ''))
+			There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('    ', '') % __version__)
 
 	sys.exit(0)
 
@@ -177,12 +180,12 @@ def restart_program(additional_args=[], remove_args=[]):
 			new_cmd += ' ' + arg
 
 	with open('/tmp/restart.sh', 'w') as f:
-		f.write('%s %s &' % (sys.executable, new_cmd))
+		f.write('%s %s' % (sys.executable, new_cmd))
 
-	sp.Popen(['sh /tmp/restart.sh'], shell=True)
-	time.sleep(1.5)  # Allow restart.sh to fully execute
+	restart_proc = sp.Popen(['sh /tmp/restart.sh'], shell=True)
+	restart_proc.wait()  # Allow restart.sh to fully execute
 
-	sys.exit(0)
+	sys.exit(restart_proc.returncode)
 
 if args.no_selection:
 	current_word = ''
@@ -257,13 +260,6 @@ def type_text(text):
 	else:
 		sp.Popen(['xdotool', 'type', '--', text])
 
-def type_command_output(command):
-
-	command_out = sp.check_output([command], shell=True)
-	command_out = command_out.decode('utf-8').rstrip()
-
-	type_text(command_out)
-
 def display_dialog_list(items_list):
 
 	mouse_loc_raw = sp.check_output(['xdotool', 'getmouselocation', '--shell'])
@@ -283,12 +279,12 @@ def display_dialog_list(items_list):
 		else:
 			font = get_font_name(language)
 			if not font:
-				# If returned empty, use default
+				# use default
 				font = 'Monospace 10'
 
 	history = '-disable-history' if args.no_history else '-no-disable-history'
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1' % (items_list, history, font, x, y)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -glob -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1' % (items_list, history, font, x, y)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
@@ -299,89 +295,63 @@ def display_dialog_list(items_list):
 	with open(full_dict_script_path, 'w') as f:
 		f.write(popup_menu_cmd_str)
 
-	try:
-		choice = sp.check_output(['sh %s' % full_dict_script_path], shell=True)
-	except sp.CalledProcessError:
-		return []  # Will be handled by apply_suggestion()
+	choice_proc = sp.Popen(['sh', full_dict_script_path], stdout=sp.PIPE)
+	choice = choice_proc.communicate()[0].decode('utf-8').rstrip('\n')
+	choice_proc.wait()
+
+	if choice_proc.returncode != 0:
+		# No suggestion wanted
+		sys.stderr.write('ERR_REJECTED: User doesn\'t want any suggestion.')
+		sys.stdout.flush()
+		sys.exit(2)
+		print('fjh')
 
 	return choice
 
-def apply_suggestion(suggestion):
+def process_suggestion(suggestion):
 
-	if not suggestion:
-		# User doesn't want any suggestion
-		# exit
-		sys.stderr.write('ERR_REJECTED: User doesn\'t want any suggestion.')
-		sys.exit(2)
+	if not args.no_history:
+		with open(hist_file, 'a') as f:
+			f.write(suggestion)
 
-	else:
-		# User wants a suggestion
+	if suggest_method == 'replace':
+		# Erase current word
+		sp.Popen(['xdotool', 'key', 'BackSpace'])
 
-		suggestion = suggestion.decode('utf-8')
+		if current_word[:1].isupper():
+			suggestion = suggestion.capitalize()
 
-		if not args.no_history:
-			with open(hist_file, 'a') as f:
-				f.write(suggestion)
+	if '=' in suggestion:
+		suggestion = suggestion.split('=', 1)[1]
 
-		if suggest_method == 'replace':
-			# Erase current word
-			sp.Popen(['xdotool', 'key' 'BackSpace'])
+	if suggestion.startswith('#'):
+		# Command output
+		suggestion = sp.check_output(suggestion[1:], shell=True).decode('utf-8').rstrip()
 
-			if current_word[:1].isupper():
-				suggestion = suggestion.capitalize()
+	elif suggestion.startswith('%'):
+		# Math
+		try:
+			suggestion = str(eval(suggestion[1:]))
+		except:
+			sys.stderr.write(traceback.format_exc())
+			sys.stderr.flush()
+			sys.stderr.write('ERR_EXPRESSION: Math expression %s was invalid.' % suggestion)
+			sys.exit(3)
 
-		# Type suggestion
-		if '=' in suggestion:
-			# Alias
-			expand_suggestion = suggestion.split('=')[1]
-
-			if expand_suggestion.startswith('#'):
-				# Aliased command
-				command_suggestion = expand_suggestion[1:]
-				type_command_output(command_suggestion)
-
-				sys.exit(0)
-				
-			elif expand_suggestion.startswith('%'):
-				# Aliased math
-				suggestion = expand_suggestion[1:]
-
-				suggestion = eval(suggestion)
-				type_text(str(suggestion))
-					
-				sys.exit(0)	
-			
-			else:
-				type_text(expand_suggestion.rstrip())
-
-				sys.exit(0)
-
-		elif suggestion.startswith('#'):
-			# Command
-			command_suggestion = suggestion[1:]
-			type_command_output(command_suggestion)
-
-			sys.exit(0)
-
-		elif suggestion.startswith('%'):
-			# Math expression
-			suggestion = suggestion[1:]
-
-			suggestion = eval(suggestion)
-			type_text(str(suggestion))
-			
-			sys.exit(0)
-
-		else:
-			type_text(suggestion.rstrip())
-			sys.exit(0)
+	return suggestion
 
 def main():
+
+	print('Running in %s mode.' % suggest_method)
+
+	if suggest_method == 'replace':
+		print('Getting suggestions for word:', current_word)
 
 	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
 
 	if not words_list or words_list == ['']:
 		if not args.exit_on_no_words_found:
+			print('WARN_NOWORDS: Restarting in --no-selection mode. To prevent restarting, use --exit-on-no-words-found.')
 			restart_program(additional_args=['--no-selection'])
 		else:
 			sys.stderr.write('ERR_NOWORDS: No words found.')
@@ -395,7 +365,15 @@ def main():
 
 	words_list = '|'.join(words_list)
 
-	apply_suggestion(display_dialog_list(words_list))
+	chosen_word = display_dialog_list(words_list)
+
+	print('Chosen word:', chosen_word)
+
+	processed_chosen_word = process_suggestion(chosen_word)
+
+	print('Processed:', processed_chosen_word)
+
+	type_text(processed_chosen_word)
 
 if __name__ == '__main__':
 	main()

@@ -178,6 +178,15 @@ You can change the way `--auto-selection` selects words.
 
 - Add `end` to `--auto-selection` to assume that text-cursor is **at end of the word**. *This is the default.*
 
+## Errors
+
+- `ERR_NOWORDS`: Caused when no suggestions are found. Return value: 1. *NOTE*: Suppressed and program restarted in `--no-selection` mode unless
+`--exit-on-no-words-found` is passed.
+
+- `ERR_REJECTED`: Caused when TextSuggest is cancelled by user (for example, by pressing `Esc`). Return value: 2.
+
+- `ERR_EXPRESSION`: Caused when evaluating a [math expression](#math) results in a Python error. (Usually `SyntaxError`). Full traceback of said error is writted to stderr. Return value: 3.
+
 ## textsuggestd
 
 `textsuggestd` is a work-in-progress background service that automatically launches TextSuggest when appropriate.

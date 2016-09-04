@@ -18,8 +18,6 @@ def get_suggestions(word, dict_files):
 
 	suggestions = []  # Store suggestions in this
 
-	orig_word = word
-
 	word = word.lower()
 
 	for dictionary in dict_files:
@@ -28,11 +26,14 @@ def get_suggestions(word, dict_files):
 				for dict_word in f:
 					if word == '':
 						suggestions.append(dict_word)
+					
 					else:
 						if word in dict_word:
 							suggestions.append(dict_word.rstrip('\r\n'))
-						elif dict_word.startswith(word):
+						
+						elif word.split(' ')[0] in dict_word:
 							suggestions.append(dict_word.rstrip('\r\n'))
+
 		except FileNotFoundError:
 			pass
 
