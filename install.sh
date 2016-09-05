@@ -40,9 +40,8 @@ case "$1" in
 esac
 
 echo "Verifying dependencies..."
-deps=(rofi xsel xdotool)
 
-for dep in "${deps[@]}"; do
+for dep in rofi xsel xdotool; do
 	if ! command -v "$dep" > /dev/null 2>&1; then
 		echo "$dep not installed!"
 		exit 1
