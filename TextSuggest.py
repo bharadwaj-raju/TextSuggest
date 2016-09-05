@@ -36,7 +36,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 135  # Updated using git pre-commit hook
+__version__ = 136  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -179,7 +179,7 @@ def restart_program(additional_args=[], remove_args=[]):
 		for arg in additional_args:
 			new_cmd += ' ' + arg
 
-	print(new_cmd)
+	print('Restarting as:', new_cmd)
 
 	with open('/tmp/restart.sh', 'w') as f:
 		f.write('%s %s' % (sys.executable, new_cmd))
@@ -248,7 +248,7 @@ def type_text(text):
 	if '\n' in text:
 		newline_list = text.split('\n')
 
-		for i in command_out_newl_list:
+		for i in newline_list:
 			type_proc = sp.Popen(['xdotool', 'type', '--clearmodifiers', '--', i])
 
 			type_proc.wait()
@@ -295,7 +295,7 @@ def display_dialog_list(items_list):
 		f.write(popup_menu_cmd_str)
 
 	choice_proc = sp.Popen(['sh', full_dict_script_path], stdout=sp.PIPE)
-	choice = choice_proc.communicate()[0].decode('utf-8').rstrip('\n')
+	choice = choice_proc.communicate()[0].decode('utf-8').rstrip('\n').replace('\\n', '\n')
 	choice_proc.wait()
 
 	if choice_proc.returncode != 0:
@@ -303,7 +303,6 @@ def display_dialog_list(items_list):
 		sys.stderr.write('ERR_REJECTED: User doesn\'t want any suggestion.')
 		sys.stdout.flush()
 		sys.exit(2)
-		print('fjh')
 
 	return choice
 
