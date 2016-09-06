@@ -36,7 +36,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 136  # Updated using git pre-commit hook
+__version__ = 137  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -44,6 +44,7 @@ base_dict_dir = '/usr/share/textsuggest/dictionaries'
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
+gtk3_apps = ['gedit', 'mousepad', 'abiword']
 
 # Arguments
 
@@ -159,6 +160,14 @@ def uniq(seq):
 	seen_add = seen.add
 	return [x for x in seq if not (x in seen or seen_add(x))]
 
+def get_cmd_out(program):
+
+	if type(program) == list:
+		return sp.check_output(program).decode('utf-8').rstrip('\n').replace('\\n', '\n')
+
+	else:
+		return sp.check_output(program, shell=True).decode('utf-8').rstrip('\n').replace('\\n', '\n')
+
 def restart_program(additional_args=[], remove_args=[]):
 
 	# Restart, preserving all original arguments and optionally adding more
@@ -196,7 +205,6 @@ if args.no_selection:
 else:
 	if args.word:
 		current_word = ' '.join(args.word)
-		suggest_method = 'replace'
 
 	else:
 		if args.auto_selection:
@@ -217,9 +225,9 @@ else:
 
 			time.sleep(1)
 
-		current_word = sp.check_output(['xsel']).decode('utf-8').strip()
+		current_word = get_cmd_out(['xsel'])
 
-		suggest_method = 'replace'
+	suggest_method = 'replace'
 
 def remove_dups(s_list):
 
@@ -243,6 +251,12 @@ def get_dictionaries():
 
 	return dictionaries
 
+def get_focused_window():
+
+	raw = get_cmd_out(['xdotool', 'getwindowfocus', 'getwindowname']).lower().split()
+
+	return raw[len(raw) - 1]
+
 def type_text(text):
 
 	if '\n' in text:
@@ -261,8 +275,7 @@ def type_text(text):
 
 def display_dialog_list(items_list):
 
-	mouse_loc_raw = sp.check_output(['xdotool', 'getmouselocation', '--shell'])
-	mouse_loc_raw = mouse_loc_raw.decode('utf-8')
+	mouse_loc_raw = get_cmd_out(['xdotool', 'getmouselocation', '--shell'])
 
 	x = mouse_loc_raw.split('\n')[0].replace('X=', '')
 	y = mouse_loc_raw.split('\n')[1].replace('Y=', '')
@@ -293,12 +306,10 @@ def display_dialog_list(items_list):
 
 	with open(full_dict_script_path, 'w') as f:
 		f.write(popup_menu_cmd_str)
+	try:
+		choice = get_cmd_out(['sh', full_dict_script_path])
 
-	choice_proc = sp.Popen(['sh', full_dict_script_path], stdout=sp.PIPE)
-	choice = choice_proc.communicate()[0].decode('utf-8').rstrip('\n').replace('\\n', '\n')
-	choice_proc.wait()
-
-	if choice_proc.returncode != 0:
+	except sp.CalledProcessError:
 		# No suggestion wanted
 		sys.stderr.write('ERR_REJECTED: User doesn\'t want any suggestion.')
 		sys.stdout.flush()
@@ -313,6 +324,10 @@ def process_suggestion(suggestion):
 			f.write('\n' + suggestion)
 
 	if suggest_method == 'replace':
+		if get_focused_window() in gtk3_apps:
+			print('Using GTK+ 3 workaround.')
+			gtk3_fix = sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Right; sleep 0.5'], shell=True)
+			gtk3_fix.wait()
 		# Erase current word
 		sp.Popen(['xdotool', 'key', 'BackSpace'])
 
@@ -324,7 +339,7 @@ def process_suggestion(suggestion):
 
 	if suggestion.startswith('#'):
 		# Command output
-		suggestion = sp.check_output(suggestion[1:], shell=True).decode('utf-8').rstrip()
+		suggestion = get_cmd_out(suggestion[1:])
 
 	elif suggestion.startswith('%'):
 		# Math
