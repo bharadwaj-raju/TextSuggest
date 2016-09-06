@@ -36,7 +36,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 137  # Updated using git pre-commit hook
+__version__ = 138  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -268,7 +268,7 @@ def type_text(text):
 			type_proc.wait()
 			sp.Popen(['xdotool', 'key', 'Shift+Return'])
 
-			time.sleep(0.5)
+			time.sleep(0.2)
 
 	else:
 		sp.Popen(['xdotool', 'type', '--', text])
