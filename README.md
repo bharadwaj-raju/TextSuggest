@@ -4,7 +4,9 @@
 
 A utility to autocomplete words in the GUI.
 
-[![TextSuggest in action](http://i.imgur.com/qa2PExH.gif)](http://i.imgur.com/qa2PExH.gif)
+**Click the image to view a GIF demo.**
+
+[![TextSuggest in action](img/demo-first-frame.png)](img/demo.gif)
 
 Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSuggest is free as in freedom.
 
