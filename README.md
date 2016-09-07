@@ -131,6 +131,8 @@ Simply type into TextSuggest:
 
 And '5' will be inserted. You can do any math expression that Python supports.
 
+You can also use any function in the Python [`math`](https://docs.python.org/3/library/math.html) library, for example `%math.sqrt(25)` for √25.
+
 #### Custom Words + Math
 
 Add in `~/.config/textsuggest/Custom_Words.txt`:

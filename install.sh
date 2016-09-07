@@ -58,7 +58,7 @@ install -D -m644 README.md /usr/share/doc/textsuggest/README
 
 # Strip README of special prettifying (to make it look good online)
 cat README.md | perl -pe 's/\(.*\)|\[|\]//g' |  perl -pe 's/<.*> //g' | perl -pe 's/!Arch Linux |!Ubuntu //g' > /usr/share/doc/textsuggest/README
-chmod 664 /usr/share/doc/textsuggest/README.md
+chmod 664 /usr/share/doc/textsuggest/README
 install -D -m644 LICENSE /usr/share/licenses/textsuggest/COPYING
 
 chmod -R a+r /usr/share/textsuggest
