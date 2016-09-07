@@ -1,6 +1,6 @@
 # TextSuggest
 
-**Save keystrokes.** Get word completions and suggestions, use [word expansions](#custom-words), results of [math](#math), [command outputs](#commands) and more.
+**Save keystrokes.** Get word completions and suggestions, use [word expansions](#custom-words), results of [math](#math), [command outputs](#commands) and more. It is also [extensible](#extensions). TextSuggest is [multi-language](#other-languages)
 
 A utility to autocomplete words in the GUI.
 
@@ -57,17 +57,7 @@ are at the top of list. History can be disabled: use the `--no-history` option.
 
 If you installed it using packages, use your system's package manager.
 
-Otherwise:
-
-```bash
-$ sudo ./install.sh --uninstall
-```
-
-To also remove configuration files, use
-
-```bash
-$ sudo ./install.sh --uninstall-full
-```
+Otherwise use `sudo ./install.sh --uninstall`.
 
 ## Options
 
@@ -105,7 +95,7 @@ optional arguments:
 
 ## Expansions
 
-TextSuggest can handle a range of expansions:
+TextSuggest can handle a range of expansions. It can also be [extended](#extensions)
 
 ### Custom words
 
@@ -121,7 +111,7 @@ Inserts the output of a command:
 
     #ls
 
-when typed into a TextSuggest window, will insert output of `ls`
+when typed into a TextSuggest window, will insert output of `ls`.
 
 #### Custom words + Commands
 
@@ -146,6 +136,45 @@ Add in `~/.config/textsuggest/Custom_Words.txt`:
     custom=%2+3
 
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
+
+## Extensions
+
+TextSuggest supports powerful *processors* for extensions.
+
+A processor *processes* text before handing it over to TextSuggest to type it out.
+By default TextSuggest has two processors, [`command`](#commands) and [`math_expression`](#math).
+
+You can see this in TextSuggest output:
+
+```bash
+$ textsuggest --no-selection
+Running in insert mode.
+Chosen word: %2 + 3
+Using processor math_expression from /usr/share/textsuggest/processors/math_expression.py
+Processed: 5
+```
+
+### Making your own extension
+
+A *processor* is a simple Python script, that *must* define two functions, `matches()` and `process()`. Look into this example:
+
+```python
+def matches(text):
+
+	# Return whether this processor should process 'text' or not. (True or False)
+	# For example, the command processor has it like this:
+	#     return True if text.startswith('#') else False
+
+def process(text):
+
+	# Do something with 'text' and return it.
+	# You *must* return a string.
+	# This is what will be finally typed.
+```
+
+Make one based on the sample above, and place it in `~/.config/textsuggest/processors/` (file must end with `.py` extension).
+
+Processors in `~/.config/textsuggest/processors` take precedence over those in `/usr/share/textsuggest/processors`, in case of a name or match conflict.
 
 ## Other langauges
 

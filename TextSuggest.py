@@ -36,7 +36,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 138  # Updated using git pre-commit hook
+__version__ = 140  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -45,6 +45,12 @@ extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 gtk3_apps = ['gedit', 'mousepad', 'abiword']
+
+processor_dirs = [os.path.expanduser('~/.config/textsuggest/processors'),
+				'/usr/share/textsuggest/processors']
+
+for dir in processor_dirs:
+	sys.path.insert(0, dir)
 
 # Arguments
 
@@ -337,19 +343,14 @@ def process_suggestion(suggestion):
 	if '=' in suggestion:
 		suggestion = suggestion.split('=', 1)[1]
 
-	if suggestion.startswith('#'):
-		# Command output
-		suggestion = get_cmd_out(suggestion[1:])
+	for dir in processor_dirs:
+		for processor_name in os.listdir(dir):
+			if processor_name.endswith('.py'):
+				processor = __import__(processor_name.replace('.py', ''))
 
-	elif suggestion.startswith('%'):
-		# Math
-		try:
-			suggestion = str(eval(suggestion[1:]))
-		except:
-			sys.stderr.write(traceback.format_exc())
-			sys.stderr.flush()
-			sys.stderr.write('ERR_EXPRESSION: Math expression %s was invalid.' % suggestion)
-			sys.exit(3)
+				if processor.matches(suggestion):
+					print('Using processor', processor_name.replace('.py', ''), 'from', os.path.join(dir, processor_name))
+					return processor.process(suggestion)
 
 	return suggestion
 
