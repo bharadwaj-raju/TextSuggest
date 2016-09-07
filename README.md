@@ -1,6 +1,6 @@
 # TextSuggest
 
-**Save keystrokes.** Get word completions and suggestions, use [word expansions](#custom-words), results of [math](#math), [command outputs](#commands) and more. It is also [extensible](#extensions). TextSuggest is [multi-language](#other-languages)
+**Save keystrokes.** Get word completions and suggestions, use [word expansions](#custom-words), results of [math](#math), [command outputs](#commands) and more. It is also [extensible](#extensions). TextSuggest is [multi-language](#other-languages).
 
 A utility to autocomplete words in the GUI.
 
@@ -97,7 +97,7 @@ optional arguments:
 
 ## Expansions
 
-TextSuggest can handle a range of expansions. It can also be [extended](#extensions)
+TextSuggest can handle a range of expansions. It can also be [extended](#extensions).
 
 ### Custom words
 
