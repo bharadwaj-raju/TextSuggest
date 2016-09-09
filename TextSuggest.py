@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+# TextSuggest
 # Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
 # Contributor: Maksudur Rahman Maateen <ugcoderbd@gmail.com>
 
@@ -11,14 +12,6 @@
 # See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
 
 # A simple linux tool to autocomplete text inputs in the GUI
-
-# Uses the English Open Word List
-# (http://dreamsteep.com/projects/the-english-open-word-list.html)
-# Plus another set (in Extra_Words.txt) to include a few words that
-# the EOWL doesn't.
-# Also uses a Bangla dictionary from sarim/ibus-avro
-
-# Inspired by zsh's smart tab completion
 
 # Bind this script to a keyboard shortcut and press it to show
 # a list of suggested words.
@@ -36,7 +29,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 142  # Updated using git pre-commit hook
+__version__ = 144  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -100,16 +93,28 @@ arg_parser.add_argument(
 	choices=['beginning', 'middle', 'end'], const='end', required=False)
 
 arg_parser.add_argument(
+	'--rofi-options', type=str,
+	help='Specify additonal options to pass to Rofi. \n \n',
+	nargs='+', required=False)
+
+arg_parser.add_argument(
+	'--additional-languages', type=str,
+	help='Specify additional languages. \n \n',
+	nargs='+', required=False)
+
+arg_parser.add_argument(
 	'--help-auto-selection', action='store_true',
 	help='See help and documentation on the auto-selection option. \n \n',
 	required=False)
 
 arg_parser.add_argument(
-	'--version', action='store_true',
+	'-v', '--version', action='store_true',
 	help='Print version and license information.',
 	required=False)
 
 args = arg_parser.parse_args()
+
+print(' '.join(args.rofi_options))
 
 if args.version:
 	print('''TextSuggest %d
@@ -148,12 +153,12 @@ if os.path.isfile(prev_custom_words_file):
 	os.rename(prev_custom_words_file, custom_words_file)
 
 if args.language:
-	language = [args.language, 'English']
+	language = [args.language]
 else:
-	if get_language_name() != 'English':
-		language = [get_language_name(), 'English']
-	else:
-		language = ['English']
+	language = [get_language_name()]
+
+if args.additional_languages:
+	language.extend(args.additional_languages)
 
 def freq_sort(lst):
 	counts = collections.Counter(lst)
@@ -247,8 +252,12 @@ def get_dictionaries():
 	dictionaries = []
 
 	for lang in language:
-		for file in os.listdir(os.path.join(base_dict_dir, lang)):
-			dictionaries.append(os.path.join(base_dict_dir, lang, file))
+		try:
+			for file in os.listdir(os.path.join(base_dict_dir, lang)):
+				dictionaries.append(os.path.join(base_dict_dir, lang, file))
+
+		except FileNotFoundError:
+			pass
 
 	if os.path.isfile(custom_words_file):
 		dictionaries.append(custom_words_file)
@@ -300,9 +309,9 @@ def display_dialog_list(items_list):
 				# use default
 				font = 'Monospace 10'
 
-	history = '-disable-history' if args.no_history else '-no-disable-history'
+	rofi_opts = ' '.join(args.rofi_options) if args.rofi_options else ''
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu %s -fuzzy -glob -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1' % (items_list, history, font, x, y)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1 %s' % (items_list, font, x, y, rofi_opts)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.

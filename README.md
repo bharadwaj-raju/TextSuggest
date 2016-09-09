@@ -65,35 +65,27 @@ Otherwise use `sudo ./install.sh --uninstall`.
 
 Also documented in the manual page: `man textsuggest` and `--help`.
 
-```bash
-$ textsuggest --help
-...
-optional arguments:
-  -h, --help            show this help message and exit
-  --word WORD [WORD ...]
-                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection.
+- `-h`, `--help`: Print out a help message.
 
-  --no-selection        Give all words as suggestions, which you can then filter.
+- `--word WORD`: Specify word to give suggestions for. If not specified, taken from X11 selection. Ignored if `--no-selection`.
 
-  --font FONT [FONT ...]
-                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize).
+- `--no-selection`: Give *all* the suggestions. Then you can search through them etc.
 
-  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt)
+- `--font FONT`: Specify font to use for Rofi. Format: FontName (Weight) (Size). Default: Varies based on language.
 
-  --exit-on-no-words-found
-                        Exit if no words are found (instead of restarting in --no-selection mode)
+- `--no-history`: Disable the storage of frequently-used words in `~/.config/textsuggest/history.txt`
 
-  --language LANGUAGE   Manually set language, in case script fails to auto-detect from keyboard layout.
+- `--language LANGUAGE`: Specify language to use. Appropriate language will be detected if not specified. If detection fails too, English will be used.
 
-  --auto-selection [{beginning,middle,end}]
-                        Automatically select word under cursor and suggest. See --help-auto-selection for details. Ignored if --no-selection.
+- `--auto-selection [beginning|middle|end]`: Auto-select word under cursor and suggest. See [Auto-selection](#auto-selection) and `--help-auto-selection`.
 
-  --help-auto-selection
-                        See help and documentation on the auto-selection option.
+- `--rofi-options OPTIONS`: Specify additional options for Rofi.
 
-  --version             Print version and license information.
-...
-```
+- `--additional-languages LANGUAGES`: Add additional languages for use.
+
+- `--help-auto-selection`: See help and documentation for the `--auto-selection` option.
+
+- `-v`, `--version`: Print out version and license information.
 
 ## Expansions
 

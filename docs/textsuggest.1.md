@@ -46,9 +46,6 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
 
 **NOTE:** The normal "you select text and textsuggests suggests on that" will **not** work with this enabled.
 
-   `--no-rofi-customization`
-   Do not apply custom Rofi theme.
-
    `--font` *font*
    Instead of selecting font based on language (default: Monospace 10), use *font* specified. *font* must be in Pango format: `FontName (Weight) Size`
 
@@ -59,10 +56,16 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
    Instead of auto-detecting language based on keyboard layout, use *language* specified.
 
    `--exit-on-no-words-found`
-   Instead of restarting in `--no-select` mode, exit with an error (error code 2, `ERR_NOWORDS`)
+   Instead of restarting in `--no-select` mode, exit with an error (error code 2, `ERR_NOWORDS`).
+
+   `--rofi-options`
+   Specify additional options for rofi(1).
+
+   `--additional-languages` *langauges* ...
+   Add additional languages for use.
 
    `--version`
-   Print version and license information
+   Print version and license information.
 
 ## EXPANSIONS
   

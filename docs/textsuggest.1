@@ -71,10 +71,6 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
 \fBNOTE:\fR The normal "you select text and textsuggests suggests on that" will \fBnot\fR work with this enabled\.
 .
 .P
-   \fB\-\-no\-rofi\-customization\fR
-   Do not apply custom Rofi theme\.
-.
-.P
    \fB\-\-font\fR \fIfont\fR
    Instead of selecting font based on language (default: Monospace 10), use \fIfont\fR specified\. \fIfont\fR must be in Pango format: \fBFontName (Weight) Size\fR
 .
@@ -88,11 +84,19 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
 .
 .P
    \fB\-\-exit\-on\-no\-words\-found\fR
-   Instead of restarting in \fB\-\-no\-select\fR mode, exit with an error (error code 2, \fBERR_NOWORDS\fR)
+   Instead of restarting in \fB\-\-no\-select\fR mode, exit with an error (error code 2, \fBERR_NOWORDS\fR)\.
+.
+.P
+   \fB\-\-rofi\-options\fR
+   Specify additional options for rofi(1)\.
+.
+.P
+   \fB\-\-additional\-languages\fR \fIlangauges\fR \.\.\.
+   Add additional languages for use\.
 .
 .P
    \fB\-\-version\fR
-   Print version and license information
+   Print version and license information\.
 .
 .SH "EXPANSIONS"
   \fBCOMMANDS\fR
