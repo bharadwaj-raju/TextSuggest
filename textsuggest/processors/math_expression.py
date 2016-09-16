@@ -1,6 +1,6 @@
 import traceback
 import sys
-import math
+from math import *  # simpler + shorter (for users): math.sqrt() → sqrt()
 
 def matches(text):
 

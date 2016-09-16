@@ -9,63 +9,53 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
 
   https://github.com/bharadwaj-raju/TextSuggest
 
-  textsuggest is a simple X11 utility that autocompletes, suggests and expands words in the GUI.
+  textsuggest (or TextSuggest) is a simple X11 utility that saves you keystrokes by autocompleting, suggesting and expanding words.
 
 ## USAGE
 
-  textsuggest has two modes:
+  Call `textsuggest` to get suggestions, completions etc. See also the **OPTIONS** section.
 
-   - 'replace' mode: Suggests word completions based on current X11 selection contents. Default.
-   - 'insert' mode : Gives a list of all known words, allowing you to search them and choose one. Activated with `--no-selection` option.
+  For convenience, bind the script to a keyboard shortcut(s):
+   
+   - `textsuggest` for replace mode (suggestions for a specific word, taken from X11 selection (see `xsel(1)`) if `--word` is not given)
+   - `textsuggest --all-words` for insert mode (get all words)
 
-  Thus, assign two keyboard shortcuts:
-
-   - `textsuggest` for replace mode
-   - `textsuggest --no-selection` for insert mode
+   Also see the **AUTO-SELECTION** section.
 
 ## OPTIONS
 
-  `--help`, `-h`
-   View a short summary of options.
+  `-h`, `--help`            show a summary of options and exit
+  
+  `--word` *word* ...
+                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. 
+                         
+  `--all-words`
+                        Give all words as suggestions, which you can then filter. 
+                         
+  `--font` *font*
+                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). 
+                         
+  `--no-history`          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
+                         
+  `--exit-on-no-words-found`
+                        Exit if no words are found (instead of restarting in --no-selection mode) 
+                         
+  `--language` *language*   Manually set language, in case script fails to auto-detect from keyboard layout. 
+                         
+  `--auto-selection` *[beginning|middle|end]*
+                        Automatically select word under cursor and suggest. See **AUTO-SELECTION**. Ignored if --no-selection. 
+                         
+  `--no-processing`       Disable using of any processors. 
+                         
+  `--rofi-options` *options* ...
+                        Specify additonal options to pass to Rofi. 
+                         
+  `--additional-languages` *languages* ...
+                        Specify additional languages. 
+                         
+  `-v`, `--version`         Print version and license information.
 
-   `--word` *word*
-   Instead of suggesting words based on X11 selection contents, suggest based on *word* specified. Ignored if `--no-selection`.
-
-  `--auto-selection *[beginning|middle|end]*`
-
-  Automatically select words for you before suggestion, saving time and (your) keystrokes. Ignored if `--no-selection`.
-
-  `--auto-selection` has three modes:
-
-  - 'beginning': Assumes text-cursor is at beginning of word.
-  - 'middle'   : Assumes text-cursor is somewhere in the middle of word.
-  - 'end'      : Assumes text-cursor is at end of word. Default.
-
-  The three choices help choose the keyboard shortcut to be pressed. It would be good to auto-detect the option
-  according to the text-cursor's position, but X11 does not provide this.
-
-**NOTE:** The normal "you select text and textsuggests suggests on that" will **not** work with this enabled.
-
-   `--font` *font*
-   Instead of selecting font based on language (default: Monospace 10), use *font* specified. *font* must be in Pango format: `FontName (Weight) Size`
-
-   `--no-history`
-   Disable frequently-used words history (stored in `~/.config/textsuggest/history.txt`)
-
-   `--language` *language*
-   Instead of auto-detecting language based on keyboard layout, use *language* specified.
-
-   `--exit-on-no-words-found`
-   Instead of restarting in `--no-select` mode, exit with an error (error code 2, `ERR_NOWORDS`).
-
-   `--rofi-options`
-   Specify additional options for rofi(1).
-
-   `--additional-languages` *langauges* ...
-   Add additional languages for use.
-
-   `--version`
-   Print version and license information.
+ 
 
 ## EXPANSIONS
   
@@ -75,7 +65,7 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
 
   **MATH**
     
-  Use `%2+3` in TextSuggest to insert the answer of `2+3`. Can be used with any math valid in Python 3.
+  Use `%2+3` in TextSuggest to insert the answer of `2+3`. Can be used with any math valid in `python3(1)`, in addition to its `math` library.
 
   **ALIASES**
 
@@ -115,10 +105,35 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
 
   **NOTE:** The normal "you select text and textsuggests suggests on that" will **not** work with this enabled.
 
+## EXTENSIONS
+
+  TextSuggest supports powerful extensions via it's *processors*.
+
+  A processor does changes to the word chosen by the user and returns it to TextSuggest to type out.
+
+  TextSuggest includes two processors by default: `command` and `math_expression` (see **EXPANSIONS**).
+
+  **Making your own**
+
+  A processor is simply a `python3(1)` script that defines at least two functions:
+
+  - `matches(text)`: Return if `text` should be processed or not (processor's choice)
+  - `process(text)`: Return a string containing changed/modified `text`
+
+  Optionally it may define a `process_all` variable, whose valuse may be:
+
+  - `"first"`: To first process text through this processor before any others.
+  - `"last"`: After all processors have processed, process the text through this
+
 ## BUGS AND FEATURE REQUESTS
 
-  Please file bug reports and feature requests at the GitHub repository: https://github.com/bharadwaj-raju/TextSuggest
+  Please file bug reports and feature requests at the GitHub repository: https://github.com/bharadwaj-raju/TextSuggest/issues
+
+  Please include the output of `textsuggest --version` in the report/request.
 
 ## SEE ALSO
 
   - `textsuggestd(1)`
+  - `xsel(1)`
+  - `xdotool(1)`
+  - `python3(1)`

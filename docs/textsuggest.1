@@ -13,90 +13,67 @@
   https://github\.com/bharadwaj\-raju/TextSuggest
 .
 .P
-  textsuggest is a simple X11 utility that autocompletes, suggests and expands words in the GUI\.
+  textsuggest (or TextSuggest) is a simple X11 utility that saves you keystrokes by autocompleting, suggesting and expanding words\.
 .
 .SH "USAGE"
-  textsuggest has two modes:
+  Call \fBtextsuggest\fR to get suggestions, completions etc\. See also the \fBOPTIONS\fR section\.
+.
+.P
+  For convenience, bind the script to a keyboard shortcut(s):
 .
 .IP "\(bu" 4
-\'replace\' mode: Suggests word completions based on current X11 selection contents\. Default\.
+\fBtextsuggest\fR for replace mode (suggestions for a specific word, taken from X11 selection (see \fBxsel(1)\fR) if \fB\-\-word\fR is not given)
 .
 .IP "\(bu" 4
-\'insert\' mode : Gives a list of all known words, allowing you to search them and choose one\. Activated with \fB\-\-no\-selection\fR option\.
+\fBtextsuggest \-\-all\-words\fR for insert mode (get all words)
 .
 .IP
-Thus, assign two keyboard shortcuts:
-.
-.IP "\(bu" 4
-\fBtextsuggest\fR for replace mode
-.
-.IP "\(bu" 4
-\fBtextsuggest \-\-no\-selection\fR for insert mode
+Also see the \fBAUTO\-SELECTION\fR section\.
 .
 .IP "" 0
 .
 .SH "OPTIONS"
-  \fB\-\-help\fR, \fB\-h\fR
-   View a short summary of options\.
+  \fB\-h\fR, \fB\-\-help\fR            show a summary of options and exit
 .
 .P
-   \fB\-\-word\fR \fIword\fR
-   Instead of suggesting words based on X11 selection contents, suggest based on \fIword\fR specified\. Ignored if \fB\-\-no\-selection\fR\|\.
+  \fB\-\-word\fR \fIword\fR \.\.\.
+                        Specify word to give suggestions for\. Default: taken from X11 clipboard\. Ignored if \-\-no\-selection\. 
 .
 .P
-  \fB\-\-auto\-selection *[beginning|middle|end]*\fR
+  \fB\-\-all\-words\fR
+                        Give all words as suggestions, which you can then filter\. 
 .
 .P
-  Automatically select words for you before suggestion, saving time and (your) keystrokes\. Ignored if \fB\-\-no\-selection\fR\|\.
+  \fB\-\-font\fR \fIfont\fR
+                        Specify font for Rofi\. Must be in Pango format: FontName (Weight (optional) FontSize)\. 
 .
 .P
-  \fB\-\-auto\-selection\fR has three modes:
-.
-.IP "\(bu" 4
-\'beginning\': Assumes text\-cursor is at beginning of word\.
-.
-.IP "\(bu" 4
-\'middle\'   : Assumes text\-cursor is somewhere in the middle of word\.
-.
-.IP "\(bu" 4
-\'end\'      : Assumes text\-cursor is at end of word\. Default\.
-.
-.IP
-The three choices help choose the keyboard shortcut to be pressed\. It would be good to auto\-detect the option
-according to the text\-cursor\'s position, but X11 does not provide this\.
-.
-.IP "" 0
+  \fB\-\-no\-history\fR          Disable the frequently\-used words history (stored in ~/\.config/textsuggest/history\.txt) 
 .
 .P
-\fBNOTE:\fR The normal "you select text and textsuggests suggests on that" will \fBnot\fR work with this enabled\.
+  \fB\-\-exit\-on\-no\-words\-found\fR
+                        Exit if no words are found (instead of restarting in \-\-no\-selection mode) 
 .
 .P
-   \fB\-\-font\fR \fIfont\fR
-   Instead of selecting font based on language (default: Monospace 10), use \fIfont\fR specified\. \fIfont\fR must be in Pango format: \fBFontName (Weight) Size\fR
+  \fB\-\-language\fR \fIlanguage\fR   Manually set language, in case script fails to auto\-detect from keyboard layout\. 
 .
 .P
-   \fB\-\-no\-history\fR
-   Disable frequently\-used words history (stored in \fB~/\.config/textsuggest/history\.txt\fR)
+  \fB\-\-auto\-selection\fR \fI[beginning|middle|end]\fR
+                        Automatically select word under cursor and suggest\. See \fBAUTO\-SELECTION\fR\|\. Ignored if \-\-no\-selection\. 
 .
 .P
-   \fB\-\-language\fR \fIlanguage\fR
-   Instead of auto\-detecting language based on keyboard layout, use \fIlanguage\fR specified\.
+  \fB\-\-no\-processing\fR       Disable using of any processors\. 
 .
 .P
-   \fB\-\-exit\-on\-no\-words\-found\fR
-   Instead of restarting in \fB\-\-no\-select\fR mode, exit with an error (error code 2, \fBERR_NOWORDS\fR)\.
+  \fB\-\-rofi\-options\fR \fIoptions\fR \.\.\.
+                        Specify additonal options to pass to Rofi\. 
 .
 .P
-   \fB\-\-rofi\-options\fR
-   Specify additional options for rofi(1)\.
+  \fB\-\-additional\-languages\fR \fIlanguages\fR \.\.\.
+                        Specify additional languages\. 
 .
 .P
-   \fB\-\-additional\-languages\fR \fIlangauges\fR \.\.\.
-   Add additional languages for use\.
-.
-.P
-   \fB\-\-version\fR
-   Print version and license information\.
+  \fB\-v\fR, \fB\-\-version\fR         Print version and license information\.
 .
 .SH "EXPANSIONS"
   \fBCOMMANDS\fR
@@ -108,7 +85,7 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
   \fBMATH\fR
 .
 .P
-  Use \fB%2+3\fR in TextSuggest to insert the answer of \fB2+3\fR\|\. Can be used with any math valid in Python 3\.
+  Use \fB%2+3\fR in TextSuggest to insert the answer of \fB2+3\fR\|\. Can be used with any math valid in \fBpython3(1)\fR, in addition to its \fBmath\fR library\.
 .
 .P
   \fBALIASES\fR
@@ -173,12 +150,56 @@ according to the text\-cursor\'s position, but X11 does not provide this\.
 .
 .IP "" 0
 .
+.SH "EXTENSIONS"
+  TextSuggest supports powerful extensions via it\'s \fIprocessors\fR\|\.
+.
+.P
+  A processor does changes to the word chosen by the user and returns it to TextSuggest to type out\.
+.
+.P
+  TextSuggest includes two processors by default: \fBcommand\fR and \fBmath_expression\fR (see \fBEXPANSIONS\fR)\.
+.
+.P
+  \fBMaking your own\fR
+.
+.P
+  A processor is simply a \fBpython3(1)\fR script that defines at least two functions:
+.
+.IP "\(bu" 4
+\fBmatches(text)\fR: Return if \fBtext\fR should be processed or not (processor\'s choice)
+.
+.IP "\(bu" 4
+\fBprocess(text)\fR: Return a string containing changed/modified \fBtext\fR
+.
+.IP
+Optionally it may define a \fBprocess_all\fR variable, whose valuse may be:
+.
+.IP "\(bu" 4
+\fB"first"\fR: To first process text through this processor before any others\.
+.
+.IP "\(bu" 4
+\fB"last"\fR: After all processors have processed, process the text through this
+.
+.IP "" 0
+.
 .SH "BUGS AND FEATURE REQUESTS"
-  Please file bug reports and feature requests at the GitHub repository: https://github\.com/bharadwaj\-raju/TextSuggest
+  Please file bug reports and feature requests at the GitHub repository: https://github\.com/bharadwaj\-raju/TextSuggest/issues
+.
+.P
+  Please include the output of \fBtextsuggest \-\-version\fR in the report/request\.
 .
 .SH "SEE ALSO"
 .
 .IP "\(bu" 4
 \fBtextsuggestd(1)\fR
+.
+.IP "\(bu" 4
+\fBxsel(1)\fR
+.
+.IP "\(bu" 4
+\fBxdotool(1)\fR
+.
+.IP "\(bu" 4
+\fBpython3(1)\fR
 .
 .IP "" 0

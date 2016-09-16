@@ -2,13 +2,13 @@
 # coding: utf-8
 
 # TextSuggest
-# Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
-# Contributor: Maksudur Rahman Maateen <ugcoderbd@gmail.com>
+# Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>, Maksudur Rahman Maateen <ugcoderv@gmail.com
+# and other contributors (see https://github.com/bharadwaj-raju/TextSuggest/graphs/contributors)
 
 # This file is part of TextSuggest.
 
 # TextSuggest is free software.
-# Licensed under the GNU General Public License 3
+# Licensed under the GNU General Public License 3 (or any later version)
 # See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
 
 # A simple linux tool to autocomplete text inputs in the GUI
@@ -29,7 +29,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 144  # Updated using git pre-commit hook
+__version__ = 145  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -37,7 +37,6 @@ base_dict_dir = '/usr/share/textsuggest/dictionaries'
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
-gtk3_apps = ['gedit', 'mousepad', 'abiword']
 
 processor_dirs = [os.path.expanduser('~/.config/textsuggest/processors'),
 				'/usr/share/textsuggest/processors']
@@ -50,12 +49,12 @@ for dir in processor_dirs:
 arg_parser = argparse.ArgumentParser(
 	description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
 	formatter_class=argparse.RawTextHelpFormatter,
-	epilog='''More information in the manual page: textsuggest(1). \n
-	Return codes:
-	0 : Success
-	1 : No words found
-	2 : Cancelled by user
-	3 : Math expression error'''.replace('\t', ''))
+	usage='%(prog)s [options]',
+	allow_abbrev=False,
+	epilog='''More information:\n
+	
+	  - Manual page: man textsuggest
+	  - Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
 
 arg_parser.add_argument(
 	'--word', type=str,
@@ -63,7 +62,7 @@ arg_parser.add_argument(
 	nargs='+', required=False)
 
 arg_parser.add_argument(
-	'--no-selection', action='store_true',
+	'--all-words', '--no-selection', action='store_true',
 	help='Give all words as suggestions, which you can then filter. \n \n',
 	required=False)
 
@@ -89,8 +88,12 @@ arg_parser.add_argument(
 
 arg_parser.add_argument(
 	'--auto-selection', type=str, nargs='?',
-	help='Automatically select word under cursor and suggest. See --help-auto-selection for details. Ignored if --no-selection. \n \n',
+	help='Automatically select word under cursor and suggest. Ignored if --no-selection. \n \n',
 	choices=['beginning', 'middle', 'end'], const='end', required=False)
+
+arg_parser.add_argument(
+	'--no-processing', action='store_true',
+	help='Disable using of any processors. \n \n', required=False)
 
 arg_parser.add_argument(
 	'--rofi-options', type=str,
@@ -103,54 +106,26 @@ arg_parser.add_argument(
 	nargs='+', required=False)
 
 arg_parser.add_argument(
-	'--help-auto-selection', action='store_true',
-	help='See help and documentation on the auto-selection option. \n \n',
-	required=False)
-
-arg_parser.add_argument(
 	'-v', '--version', action='store_true',
 	help='Print version and license information.',
 	required=False)
 
 args = arg_parser.parse_args()
 
-print(' '.join(args.rofi_options))
-
 if args.version:
 	print('''TextSuggest %d
+			
 			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
-			License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+			License GPLv3+: GNU GPL (General Public License) version 3 or later <https://gnu.org/licenses/gpl.html>
 			This is free software; you are free to change and redistribute it.
-			There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('    ', '') % __version__)
-
-	sys.exit(0)
-
-if args.help_auto_selection:
-	print('''This is the help and documentation for the --auto-selection option.
-
-Automatically select word under cursor for you before suggestion, saving time and keystrokes. Ignored if --no-selection.
-
---auto-selection has three modes:
-
-- 'beginning': Assumes text-cursor is at beginning of word.
-- 'middle'   : Assumes text-cursor is somewhere in the middle of word.
-- 'end'      : Assumes text-cursor is at end of word. Default.
-
-The three choices help choose the keyboard shortcut to be pressed. It would be good to auto-detect the option
-according to the text-cursor's position, but X11 does not provide this.
-
-NOTE: The normal "you select text and textsuggests suggests on that" will not work with this enabled.''')
+			There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('	', '') % __version__)
 
 	sys.exit(0)
 
 if not os.path.isdir(config_dir):
 	os.mkdir(config_dir)
 
-# Moving ~/.Custom_Words.txt to config_dir
-prev_custom_words_file = os.path.expanduser('~/.Custom_Words.txt')
-
-if os.path.isfile(prev_custom_words_file):
-	os.rename(prev_custom_words_file, custom_words_file)
+sp.Popen(['xsel', '--keep'])  # Make selection persist
 
 if args.language:
 	language = [args.language]
@@ -209,7 +184,7 @@ def restart_program(additional_args=[], remove_args=[]):
 
 	sys.exit(restart_proc.returncode)
 
-if args.no_selection:
+if args.all_words:
 	current_word = ''
 	suggest_method = 'insert'
 
@@ -271,6 +246,26 @@ def get_focused_window():
 	raw = get_cmd_out(['xdotool', 'getwindowfocus', 'getwindowname']).lower().split()
 
 	return raw[len(raw) - 1]
+
+def is_program_gtk3(program):
+
+	gtk3_apps = ['gedit', 'mousepad', 'abiword']
+
+	try:
+		program_ldd = get_cmd_out('ldd $(which %s)' % program)
+
+		if 'libgtk-3' in program_ldd:
+			return True
+
+		else:
+			return False
+
+	except sp.CalledProcessError:
+		# Not a dynamic executable
+		pass
+
+	if program.lower() in gtk3_apps:
+		return True
 
 def type_text(text):
 
@@ -339,7 +334,7 @@ def process_suggestion(suggestion):
 			f.write('\n' + suggestion)
 
 	if suggest_method == 'replace':
-		if get_focused_window() in gtk3_apps:
+		if is_program_gtk3(get_focused_window()):
 			print('Using GTK+ 3 workaround.')
 			gtk3_fix = sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Right; sleep 0.5'], shell=True)
 			gtk3_fix.wait()
@@ -349,17 +344,46 @@ def process_suggestion(suggestion):
 		if current_word[:1].isupper():
 			suggestion = suggestion.capitalize()
 
+	if args.no_processing:
+		print('Processors disabled.')
+		return suggestion
+
 	if '=' in suggestion:
 		suggestion = suggestion.split('=', 1)[1]
+
+	last_processors = []
 
 	for dir in processor_dirs:
 		for processor_name in os.listdir(dir):
 			if processor_name.endswith('.py'):
 				processor = __import__(processor_name.replace('.py', ''))
 
+				processor_name_formatted = processor.__name__ + ' from ' + processor.__file__
+				
+				try:
+					if processor.process_all == "first":
+						print('Pre-processing using', processor_name_formatted)
+						suggestion = processor.process(suggestion)
+						continue
+
+					elif processor.process_all == "last":
+						last_processors.append(processor_name.replace('.py', ''))
+						continue
+
+				except AttributeError:
+					pass
+
 				if processor.matches(suggestion):
 					print('Using processor', processor_name.replace('.py', ''), 'from', os.path.join(dir, processor_name))
+					
 					return processor.process(suggestion)
+	
+	if last_processors:
+		for processor_name in last_processors:
+			processor = __import__(processor_name)
+			
+			print('Post-processing using', processor.__name__, 'from', processor.__file__)
+			suggestion = processor.process(suggestion)
 
 	return suggestion
 
@@ -379,6 +403,9 @@ def main():
 		else:
 			sys.stderr.write('ERR_NOWORDS: No words found.')
 			sys.exit(1)
+
+	if args.no_history:
+		print('History is disabled.')
 
 	if not args.no_history:
 		words_list.extend(get_suggestions(current_word, dict_files=[hist_file]))

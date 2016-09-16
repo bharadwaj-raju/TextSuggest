@@ -45,15 +45,12 @@ Run the included install script with `sudo ./install.sh`.
 Assign keyboard shortcuts to
 
 - `textsuggest`
-- `textsuggest --no-selection`
+- `textsuggest --all-words`
 
 The first one gives you suggestions on the currently selected word (don't want to select? See [this](#auto-select-and-suggest)).
 The second one simply gives you a list of all words, you can search through them. These are TextSuggest's two [modes](#modes).
 
 The two commands offer the most basic of TextSuggest features. For more, see [options](#options) and browse through the rest of this page.
-
-The script stores frequently used words in a history file (`~/.config/textsuggest/history.txt`). Suggestions more often used
-are at the top of list. History can be disabled: use the `--no-history` option.
 
 ### Uninstallation
 
@@ -67,9 +64,9 @@ Also documented in the manual page: `man textsuggest` and `--help`.
 
 - `-h`, `--help`: Print out a help message.
 
-- `--word WORD`: Specify word to give suggestions for. If not specified, taken from X11 selection. Ignored if `--no-selection`.
+- `--word WORD`: Specify word to give suggestions for. If not specified, taken from X11 selection. Ignored if `--all-words`.
 
-- `--no-selection`: Give *all* the suggestions. Then you can search through them etc.
+- `--all-words`: Give *all* the suggestions. Then you can search through them etc.
 
 - `--font FONT`: Specify font to use for Rofi. Format: FontName (Weight) (Size). Default: Varies based on language.
 
@@ -79,11 +76,11 @@ Also documented in the manual page: `man textsuggest` and `--help`.
 
 - `--auto-selection [beginning|middle|end]`: Auto-select word under cursor and suggest. See [Auto-selection](#auto-selection) and `--help-auto-selection`.
 
+- `--no-processing`: Disable use of [processors](#extensions)
+
 - `--rofi-options OPTIONS`: Specify additional options for Rofi.
 
 - `--additional-languages LANGUAGES`: Add additional languages for use.
-
-- `--help-auto-selection`: See help and documentation for the `--auto-selection` option.
 
 - `-v`, `--version`: Print out version and license information.
 
@@ -123,7 +120,7 @@ Simply type into TextSuggest:
 
 And '5' will be inserted. You can do any math expression that Python supports.
 
-You can also use any function in the Python [`math`](https://docs.python.org/3/library/math.html) library, for example `%math.sqrt(25)` for √25.
+You can also use any function in the Python [`math`](https://docs.python.org/3/library/math.html) library, for example `%sqrt(25)` for √25.
 
 #### Custom Words + Math
 
@@ -143,7 +140,7 @@ By default TextSuggest has two processors, [`command`](#commands) and [`math_exp
 You can see this in TextSuggest output:
 
 ```bash
-$ textsuggest --no-selection
+$ textsuggest --all-words
 Running in insert mode.
 Chosen word: %2 + 3
 Using processor math_expression from /usr/share/textsuggest/processors/math_expression.py
@@ -171,6 +168,8 @@ def process(text):
 Make one based on the sample above, and place it in `~/.config/textsuggest/processors/` (file must end with `.py` extension).
 
 Processors in `~/.config/textsuggest/processors` take precedence over those in `/usr/share/textsuggest/processors`, in case of a name or match conflict.
+
+Optionally, you can use `process_all = "first"` in the file to make all suggestions be processed through it first. Set it to `"last"` instead to make it process everything last.
 
 ## Other langauges
 
@@ -215,7 +214,7 @@ It has:
 
 ## Errors
 
-- `ERR_NOWORDS`: Caused when no suggestions are found. Return value: 1. *NOTE*: Suppressed and program restarted in `--no-selection` mode unless
+- `ERR_NOWORDS`: Caused when no suggestions are found. Return value: 1. *NOTE*: Suppressed and program restarted in `--all-words` mode unless
 `--exit-on-no-words-found` is passed.
 
 - `ERR_REJECTED`: Caused when TextSuggest is cancelled by user (for example, by pressing `Esc`). Return value: 2.

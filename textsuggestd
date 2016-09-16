@@ -34,24 +34,9 @@ arg_parser.add_argument(
 	required=False)
 
 arg_parser.add_argument(
-	'--no-rofi-customization', action='store_true',
-	help='Do not apply custom Rofi theme. \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'--font', type=str,
-	help='Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). \n \n',
+	'--textsuggest-args', type=str,
+	help='Specify additional arguments for TextSuggest. \n \n',
 	nargs='+', required=False)
-
-arg_parser.add_argument(
-	'--no-history', action='store_true',
-	help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'--language', type=str,
-	help='Manually set language, in case script fails to auto-detect from keyboard layout. \n \n',
-	required=False)
 
 args = arg_parser.parse_args()
 
@@ -102,8 +87,10 @@ xargs -P0 -n1 xinput test | awk 'BEGIN{while (("xmodmap -pke" | getline) > 0) k[
 	logger_proc = sp.Popen(logger_shell, stdout=sp.PIPE, universal_newlines=True, shell=True)
 	stdout_lines = iter(logger_proc.stdout.readline, "")
 	logger_proc.stdout.flush()
+	
 	for stdout_line in stdout_lines:
 		yield stdout_line
+	
 	logger_proc.stdout.flush()
 
 	logger_proc.stdout.close()
@@ -153,23 +140,9 @@ def textsuggest_should_start(additional_exclude=None, include=None):
 
 def start_textsuggest(textsuggest_exec_path, return_cmd=False):
 
-	textsuggest_args = []
+	textsuggest_args = args.textsuggest_args if args.textsuggest_args else []
 
 	textsuggest_args.append('--auto-selection')
-
-	if args.no_rofi_customization:
-		textsuggest_args.append('--no-rofi-customization')
-
-	if args.language is not None:
-		textsuggest_args.append(
-			'--no-rofi-customization ' + ' '.join(args.language))
-
-	if args.no_history:
-		textsuggest_args.append('--no-history')
-
-	if args.font is not None:
-		textsuggest_args.append(
-			'--font ' + ' '.join(args.font))
 
 	textsuggest_cmd = '%s %s %s' % (sys.executable, textsuggest_exec_path, ' '.join(textsuggest_args))
 
@@ -188,11 +161,42 @@ def start_textsuggest(textsuggest_exec_path, return_cmd=False):
 	else:
 		return 'OK'
 
+def exit(code):
+
+	# Exit, cleanly
+	os.remove('/tmp/textsuggestd.pid')
+	sys.exit(code)
+
+def is_already_running():
+
+	# Check if an instance of textsuggestd is already running
+
+	if not os.path.isfile('/tmp/textsuggestd.pid'):
+		return False
+
+	else:
+		with open('/tmp/textsuggestd.pid') as f:
+			pidfile_pid = f.read()
+
+		if sp.Popen(['ps', pidfile_pid], stdout=sp.PIPE).returncode != 0:
+			return False
+
+		else:
+			return True, pidfile_pid
+
 # Start inputlistener
 
 def main():
 
+	if is_already_running():
+		log('textsuggestd already running (/tmp/textsuggestd.pid)! Exiting...', 'ERROR')
+		exit(1)
+
 	log('Started textsuggestd.', 'INFO')
+	log('PID: %d' % os.getpid(), 'INFO')
+
+	with open('/tmp/textsuggestd.pid', 'w') as f:
+		f.write(str(os.getpid()))
 
 	if args.textsuggest_executable is None:
 		if os.path.isfile(os.path.join(os.getcwd(), 'TextSuggest.py')):
@@ -201,11 +205,11 @@ def main():
 			textsuggest_exec = '/usr/bin/textsuggest'
 		else:
 			log('No TextSuggest executable found.', 'ERROR')
-			sys.exit(1)
+			exit(1)
 	else:
 		if not os.path.isfile(args.textsuggest_executable):
 			log('Specified TextSuggest executable does not exist.', 'ERROR')
-			sys.exit(1)
+			exit(1)
 
 	log('TextSuggest command: %s' % start_textsuggest(textsuggest_exec, return_cmd=True), 'INFO')
 
