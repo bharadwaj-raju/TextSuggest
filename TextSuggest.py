@@ -21,7 +21,6 @@ import subprocess as sp
 import sys
 import time
 import collections
-import traceback
 
 from languages import get_language_name
 from fonts import get_font_name
@@ -41,8 +40,8 @@ hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
 processor_dirs = [os.path.expanduser('~/.config/textsuggest/processors'),
 				'/usr/share/textsuggest/processors']
 
-for dir in processor_dirs:
-	sys.path.insert(0, dir)
+for processor_dir in processor_dirs:
+	sys.path.insert(0, processor_dir)
 
 # Arguments
 
@@ -148,15 +147,21 @@ def uniq(seq):
 
 def get_cmd_out(program):
 
-	if type(program) == list:
+	if isinstance(program, list):
 		return sp.check_output(program).decode('utf-8').rstrip('\n').replace('\\n', '\n')
 
 	else:
 		return sp.check_output(program, shell=True).decode('utf-8').rstrip('\n').replace('\\n', '\n')
 
-def restart_program(additional_args=[], remove_args=[]):
+def restart_program(additional_args=None, remove_args=None):
 
 	# Restart, preserving all original arguments and optionally adding more
+
+	if not additional_args:
+		additional_args = []
+
+	if not remove_args:
+		remove_args = []
 
 	new_cmd = ''
 
@@ -168,7 +173,6 @@ def restart_program(additional_args=[], remove_args=[]):
 			for i in sys.argv:
 				if arg in i:
 					new_cmd = new_cmd.replace(i, '')
-					removed = True
 
 	if additional_args != []:
 		for arg in additional_args:
@@ -254,18 +258,13 @@ def is_program_gtk3(program):
 	try:
 		program_ldd = get_cmd_out('ldd $(which %s)' % program)
 
-		if 'libgtk-3' in program_ldd:
-			return True
-
-		else:
-			return False
+		return bool('libgtk-3' in program_ldd)
 
 	except sp.CalledProcessError:
 		# Not a dynamic executable
 		pass
 
-	if program.lower() in gtk3_apps:
-		return True
+	return bool(program.lower() in gtk3_apps)
 
 def type_text(text):
 
@@ -353,8 +352,8 @@ def process_suggestion(suggestion):
 
 	last_processors = []
 
-	for dir in processor_dirs:
-		for processor_name in os.listdir(dir):
+	for processor_dir in processor_dirs:
+		for processor_name in os.listdir(processor_dir):
 			if processor_name.endswith('.py'):
 				processor = __import__(processor_name.replace('.py', ''))
 
@@ -374,7 +373,7 @@ def process_suggestion(suggestion):
 					pass
 
 				if processor.matches(suggestion):
-					print('Using processor', processor_name.replace('.py', ''), 'from', os.path.join(dir, processor_name))
+					print('Using processor', processor_name_formatted) 
 					
 					return processor.process(suggestion)
 	
