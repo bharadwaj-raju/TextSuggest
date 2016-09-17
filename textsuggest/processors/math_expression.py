@@ -13,7 +13,7 @@ def process(text):
 	try:
 		return str(eval(text))
 
-	except:
+	except (SyntaxError, NameError, UnboundLocalError):
 		sys.stderr.write(traceback.format_exc())
 		sys.stderr.flush()
 		sys.stderr.write('ERR_EXPRESSION: Invalid expression: %s' % text)

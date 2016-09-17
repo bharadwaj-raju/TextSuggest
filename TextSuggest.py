@@ -28,7 +28,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 145  # Updated using git pre-commit hook
+__version__ = 146  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -51,7 +51,7 @@ arg_parser = argparse.ArgumentParser(
 	usage='%(prog)s [options]',
 	allow_abbrev=False,
 	epilog='''More information:\n
-	
+
 	  - Manual page: man textsuggest
 	  - Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
 
@@ -113,7 +113,7 @@ args = arg_parser.parse_args()
 
 if args.version:
 	print('''TextSuggest %d
-			
+
 			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
 			License GPLv3+: GNU GPL (General Public License) version 3 or later <https://gnu.org/licenses/gpl.html>
 			This is free software; you are free to change and redistribute it.
@@ -358,7 +358,7 @@ def process_suggestion(suggestion):
 				processor = __import__(processor_name.replace('.py', ''))
 
 				processor_name_formatted = processor.__name__ + ' from ' + processor.__file__
-				
+
 				try:
 					if processor.process_all == "first":
 						print('Pre-processing using', processor_name_formatted)
@@ -373,14 +373,14 @@ def process_suggestion(suggestion):
 					pass
 
 				if processor.matches(suggestion):
-					print('Using processor', processor_name_formatted) 
-					
+					print('Using processor', processor_name_formatted)
+
 					return processor.process(suggestion)
-	
+
 	if last_processors:
 		for processor_name in last_processors:
 			processor = __import__(processor_name)
-			
+
 			print('Post-processing using', processor.__name__, 'from', processor.__file__)
 			suggestion = processor.process(suggestion)
 
