@@ -20,19 +20,19 @@ An [alternative background service, textsuggestd](#textsuggestd) that intelligen
 
 ## Installation
 
-### [![Ubuntu](https://www.pylint.org/assets/img/ubuntu.png)](https://ubuntu.com) Ubuntu and Debian
+### Ubuntu and Debian
 
 [Download `textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
 
 **Now, see [Post-install](#post-install)**
 
-### [![Arch Linux](https://www.pylint.org/assets/img/arch.png)](https://archlinux.org) Arch Linux
+###  Arch Linux
 
 AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
 
 **Now, see [Post-install](#post-install)**
 
-### [<img height=48px src="https://pylint.org/assets/img/git.png" alt="Source">](https://github.com/bharadwaj-raju/TextSuggest) Manual
+###  Manual
 
 Make sure you have all the requirements (`xdotool`, `xsel` and `rofi`).
 
