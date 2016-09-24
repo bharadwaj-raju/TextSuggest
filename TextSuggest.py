@@ -28,7 +28,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 148  # Updated using git pre-commit hook
+__version__ = 149  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')

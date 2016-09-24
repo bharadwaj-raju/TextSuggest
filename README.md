@@ -44,15 +44,9 @@ Run the included install script with `sudo ./install.sh`.
 
 ### Post-install
 
-Assign keyboard shortcuts to
+Bind the command `textsuggest --auto-selection` to a keyboard shortcut. Type a word, press the shortcut and ... TextSuggest will give you suggestions!
 
-- `textsuggest`
-- `textsuggest --all-words`
-
-The first one gives you suggestions on the currently selected word (don't want to select? See [this](#auto-select-and-suggest)).
-The second one simply gives you a list of all words, you can search through them. These are TextSuggest's two [modes](#modes).
-
-The two commands offer the most basic of TextSuggest features. For more, see [options](#options) and browse through the rest of this page.
+This offers the most basic use of TextSuggest. For more, see [options](#options) and browse through the rest of this page.
 
 ### Uninstallation
 
