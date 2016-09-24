@@ -28,7 +28,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 150  # Updated using git pre-commit hook
+__version__ = 1510  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -247,6 +247,9 @@ else:
 
 	suggest_method = 'replace'
 
+if current_word.endswith('.'):
+	current_word = current_word[:-1]
+
 def remove_dups(s_list):
 
 	seen = set()
@@ -444,7 +447,7 @@ def main():
 	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
 
 	if not words_list or words_list == ['']:
-		if not args.exit_on_no_words_found:
+		if not args.exit_if_no_words_found:
 			print('WARN_NOWORDS: Restarting in --no-selection mode. To prevent restarting, use --exit-on-no-words-found.')
 			restart_program(additional_args=['--no-selection'])
 		else:

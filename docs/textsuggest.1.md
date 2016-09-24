@@ -37,7 +37,7 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
 
   `--no-history`          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt)
 
-  `--exit-on-no-words-found`
+  `--exit-if-no-words-found`
                         Exit if no words are found (instead of restarting in --no-selection mode)
 
   `--language` *languages* ...   Manually set language(s), in case script fails to auto-detect from keyboard layout.

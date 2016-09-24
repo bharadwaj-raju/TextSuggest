@@ -76,6 +76,8 @@ Also documented in the manual page: `man textsuggest` and `--help`.
 
 - `--rofi-options options ...`: Specify additional options for Rofi.
 
+- `--exit-if-no-words-found`: Exit if no words are found (`ERR_NOWORDS`, return code 1) instead of restarting in `--all-words` mode (`WARN_NOWORDS`)
+
 - `-v`, `--version`: Print out version and license information.
 
 ## Expansions
@@ -209,7 +211,7 @@ It has:
 ## Errors
 
 - `ERR_NOWORDS`: Caused when no suggestions are found. Return value: 1. *NOTE*: Suppressed and program restarted in `--all-words` mode unless
-`--exit-on-no-words-found` is passed.
+`--exit-if-no-words-found` is passed.
 
 - `ERR_REJECTED`: Caused when TextSuggest is cancelled by user (for example, by pressing `Esc`). Return value: 2.
 

@@ -37,40 +37,39 @@ Also see the \fBAUTO\-SELECTION\fR section\.
 .
 .P
   \fB\-\-word\fR \fIword\fR \.\.\.
-                        Specify word to give suggestions for\. Default: taken from X11 clipboard\. Ignored if \-\-no\-selection\. 
+                        Specify word to give suggestions for\. Default: taken from X11 clipboard\. Ignored if \-\-no\-selection\.
 .
 .P
   \fB\-\-all\-words\fR
-                        Give all words as suggestions, which you can then filter\. 
+                        Give all words as suggestions, which you can then filter\.
 .
 .P
   \fB\-\-font\fR \fIfont\fR
-                        Specify font for Rofi\. Must be in Pango format: FontName (Weight (optional) FontSize)\. 
+                        Specify font for Rofi\. Must be in Pango format: FontName (Weight (optional) FontSize)\.
 .
 .P
-  \fB\-\-no\-history\fR          Disable the frequently\-used words history (stored in ~/\.config/textsuggest/history\.txt) 
+  \fB\-\-no\-history\fR          Disable the frequently\-used words history (stored in ~/\.config/textsuggest/history\.txt)
 .
 .P
-  \fB\-\-exit\-on\-no\-words\-found\fR
-                        Exit if no words are found (instead of restarting in \-\-no\-selection mode) 
+  \fB\-\-exit\-if\-no\-words\-found\fR
+                        Exit if no words are found (instead of restarting in \-\-no\-selection mode)
 .
 .P
-  \fB\-\-language\fR \fIlanguage\fR   Manually set language, in case script fails to auto\-detect from keyboard layout\. 
+  \fB\-\-language\fR \fIlanguages\fR \.\.\.   Manually set language(s), in case script fails to auto\-detect from keyboard layout\.
 .
 .P
   \fB\-\-auto\-selection\fR \fI[beginning|middle|end]\fR
-                        Automatically select word under cursor and suggest\. See \fBAUTO\-SELECTION\fR\|\. Ignored if \-\-no\-selection\. 
+                        Automatically select word under cursor and suggest\. See \fBAUTO\-SELECTION\fR\|\. Ignored if \-\-no\-selection\.
 .
 .P
-  \fB\-\-no\-processing\fR       Disable using of any processors\. 
+  \fB\-\-no\-processing\fR       Disable using of any processors\.
 .
 .P
   \fB\-\-rofi\-options\fR \fIoptions\fR \.\.\.
-                        Specify additonal options to pass to Rofi\. 
+                        Specify additonal options to pass to Rofi\.
 .
 .P
-  \fB\-\-additional\-languages\fR \fIlanguages\fR \.\.\.
-                        Specify additional languages\. 
+  \fB\-\-force\-gtk3\-fix\fR		Always use the GTK+ 3 workaround\. If not specified, it is detected whether use is applicable\.
 .
 .P
   \fB\-v\fR, \fB\-\-version\fR         Print version and license information\.
