@@ -60,23 +60,21 @@ Also documented in the manual page: `man textsuggest` and `--help`.
 
 - `-h`, `--help`: Print out a help message.
 
-- `--word WORD`: Specify word to give suggestions for. If not specified, taken from X11 selection. Ignored if `--all-words`.
+- `--word word ...`: Specify word to give suggestions for. If not specified, taken from X11 selection. Ignored if `--all-words`.
 
 - `--all-words`: Give *all* the suggestions. Then you can search through them etc.
 
-- `--font FONT`: Specify font to use for Rofi. Format: FontName (Weight) (Size). Default: Varies based on language.
+- `--font font`: Specify font to use for Rofi. Format: FontName (Weight) (Size). Default: Varies based on language.
 
 - `--no-history`: Disable the storage of frequently-used words in `~/.config/textsuggest/history.txt`
 
-- `--language LANGUAGE`: Specify language to use. Appropriate language will be detected if not specified. If detection fails too, English will be used.
+- `--language languages ...`: Specify language to use. Appropriate language will be detected if not specified. If detection fails too, English will be used.
 
-- `--auto-selection [beginning|middle|end]`: Auto-select word under cursor and suggest. See [Auto-selection](#auto-selection) and `--help-auto-selection`.
+- `--auto-selection [beginning|middle|end]`: Auto-select word under cursor and suggest. See [Auto-selection](#auto-selection).
 
 - `--no-processing`: Disable use of [processors](#extensions)
 
-- `--rofi-options OPTIONS`: Specify additional options for Rofi.
-
-- `--additional-languages LANGUAGES`: Add additional languages for use.
+- `--rofi-options options ...`: Specify additional options for Rofi.
 
 - `-v`, `--version`: Print out version and license information.
 
