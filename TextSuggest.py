@@ -28,7 +28,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 147  # Updated using git pre-commit hook
+__version__ = 148  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -67,7 +67,7 @@ arg_parser.add_argument(
 
 arg_parser.add_argument(
 	'--font', type=str,
-	help='Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). \n \n',
+	help='Specify font for Rofi. Format: FontName Weight Size. \n \n',
 	nargs='+', required=False)
 
 arg_parser.add_argument(
@@ -76,19 +76,19 @@ arg_parser.add_argument(
 	required=False)
 
 arg_parser.add_argument(
-	'--exit-on-no-words-found', action='store_true',
+	'--exit-if-no-words-found', action='store_true',
 	help='Exit if no words are found (instead of restarting in --no-selection mode) \n \n',
 	required=False)
 
 arg_parser.add_argument(
 	'--language', type=str,
-	help='Manually set language, in case script fails to auto-detect from keyboard layout. \n \n',
-	required=False)
+	help='Manually set language(s), in case script fails to auto-detect from keyboard layout. \n \n',
+	nargs='+', required=False, metavar='languages')
 
 arg_parser.add_argument(
 	'--auto-selection', type=str, nargs='?',
 	help='Automatically select word under cursor and suggest. Ignored if --no-selection. \n \n',
-	choices=['beginning', 'middle', 'end'], const='end', required=False)
+	choices=['beginning', 'middle', 'end'], const='end', required=False, metavar='beginning|middle|end')
 
 arg_parser.add_argument(
 	'--no-processing', action='store_true',
@@ -97,19 +97,48 @@ arg_parser.add_argument(
 arg_parser.add_argument(
 	'--rofi-options', type=str,
 	help='Specify additonal options to pass to Rofi. \n \n',
-	nargs='+', required=False)
+	nargs='+', required=False, metavar='options for rofi')
 
 arg_parser.add_argument(
-	'--additional-languages', type=str,
-	help='Specify additional languages. \n \n',
-	nargs='+', required=False)
+	'--force-gtk3-fix', action='store_true',
+	help='Always use the GTK+ 3 workaround. If not set, tries to detect the current program\'s GTK+ version. \n \n',
+	required=False)
 
 arg_parser.add_argument(
 	'-v', '--version', action='store_true',
 	help='Print version and license information.',
 	required=False)
 
-args = arg_parser.parse_args()
+args, unknown_args = arg_parser.parse_known_args()
+
+# Get the runtime/tmp dir
+if os.getenv('XDG_RUNTIME_DIR'):
+	runtime_dir = os.path.join(os.getenv('XDG_RUNTIME_DIR'), 'textsuggest')
+
+elif os.getenv('TMPDIR'):
+	runtime_dir = os.path.join(os.getenv('TMPDIR'), 'textsuggest')
+
+else:
+	runtime_dir = '/tmp/textsuggest'
+
+if not os.path.isdir(runtime_dir):
+	os.mkdir(runtime_dir)
+
+menu_script = os.path.join(runtime_dir, 'menu_script.sh')
+restart_script = os.path.join(runtime_dir, 'restart_auto_sel.sh')
+
+def print_error(error):
+
+	# Wrapper around sys.stderr
+
+	if not error.endswith('\n'):
+		error += '\n'
+
+	sys.stderr.write(error)
+	sys.stderr.flush()
+
+for arg in unknown_args:
+	print_error('Unknown option: %s. Ignoring.' % arg)
 
 if args.version:
 	print('''TextSuggest %d
@@ -127,12 +156,9 @@ if not os.path.isdir(config_dir):
 sp.Popen(['xsel', '--keep'])  # Make selection persist
 
 if args.language:
-	language = [args.language]
+	language = args.language
 else:
 	language = [get_language_name()]
-
-if args.additional_languages:
-	language.extend(args.additional_languages)
 
 def freq_sort(lst):
 	counts = collections.Counter(lst)
@@ -145,17 +171,19 @@ def uniq(seq):
 	seen_add = seen.add
 	return [x for x in seq if not (x in seen or seen_add(x))]
 
-def get_cmd_out(program):
+def get_cmd_out(program, suppress_stderr=False):
 
-	if isinstance(program, list):
-		return sp.check_output(program).decode('utf-8').rstrip('\n').replace('\\n', '\n')
+	run_in_shell = not isinstance(program, list)
+
+	if suppress_stderr:
+		return sp.check_output(program, stderr=sp.PIPE, shell=run_in_shell).decode('utf-8').rstrip('\n').replace('\\n', '\n')
 
 	else:
-		return sp.check_output(program, shell=True).decode('utf-8').rstrip('\n').replace('\\n', '\n')
+		return sp.check_output(program, shell=run_in_shell).decode('utf-8').rstrip('\n').replace('\\n', '\n')
 
 def restart_program(additional_args=None, remove_args=None):
 
-	# Restart, preserving all original arguments and optionally adding more
+	# Restart, preserving all original arguments and optionally adding/removing
 
 	if not additional_args:
 		additional_args = []
@@ -180,10 +208,10 @@ def restart_program(additional_args=None, remove_args=None):
 
 	print('Restarting as:', new_cmd)
 
-	with open('/tmp/restart.sh', 'w') as f:
+	with open(restart_script, 'w') as f:
 		f.write('%s %s' % (sys.executable, new_cmd))
 
-	restart_proc = sp.Popen(['sh', '/tmp/restart.sh'])
+	restart_proc = sp.Popen(['sh', restart_script])
 	restart_proc.wait()  # Allow restart.sh to fully execute
 
 	sys.exit(restart_proc.returncode)
@@ -249,19 +277,41 @@ def get_focused_window():
 
 	raw = get_cmd_out(['xdotool', 'getwindowfocus', 'getwindowname']).lower().split()
 
-	return raw[len(raw) - 1]
+	try:
+		return raw[len(raw) - 1]
+
+	except:
+		return ''
 
 def is_program_gtk3(program):
 
 	gtk3_apps = ['gedit', 'mousepad', 'abiword']
 
+	if args.force_gtk3_fix:
+		return True
+
 	try:
-		program_ldd = get_cmd_out('ldd $(which %s)' % program)
+		program_ldd = get_cmd_out('ldd $(which %s)' % program, suppress_stderr=True)
 
 		return bool('libgtk-3' in program_ldd)
 
 	except sp.CalledProcessError:
 		# Not a dynamic executable
+		pass
+
+	try:
+		with open(get_cmd_out('$(which %s)' % program), 'r') as f:
+			contents = f.read()
+			if 'require_version' in contents and 'Gtk' in contents and '3.0' in contents:
+				return True
+
+			elif 'from gi.repository import Gtk' in contents:
+				return True
+
+			elif 'require' in contents and 'gtk3' in contents:
+				return True
+
+	except:
 		pass
 
 	return bool(program.lower() in gtk3_apps)
@@ -311,16 +361,14 @@ def display_dialog_list(items_list):
 	# subprocess can't handle it, and will raise OSError.
 	# So we will write it to a script file.
 
-	full_dict_script_path = os.path.expanduser('/tmp/textsuggest_full.sh')
-
-	with open(full_dict_script_path, 'w') as f:
+	with open(menu_script, 'w') as f:
 		f.write(popup_menu_cmd_str)
 	try:
-		choice = get_cmd_out(['sh', full_dict_script_path])
+		choice = get_cmd_out(['sh', menu_script])
 
 	except sp.CalledProcessError:
 		# No suggestion wanted
-		sys.stderr.write('ERR_REJECTED: User doesn\'t want any suggestion.')
+		print_error('ERR_REJECTED: User doesn\'t want any suggestion.')
 		sys.stdout.flush()
 		sys.exit(2)
 
@@ -400,7 +448,7 @@ def main():
 			print('WARN_NOWORDS: Restarting in --no-selection mode. To prevent restarting, use --exit-on-no-words-found.')
 			restart_program(additional_args=['--no-selection'])
 		else:
-			sys.stderr.write('ERR_NOWORDS: No words found.')
+			print_error('ERR_NOWORDS: No words found.')
 			sys.exit(1)
 
 	if args.no_history:

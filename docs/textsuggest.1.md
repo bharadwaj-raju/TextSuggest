@@ -16,7 +16,7 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
   Call `textsuggest` to get suggestions, completions etc. See also the **OPTIONS** section.
 
   For convenience, bind the script to a keyboard shortcut(s):
-   
+
    - `textsuggest` for replace mode (suggestions for a specific word, taken from X11 selection (see `xsel(1)`) if `--word` is not given)
    - `textsuggest --all-words` for insert mode (get all words)
 
@@ -25,46 +25,45 @@ textsuggest(1) -- X11 utility to autocomplete words in the GUI
 ## OPTIONS
 
   `-h`, `--help`            show a summary of options and exit
-  
+
   `--word` *word* ...
-                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. 
-                         
+                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection.
+
   `--all-words`
-                        Give all words as suggestions, which you can then filter. 
-                         
+                        Give all words as suggestions, which you can then filter.
+
   `--font` *font*
-                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize). 
-                         
-  `--no-history`          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
-                         
+                        Specify font for Rofi. Must be in Pango format: FontName (Weight (optional) FontSize).
+
+  `--no-history`          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt)
+
   `--exit-on-no-words-found`
-                        Exit if no words are found (instead of restarting in --no-selection mode) 
-                         
-  `--language` *language*   Manually set language, in case script fails to auto-detect from keyboard layout. 
-                         
+                        Exit if no words are found (instead of restarting in --no-selection mode)
+
+  `--language` *languages* ...   Manually set language(s), in case script fails to auto-detect from keyboard layout.
+
   `--auto-selection` *[beginning|middle|end]*
-                        Automatically select word under cursor and suggest. See **AUTO-SELECTION**. Ignored if --no-selection. 
-                         
-  `--no-processing`       Disable using of any processors. 
-                         
+                        Automatically select word under cursor and suggest. See **AUTO-SELECTION**. Ignored if --no-selection.
+
+  `--no-processing`       Disable using of any processors.
+
   `--rofi-options` *options* ...
-                        Specify additonal options to pass to Rofi. 
-                         
-  `--additional-languages` *languages* ...
-                        Specify additional languages. 
-                         
+                        Specify additonal options to pass to Rofi.
+
+  `--force-gtk3-fix`		Always use the GTK+ 3 workaround. If not specified, it is detected whether use is applicable.
+
   `-v`, `--version`         Print version and license information.
 
- 
+
 
 ## EXPANSIONS
-  
+
   **COMMANDS**
 
   Use `#command` in TextSuggest to type out the output of `command`.
 
   **MATH**
-    
+
   Use `%2+3` in TextSuggest to insert the answer of `2+3`. Can be used with any math valid in `python3(1)`, in addition to its `math` library.
 
   **ALIASES**
