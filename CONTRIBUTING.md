@@ -2,7 +2,7 @@
 
 ## Reporting issues, bugs or feature requests
 
-Please use the *latest* version. It is likely that the issue has already been fixed.
+**Please use the *latest* version.** It is likely that the issue has already been fixed. You can download it [here](https://github.com/bharadwaj-raju/TextSuggest/archive/master.zip).
 
 If it *hasn't* been fixed yet, please report it and include the following:
 
@@ -27,7 +27,7 @@ Please read the following:
 
 ### Code style
 
-Mostly follows [PEP8] but a few exceptions:
+Mostly follows [PEP8](https://pep8.org/) but a few exceptions:
 
 - Use tabs. Not spaces. Tabs, as in `\t`.
 
