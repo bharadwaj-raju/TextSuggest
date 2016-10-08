@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # TextSuggest
-# Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>, Maksudur Rahman Maateen <ugcoderv@gmail.com
+# Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>, Maksudur Rahman Maateen <ugcoderbg@gmail.com>,
 # and other contributors (see https://github.com/bharadwaj-raju/TextSuggest/graphs/contributors)
 
 # This file is part of TextSuggest.
@@ -28,7 +28,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1510  # Updated using git pre-commit hook
+__version__ = 1520  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
@@ -335,7 +335,7 @@ def type_text(text):
 	else:
 		sp.Popen(['xdotool', 'type', '--', text])
 
-def display_dialog_list(items_list):
+def display_menu(items_list):
 
 	mouse_loc_raw = get_cmd_out(['xdotool', 'getmouselocation', '--shell'])
 
@@ -465,7 +465,7 @@ def main():
 
 	words_list = '|'.join(words_list)
 
-	chosen_word = display_dialog_list(words_list)
+	chosen_word = display_menu(words_list)
 
 	print('Chosen word:', chosen_word)
 
