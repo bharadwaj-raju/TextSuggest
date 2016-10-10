@@ -9,6 +9,9 @@
 # Licensed under the GNU General Public License 3
 # See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
 
+import subprocess as sp
+import os
+
 def get_suggestions(word, dict_files):
 
 	'''Get a list of suggestions for 'word'
@@ -18,21 +21,18 @@ def get_suggestions(word, dict_files):
 
 	suggestions = []  # Store suggestions in this
 
-	word = word.lower()
-
 	for dictionary in dict_files:
-		try:
-			with open(dictionary) as f:
-				dictionary_contents = f.read()
-			
-		except FileNotFoundError:
-			dictionary_contents = ''
+		if os.path.isfile(dictionary):
+			try:
+				suggestions.extend(sp.check_output(['grep', '-i', word, dictionary]).decode('utf-8').rstrip().split('\n'))
 
-		for dict_word in dictionary_contents.split('\n'):
-			if word in dict_word:
-				suggestions.append(dict_word.rstrip('\r\n'))
-			
-			elif word.split(' ')[0] in dict_word:
-				suggestions.append(dict_word.rstrip('\r\n'))
+			except sp.CalledProcessError:
+				# grep did not find word
+				pass
 
-	return suggestions
+	parsed_suggestions = []
+
+	for i in suggestions:
+		parsed_suggestions.append(i.replace('\n', r'\\\\n'))
+
+	return parsed_suggestions

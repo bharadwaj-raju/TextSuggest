@@ -6,6 +6,8 @@ A utility to autocomplete words in the GUI.
 
 TextSuggest supports [multiple languages](#other-languages) and [extensions](#extensions).
 
+Want to contribute? See [this](CONTRIBUTING.md).
+
 **Click the image to view a GIF demo.**
 
 [![TextSuggest in action](img/demo-first-frame.png)](img/demo.gif)
@@ -175,7 +177,7 @@ For other langauges, follow these steps:
 
 - Get a suitable dictionary/wordlist for your language. Search online for "<language name> wordlist" or "<language name> dictionary".
 
-- Move said dictionary into a new directory in `/usr/share/textsuggest/dictionaries` with its name being your language's name (English name, like "German" instead of "Deutsch").
+- Put that dictionary into a text file in `/usr/share/textsuggest/dictionaries` with its name being your language's name and extension being `.txt` (English name, like "German.txt" instead of "Deutsch.txt").
 
 - A suitable font should be auto-detected. If not, pass a suitable font with the `--font` option.
 

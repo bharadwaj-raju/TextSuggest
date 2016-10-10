@@ -28,11 +28,11 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1530  # Updated using git pre-commit hook
+__version__ = 1550  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_dir = os.path.expanduser('~/.config/textsuggest')
-base_dict_dir = '/usr/share/textsuggest/dictionaries'
+dict_dir = '/usr/share/textsuggest/dictionaries'
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
 custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
 hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
@@ -262,12 +262,7 @@ def get_dictionaries():
 	dictionaries = []
 
 	for lang in language:
-		try:
-			for file in os.listdir(os.path.join(base_dict_dir, lang)):
-				dictionaries.append(os.path.join(base_dict_dir, lang, file))
-
-		except FileNotFoundError:
-			pass
+		dictionaries.append(os.path.join(dict_dir, lang + '.txt'))
 
 	if os.path.isfile(custom_words_file):
 		dictionaries.append(custom_words_file)
@@ -358,7 +353,7 @@ def display_menu(items_list):
 
 	rofi_opts = ' '.join(args.rofi_options) if args.rofi_options else ''
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -sep "|" -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1 %s' % (items_list, font, x, y, rofi_opts)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1 %s' % (items_list, font, x, y, rofi_opts)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
@@ -463,7 +458,7 @@ def main():
 		# Frequency sort + Remove duplicates
 		words_list = uniq(freq_sort(words_list))
 
-	words_list = '|'.join(words_list)
+	words_list = '\n'.join(words_list)
 
 	chosen_word = display_menu(words_list)
 
