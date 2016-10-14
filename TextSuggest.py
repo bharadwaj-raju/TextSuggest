@@ -389,46 +389,36 @@ def process_suggestion(suggestion):
 		if current_word[:1].isupper():
 			suggestion = suggestion.capitalize()
 
+	if '=' in suggestion:
+		suggestion = suggestion.split('=', 1)[1]
+
 	if args.no_processing:
 		print('Processors disabled.')
 		return suggestion
 
-	if '=' in suggestion:
-		suggestion = suggestion.split('=', 1)[1]
-
-	last_processors = []
+	processor_list = []
 
 	for processor_dir in processor_dirs:
-		for processor_name in os.listdir(processor_dir):
-			if processor_name.endswith('.py'):
-				processor = __import__(processor_name.replace('.py', ''))
+		if 'load-order.txt' in os.listdir(processor_dir):
+			with open(os.path.join(processor_dir, 'load-order.txt')) as f:
+				for line in f:
+					if line.rstrip().endswith('.py'):
+						line = line.rstrip('\n').rstrip('.py')
 
-				processor_name_formatted = processor.__name__ + ' from ' + processor.__file__
+					processor_list.append(line)
 
-				try:
-					if processor.process_all == "first":
-						print('Pre-processing using', processor_name_formatted)
-						suggestion = processor.process(suggestion)
-						continue
+		else:
+			processor_list = [x.rstrip('.py') for x in os.listdir(processor_dir)]
 
-					elif processor.process_all == "last":
-						last_processors.append(processor_name.replace('.py', ''))
-						continue
-
-				except AttributeError:
-					pass
-
-				if processor.matches(suggestion):
-					print('Using processor', processor_name_formatted)
-
-					return processor.process(suggestion)
-
-	if last_processors:
-		for processor_name in last_processors:
+		for processor_name in processor_list:
 			processor = __import__(processor_name)
 
-			print('Post-processing using', processor.__name__, 'from', processor.__file__)
-			suggestion = processor.process(suggestion)
+			processor_name_formatted = processor.__name__ + ' from ' + processor.__file__
+
+			if processor.matches(suggestion):
+				print('Using processor', processor_name_formatted)
+
+				suggestion = processor.process(suggestion)
 
 	return suggestion
 

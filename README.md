@@ -167,7 +167,8 @@ Make one based on the sample above, and place it in `~/.config/textsuggest/proce
 
 Processors in `~/.config/textsuggest/processors` take precedence over those in `/usr/share/textsuggest/processors`, in case of a name or match conflict.
 
-Optionally, you can use `process_all = "first"` in the file to make all suggestions be processed through it first. Set it to `"last"` instead to make it process everything last.
+You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have
+a newline-separated list of processors. The processors will then load in that order.
 
 ## Other langauges
 
