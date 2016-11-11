@@ -170,11 +170,11 @@ Processors in `~/.config/textsuggest/processors` take precedence over those in `
 You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have
 a newline-separated list of processors. The processors will then load in that order.
 
-## Other langauges
+## Other languages
 
 English and Bangla dictionaries are provided by default.
 
-For other langauges, follow these steps:
+For other languages, follow these steps:
 
 - Get a suitable dictionary/wordlist for your language. Search online for "<language name> wordlist" or "<language name> dictionary".
 
