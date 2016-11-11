@@ -376,7 +376,7 @@ def process_suggestion(suggestion):
 
 	if not args.no_history:
 		with open(hist_file, 'a') as f:
-			f.write('\n' + suggestion)
+			f.write('\n' + suggestion.replace('\n', '\\n'))
 
 	if suggest_method == 'replace':
 		if is_program_gtk3(get_focused_window()):
