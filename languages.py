@@ -10,6 +10,7 @@
 # See included LICENSE file or visit https://www.gnu.org/licenses/gpl.txt
 
 import subprocess as sp
+import re
 
 def get_language_name():
 
@@ -31,7 +32,7 @@ def get_language_name():
 					'ru' : 'Russian',
 					'es' : 'Spanish',
 					'se' : 'Swedish',
-					'fi'  : 'Finnish',
+					'fi' : 'Finnish',
 					'kr' : 'Korean',
 					'pk' : 'Urdu',
 					'fr' : 'French',
@@ -39,14 +40,24 @@ def get_language_name():
 					'ua' : 'Ukrainian'
 				}
 
-	keyboard_layout_cmd_str = r"setxkbmap -print | awk -F '(+|\\()' '/xkb_symbols/ {print $2}'"
+	xkb_map = sp.check_output(
+			['setxkbmap', '-print'],
+			universal_newlines=True)
 
-	keyboard_layout = sp.check_output(keyboard_layout_cmd_str, shell=True).decode('utf-8').rstrip()
+	for i in xkb_map.splitlines():
+		if 'xkb_symbols' in i:
+			kbd_layout = i.strip().split()
+
+	kbd_layout = kbd_layout[kbd_layout.index('include') + 1].split('+')[1]
+
+	# Sometimes some text is included in brackets, remove that
+	kbd_layout = re.sub(r'\(.*?\)', '', kbd_layout)
+
 
 	# Language will be detected by layout
 
-	if keyboard_layout in languages:
-		return languages[keyboard_layout]
+	if kbd_layout in languages:
+		return languages[kbd_layout]
 
 	else:
 		return 'English'

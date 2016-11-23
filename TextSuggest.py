@@ -105,6 +105,11 @@ arg_parser.add_argument(
 	required=False)
 
 arg_parser.add_argument(
+	'--log', type=str, metavar='LOG_FILE',
+	help='Log all output to a file. Useful when debugging. \n \n',
+	required=False)
+
+arg_parser.add_argument(
 	'-v', '--version', action='store_true',
 	help='Print version and license information.',
 	required=False)
@@ -250,6 +255,15 @@ else:
 if current_word.endswith('.'):
 	current_word = current_word[:-1]
 
+if args.log:
+	sys.stdout = open(args.log, 'a')
+	sys.stderr = open(args.log, 'a')
+	print('TextSuggest version {}, running on {}, with application {}.'.format(
+		__version__,
+		os.getenv('XDG_CURRENT_DESKTOP'),
+		get_cmd_out('xdotool getwindowfocus getwindowname')))
+
+
 def remove_dups(s_list):
 
 	seen = set()
@@ -289,7 +303,7 @@ def is_program_gtk3(program):
 		return True
 
 	try:
-		program_ldd = get_cmd_out('ldd $(which %s)' % program, suppress_stderr=True)
+		program_ldd = get_cmd_out('ldd $(which %s 2>/dev/null)' % program, suppress_stderr=True)
 
 		return bool('libgtk-3' in program_ldd)
 
@@ -298,7 +312,7 @@ def is_program_gtk3(program):
 		pass
 
 	try:
-		with open(get_cmd_out('$(which %s)' % program), 'r') as f:
+		with open(get_cmd_out('$(which %s 2>/dev/null)' % program), 'r') as f:
 			contents = f.read()
 			if 'require_version' in contents and 'Gtk' in contents and '3.0' in contents:
 				return True
