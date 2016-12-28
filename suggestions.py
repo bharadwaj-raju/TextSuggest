@@ -14,13 +14,12 @@ import os
 
 def get_suggestions(word, dict_files):
 
-	'''Get a list of suggestions for 'word'
+	'''Get a list of suggestions for 'word'.
 
 	Suggestions are taken from words in each file in the 'dict_files' list
 	'''
 
 	suggestions = []  # Store suggestions in this
-
 	for dictionary in dict_files:
 		if os.path.isfile(dictionary):
 			try:
@@ -30,9 +29,4 @@ def get_suggestions(word, dict_files):
 				# grep did not find word
 				pass
 
-	parsed_suggestions = []
-
-	for i in suggestions:
-		parsed_suggestions.append(i.replace('\n', r'\\\\n'))
-
-	return parsed_suggestions
+	return [s.replace('\n', r'\\\\n') for s in suggestions]
