@@ -33,6 +33,4 @@ def get_font_name(language):
 	# NOTE: Why so many 'Monospace 10's?
 	# Because it supports all the unicode characters needed for them.
 
-	if language in fonts:
-
-		return fonts[language]
+	return fonts.get(language, 'Monospace 10')

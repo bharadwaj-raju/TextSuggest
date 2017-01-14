@@ -22,6 +22,8 @@ import sys
 import time
 import collections
 
+sys.path.append('/usr/lib/textsuggest')
+
 from languages import get_language_name
 from fonts import get_font_name
 from suggestions import get_suggestions
@@ -358,13 +360,7 @@ def display_menu(items_list):
 
 	else:
 		language = get_language_name()
-		if language == ['English']:
-			font = 'Monospace 10'
-		else:
-			font = get_font_name(language)
-			if not font:
-				# use default
-				font = 'Monospace 10'
+		font = get_font_name(language)
 
 	rofi_opts = ' '.join(args.rofi_options) if args.rofi_options else ''
 
