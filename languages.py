@@ -12,33 +12,34 @@
 import subprocess as sp
 import re
 
-def get_language_name():
+_DEFAULT_KEYBOARD_LAYOUT = 'English'
 
-	# This function will return the language name
-	# Reading keyboard layout from shell command
+def get_language_name():
+	""" This function will return the language name for given layout.
+	
+	Keyboard layout is passed via shell command.
+	"""
 
 	# TODO: Add more definitions
-
 	languages = {
-					'bd' : 'Bangla',
-					'us' : 'English',
-					'uk' : 'English',
-					'gb' : 'English',
-					'ara': 'Arabic',
-					'cn' : 'Chinese',
-					'tw' : 'Chinese',
-					'de' : 'German',
-					'jp' : 'Japanese',
-					'ru' : 'Russian',
-					'es' : 'Spanish',
-					'se' : 'Swedish',
-					'fi' : 'Finnish',
-					'kr' : 'Korean',
-					'pk' : 'Urdu',
-					'fr' : 'French',
-					'gr' : 'Greek',
-					'ua' : 'Ukrainian'
-				}
+			'bd' : 'Bangla',
+			'us' : 'English',
+			'uk' : 'English',
+			'gb' : 'English',
+			'ara': 'Arabic',
+			'cn' : 'Chinese',
+			'tw' : 'Chinese',
+			'de' : 'German',
+			'jp' : 'Japanese',
+			'ru' : 'Russian',
+			'es' : 'Spanish',
+			'se' : 'Swedish',
+			'fi' : 'Finnish',
+			'kr' : 'Korean',
+			'pk' : 'Urdu',
+			'fr' : 'French',
+			'gr' : 'Greek',
+			'ua' : 'Ukrainian'}
 
 	xkb_map = sp.check_output(
 			['setxkbmap', '-print'],
@@ -54,10 +55,5 @@ def get_language_name():
 	kbd_layout = re.sub(r'\(.*?\)', '', kbd_layout)
 
 
-	# Language will be detected by layout
-
-	if kbd_layout in languages:
-		return languages[kbd_layout]
-
-	else:
-		return 'English'
+	# Return keyboard layout for detected language.
+	return languages[kbd_layout] if kbd_layout in languages else _DEFAULT_KEYBOARD_LAYOUT
