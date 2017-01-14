@@ -11,13 +11,15 @@ if [ "$(id -u)" -ne 0 ]; then
 	exit
 fi
 
+pyversion=$(python3 --version | sed 's/ //g;s/P/p/g;s/.\{2\}$//')
+
 case "$1" in
 	"--uninstall")
 		echo "Uninstalling..."
 		rm -rf /usr/share/textsuggest
 		rm /usr/bin/textsuggest
-		rm /usr/lib/python3.5/site-packages/fonts.py
-		rm /usr/lib/python3.5/site-packages/suggestions.py
+		rm /usr/lib/$pyversion/site-packages/fonts.py
+		rm /usr/lib/$pyversion/site-packages/suggestions.py
 		rm /usr/share/man/man1/textsuggest.1
 		rm -rf /usr/share/doc/textsuggest
 		rm -rf /usr/share/licenses/textsuggest
@@ -37,6 +39,8 @@ done
 echo -e "Installing..."
 
 install -d /usr/share/textsuggest
+install -d ${XDG_CONFIG_HOME:-$HOME/.config}/textsuggest
+install -d ${XDG_CONFIG_HOME:-$HOME/.config}/textsuggest/processors
 cp -rf textsuggest/dictionaries/ /usr/share/textsuggest/
 cp textsuggest/Extra_Words.txt /usr/share/textsuggest/
 cp -rf textsuggest/processors/ /usr/share/textsuggest
@@ -44,13 +48,13 @@ cp -rf textsuggest/processors/ /usr/share/textsuggest
 install -D -m755 TextSuggest.py /usr/bin/textsuggest
 
 if python3 -c 'import sys; print(sys.path)' | grep 'site-packages' > /dev/null; then
-	install -D -m644 languages.py -t /usr/lib/python3.5/site-packages/
-	install -D -m644 fonts.py -t /usr/lib/python3.5/site-packages/
-	install -D -m644 suggestions.py /usr/lib/python3.5/site-packages/
+	install -D -m644 languages.py -t /usr/lib/$pyversion/site-packages/
+	install -D -m644 fonts.py -t /usr/lib/$pyversion/site-packages/
+	install -D -m644 suggestions.py /usr/lib/$pyversion/site-packages/
 else
-	install -D -m644 languages.py -t /usr/lib/python3.5/
-	install -D -m644 fonts.py -t /usr/lib/python3.5/
-	install -D -m644 suggestions.py /usr/lib/python3.5/
+	install -D -m644 languages.py -t /usr/lib/$pyversion/
+	install -D -m644 fonts.py -t /usr/lib/$pyversion/
+	install -D -m644 suggestions.py /usr/lib/$pyversion/
 fi
 
 install -D -m644 docs/textsuggest.1 -t /usr/share/man/man1/

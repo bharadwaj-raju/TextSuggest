@@ -31,13 +31,14 @@ import argparse
 __version__ = 1570  # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
-config_dir = os.path.expanduser('~/.config/textsuggest')
+config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
+config_dir = os.path.join(config_home, 'textsuggest')
 dict_dir = '/usr/share/textsuggest/dictionaries'
 extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
-custom_words_file = os.path.expanduser('~/.config/textsuggest/Custom_Words.txt')
-hist_file = os.path.expanduser('~/.config/textsuggest/history.txt')
+custom_words_file = os.path.join(config_dir, 'Custom_Words.txt')
+hist_file = os.path.join(config_dir, 'history.txt')
 
-processor_dirs = [os.path.expanduser('~/.config/textsuggest/processors'),
+processor_dirs = [os.path.join(config_dir, 'processors'),
 				'/usr/share/textsuggest/processors']
 
 for processor_dir in processor_dirs:
@@ -156,7 +157,7 @@ if args.version:
 	sys.exit(0)
 
 if not os.path.isdir(config_dir):
-	os.mkdir(config_dir)
+	os.makedirs(config_dir)
 
 sp.Popen(['xsel', '--keep'])  # Make selection persist
 
