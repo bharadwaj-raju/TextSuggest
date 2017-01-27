@@ -1,5 +1,7 @@
 # TextSuggest
 
+![TextSuggest](img/TextSuggest.png)
+
 **Save keystrokes.** Autocomplete, [expansions](#custom-words) and [more](#expansions) — everywhere.
 
 A utility to autocomplete words in the GUI.
