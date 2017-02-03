@@ -23,7 +23,7 @@ def get_suggestions(word, dict_files):
 	for dictionary in dict_files:
 		if os.path.isfile(dictionary):
 			try:
-				suggestions.extend(sp.check_output(['grep', '-i', word, dictionary]).decode('utf-8').rstrip().split('\n'))
+				suggestions.extend(sp.check_output(['grep', '-i', '--', word, dictionary]).decode('utf-8').rstrip().split('\n'))
 
 			except sp.CalledProcessError:
 				# grep did not find word
