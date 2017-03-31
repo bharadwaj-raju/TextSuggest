@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1573 # Updated using git pre-commit hook
+__version__ = 1574 # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
@@ -121,7 +121,7 @@ arg_parser.add_argument(
 arg_parser.add_argument(
 	'--rofi-options', type=str,
 	help='Specify additonal options to pass to Rofi. \n \n',
-	nargs='+', required=False, metavar='options for rofi')
+	required=False, metavar='options for rofi')
 
 arg_parser.add_argument(
 	'--force-gtk3-fix', action='store_true',
@@ -139,6 +139,7 @@ arg_parser.add_argument(
 	required=False)
 
 args, unknown_args = arg_parser.parse_known_args()
+print(args, unknown_args)
 
 # Get the runtime/tmp dir
 if os.getenv('XDG_RUNTIME_DIR'):
@@ -225,7 +226,7 @@ def restart_program(additional_args=None, remove_args=None):
 	new_cmd = ''
 
 	for i in sys.argv:
-		new_cmd += ' ' + i
+		new_cmd += ' ' + '"{}"'.format(i)
 
 	if remove_args != []:
 		for arg in remove_args:
