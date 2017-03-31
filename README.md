@@ -94,7 +94,7 @@ Simply add them to `~/.config/textsuggest/Custom_Words.txt` in a JSON format lik
 
 	{
 	    "custom": "Expansion",
-		"another": "Another expansion"
+	    "another": "Another expansion"
 	}
 
 and whenever 'custom' is typed, 'Expansion' will be inserted. Similarly for 'another' ('Another expansion' will be inserted)

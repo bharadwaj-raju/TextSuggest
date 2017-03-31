@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1574 # Updated using git pre-commit hook
+__version__ = 1577 # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
@@ -48,7 +48,8 @@ for processor_dir in processor_dirs:
 	sys.path.insert(0, processor_dir)
 
 with open(custom_words_file) as f:
-	custom_words = json.load(f)
+	contents = f.read() else "{}"
+	custom_words = json.loads(contents)
 
 # Arguments
 
@@ -395,7 +396,13 @@ def display_menu(items_list):
 
 	rofi_opts = ' '.join(args.rofi_options) if args.rofi_options else ''
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -p "> " -font "%s" -xoffset %s -yoffset %s -location 1 %s' % (items_list, font, x, y, rofi_opts)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -p "> " -font "%s"' % (items_list, font)
+
+	if rofi_opts:
+		popup_menu_cmd_str += ' ' + rofi_opts
+
+	else:
+		popup_menu_cmd_str += ' -location 1 -xoffset %s -yoffset %s' % (x, y)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
