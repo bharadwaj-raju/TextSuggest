@@ -18,7 +18,6 @@ case "$1" in
 		rm -rf /usr/share/textsuggest
 		rm /usr/bin/textsuggest
 		rm -rf /usr/lib/textsuggest
-		rm /usr/share/man/man1/textsuggest.1
 		rm -rf /usr/share/doc/textsuggest
 		rm -rf /usr/share/licenses/textsuggest
 		exit
@@ -50,7 +49,6 @@ for lib in "fonts.py languages.py suggestions.py"; do
 	install -D -m644 $lib /usr/lib/textsuggest
 done
 
-install -D -m644 docs/textsuggest.1 -t /usr/share/man/man1/
 install -D -m644 README.md /usr/share/doc/textsuggest/README
 
 # Strip README of special prettifying (to make it look good online)

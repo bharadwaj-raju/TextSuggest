@@ -90,11 +90,14 @@ TextSuggest can handle a range of expansions. It can also be [extended](#extensi
 
 ### Custom words
 
-Simply add them to `~/.config/textsuggest/Custom_Words.txt` like this:
+Simply add them to `~/.config/textsuggest/Custom_Words.txt` in a JSON format like this:
 
-	custom=My custom Expansion!
+	{
+	    "custom": "Expansion",
+		"another": "Another expansion"
+	}
 
-and whenever 'custom' is typed, 'My custom Expansion!' will be inserted.
+and whenever 'custom' is typed, 'Expansion' will be inserted. Similarly for 'another' ('Another expansion' will be inserted)
 
 ### Commands
 

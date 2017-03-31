@@ -21,6 +21,7 @@ import subprocess as sp
 import sys
 import time
 import collections
+import json
 
 sys.path.append('/usr/lib/textsuggest')
 
@@ -30,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1570  # Updated using git pre-commit hook
+__version__ = 1573 # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
@@ -46,17 +47,33 @@ processor_dirs = [os.path.join(config_dir, 'processors'),
 for processor_dir in processor_dirs:
 	sys.path.insert(0, processor_dir)
 
+with open(custom_words_file) as f:
+	custom_words = json.load(f)
+
 # Arguments
 
-arg_parser = argparse.ArgumentParser(
-	description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
-	formatter_class=argparse.RawTextHelpFormatter,
-	usage='%(prog)s [options]',
-	allow_abbrev=False,
-	epilog='''More information:\n
+try:
+	arg_parser = argparse.ArgumentParser(
+		description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
+		formatter_class=argparse.RawTextHelpFormatter,
+		usage='%(prog)s [options]',
+		allow_abbrev=False,
+		epilog='''More information:\n
 
-	  - Manual page: man textsuggest
-	  - Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
+		- Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
+
+except:
+	# Older version of Python
+	# allow_abbrev not supported
+	arg_parser = argparse.ArgumentParser(
+		description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
+		formatter_class=argparse.RawTextHelpFormatter,
+		usage='%(prog)s [options]',
+		epilog='''More information:\n
+
+		- Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
+
+
 
 arg_parser.add_argument(
 	'--word', type=str,
@@ -92,6 +109,10 @@ arg_parser.add_argument(
 	'--auto-selection', type=str, nargs='?',
 	help='Automatically select word under cursor and suggest. Ignored if --no-selection. \n \n',
 	choices=['beginning', 'middle', 'end'], const='end', required=False, metavar='beginning|middle|end')
+
+arg_parser.add_argument(
+	'--custom-words-only', action='store_true',
+	help='Use custom words only. \n \n', required=False)
 
 arg_parser.add_argument(
 	'--no-processing', action='store_true',
@@ -131,6 +152,8 @@ else:
 
 if not os.path.isdir(runtime_dir):
 	os.mkdir(runtime_dir)
+
+# Scripts generated while running
 
 menu_script = os.path.join(runtime_dir, 'menu_script.sh')
 restart_script = os.path.join(runtime_dir, 'restart_auto_sel.sh')
@@ -279,12 +302,16 @@ def get_dictionaries():
 	dictionaries = []
 
 	for lang in language:
-		dictionaries.append(os.path.join(dict_dir, lang + '.txt'))
+		dictionaries.append(('REGULAR', os.path.join(dict_dir, lang + '.txt')))
 
 	if os.path.isfile(custom_words_file):
-		dictionaries.append(custom_words_file)
+		dictionaries.append(('CUSTOM', custom_words_file))
+
 	if os.path.isfile(extra_words_file):
-		dictionaries.append(extra_words_file)
+		dictionaries.append(('EXTRA', extra_words_file))
+
+	if args.custom_words_only:
+		dictionaries = [('CUSTOM', custom_words_file)]
 
 	return dictionaries
 
@@ -316,15 +343,18 @@ def is_program_gtk3(program):
 
 	try:
 		with open(get_cmd_out('$(which %s 2>/dev/null)' % program), 'r') as f:
-			contents = f.read()
-			if 'require_version' in contents and 'Gtk' in contents and '3.0' in contents:
-				return True
+			for line in f:
+				if 'require_version' in line and 'Gtk' in line and '3.0' in line:
+					return True
 
-			elif 'from gi.repository import Gtk' in contents:
-				return True
+				elif 'from gi.repository import Gtk' in line:
+					return True
 
-			elif 'require' in contents and 'gtk3' in contents:
-				return True
+				elif 'import gi.repository' in line:
+					return True
+
+				elif 'require' in line and 'gtk3' in line:
+					return True
 
 	except:
 		pass
@@ -364,7 +394,7 @@ def display_menu(items_list):
 
 	rofi_opts = ' '.join(args.rofi_options) if args.rofi_options else ''
 
-	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -p "> " -i -font "%s" -xoffset %s -yoffset %s -location 1 %s' % (items_list, font, x, y, rofi_opts)
+	popup_menu_cmd_str = 'echo "%s" | rofi -dmenu -fuzzy -glob -matching glob -p "> " -font "%s" -xoffset %s -yoffset %s -location 1 %s' % (items_list, font, x, y, rofi_opts)
 
 	# The argument list will sometimes be too long (too many words)
 	# subprocess can't handle it, and will raise OSError.
@@ -400,8 +430,8 @@ def process_suggestion(suggestion):
 		if current_word[:1].isupper():
 			suggestion = suggestion.capitalize()
 
-	if '=' in suggestion:
-		suggestion = suggestion.split('=', 1)[1]
+	if suggestion in custom_words:
+		suggestion = custom_words[suggestion]
 
 	if args.no_processing:
 		print('Processors disabled.')
@@ -458,6 +488,7 @@ def main():
 
 		# Frequency sort + Remove duplicates
 		words_list = uniq(freq_sort(words_list))
+
 
 	words_list = '\n'.join(words_list)
 
