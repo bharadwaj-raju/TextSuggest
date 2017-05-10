@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1577 # Updated using git pre-commit hook
+__version__ = 1579 # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
@@ -48,7 +48,7 @@ for processor_dir in processor_dirs:
 	sys.path.insert(0, processor_dir)
 
 with open(custom_words_file) as f:
-	contents = f.read() else "{}"
+	contents = f.read() or '{}'
 	custom_words = json.loads(contents)
 
 # Arguments
