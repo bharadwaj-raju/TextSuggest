@@ -34,7 +34,8 @@ def get_suggestions(word, dict_files):
 
 			else:  # CUSTOM
 				with open(dictionary[1]) as f:
-					custom = json.load(f)
+					contents = f.read() or '{}'
+					custom = json.loads(contents)
 
 				if word:
 					for cust in custom.keys():
