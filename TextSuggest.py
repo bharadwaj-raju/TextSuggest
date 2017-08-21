@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ =  # Updated using git pre-commit hook
+__version__ = 1571 # Updated using git pre-commit hook
 
 script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
 config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
