@@ -111,7 +111,7 @@ when typed into a TextSuggest window, will insert output of `ls`.
 
 Add in `~/.config/textsuggest/Custom_Words.txt`:
 
-    custom=#command --opts
+    "custom": "#command --opts"
 
 and whenever you type 'custom' into TextSuggest, the output of `command --opts` will be inserted.
 
@@ -129,7 +129,7 @@ You can also use any function in the Python [`math`](https://docs.python.org/3/l
 
 Add in `~/.config/textsuggest/Custom_Words.txt`:
 
-    custom=%2+3
+    "custom": "%2+3"
 
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
