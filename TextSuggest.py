@@ -31,138 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1572 # Updated using git pre-commit hook
-
-script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
-config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
-config_dir = os.path.join(config_home, 'textsuggest')
-dict_dir = '/usr/share/textsuggest/dictionaries'
-extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
-custom_words_file = os.path.join(config_dir, 'Custom_Words.txt')
-hist_file = os.path.join(config_dir, 'history.txt')
-
-processor_dirs = [os.path.join(config_dir, 'processors'),
-				'/usr/share/textsuggest/processors']
-
-for processor_dir in processor_dirs:
-	sys.path.insert(0, processor_dir)
-
-try:
-	with open(custom_words_file) as f:
-		contents = f.read() or '{}'
-		custom_words = json.loads(contents)
-
-except:
-	custom_words = json.loads('{}')
-
-# Arguments
-
-try:
-	arg_parser = argparse.ArgumentParser(
-		description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
-		formatter_class=argparse.RawTextHelpFormatter,
-		usage='%(prog)s [options]',
-		allow_abbrev=False,
-		epilog='''More information:\n
-
-		- Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
-
-except:
-	# Older version of Python
-	# allow_abbrev not supported
-	arg_parser = argparse.ArgumentParser(
-		description='''TextSuggest - X11 utility to autocomplete words in the GUI''',
-		formatter_class=argparse.RawTextHelpFormatter,
-		usage='%(prog)s [options]',
-		epilog='''More information:\n
-
-		- Full README: /usr/share/doc/textsuggest/README'''.replace('\t', '').replace('    ', ''))
-
-
-
-arg_parser.add_argument(
-	'--word', type=str,
-	help='Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. \n \n',
-	nargs='+', required=False)
-
-arg_parser.add_argument(
-	'--all-words', '--no-selection', action='store_true',
-	help='Give all words as suggestions, which you can then filter. \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'--font', type=str,
-	help='Specify font for Rofi. Format: FontName Weight Size. \n \n',
-	nargs='+', required=False)
-
-arg_parser.add_argument(
-	'--no-history', action='store_true',
-	help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'--exit-if-no-words-found', action='store_true',
-	help='Exit if no words are found (instead of restarting in --no-selection mode) \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'--language', type=str,
-	help='Manually set language(s), in case script fails to auto-detect from keyboard layout. \n \n',
-	nargs='+', required=False, metavar='languages')
-
-arg_parser.add_argument(
-	'--auto-selection', type=str, nargs='?',
-	help='Automatically select word under cursor and suggest. Ignored if --no-selection. \n \n',
-	choices=['beginning', 'middle', 'end'], const='end', required=False, metavar='beginning|middle|end')
-
-arg_parser.add_argument(
-	'--custom-words-only', action='store_true',
-	help='Use custom words only. \n \n', required=False)
-
-arg_parser.add_argument(
-	'--no-processing', action='store_true',
-	help='Disable using of any processors. \n \n', required=False)
-
-arg_parser.add_argument(
-	'--rofi-options', type=str,
-	help='Specify additonal options to pass to Rofi. \n \n',
-	required=False, metavar='options for rofi')
-
-arg_parser.add_argument(
-	'--force-gtk3-fix', action='store_true',
-	help='Always use the GTK+ 3 workaround. If not set, tries to detect the current program\'s GTK+ version. \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'--log', type=str, metavar='LOG_FILE',
-	help='Log all output to a file. Useful when debugging. \n \n',
-	required=False)
-
-arg_parser.add_argument(
-	'-v', '--version', action='store_true',
-	help='Print version and license information.',
-	required=False)
-
-args, unknown_args = arg_parser.parse_known_args()
-print(args, unknown_args)
-
-# Get the runtime/tmp dir
-if os.getenv('XDG_RUNTIME_DIR'):
-	runtime_dir = os.path.join(os.getenv('XDG_RUNTIME_DIR'), 'textsuggest')
-
-elif os.getenv('TMPDIR'):
-	runtime_dir = os.path.join(os.getenv('TMPDIR'), 'textsuggest')
-
-else:
-	runtime_dir = '/tmp/textsuggest'
-
-if not os.path.isdir(runtime_dir):
-	os.mkdir(runtime_dir)
-
-# Scripts generated while running
-
-menu_script = os.path.join(runtime_dir, 'menu_script.sh')
-restart_script = os.path.join(runtime_dir, 'restart_auto_sel.sh')
+__version__ = 1573 # Updated using git pre-commit hook
 
 def print_error(error):
 
@@ -173,29 +42,6 @@ def print_error(error):
 
 	sys.stderr.write(error)
 	sys.stderr.flush()
-
-for arg in unknown_args:
-	print_error('Unknown option: %s. Ignoring.' % arg)
-
-if args.version:
-	print('''TextSuggest %d
-
-			Copyright © 2016 Bharadwaj Raju <bharadwaj.raju@keemail.me>
-			License GPLv3+: GNU GPL (General Public License) version 3 or later <https://gnu.org/licenses/gpl.html>
-			This is free software; you are free to change and redistribute it.
-			There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('	', '') % __version__)
-
-	sys.exit(0)
-
-if not os.path.isdir(config_dir):
-	os.makedirs(config_dir)
-
-sp.Popen(['xsel', '--keep'])  # Make selection persist
-
-if args.language:
-	language = args.language
-else:
-	language = [get_language_name()]
 
 def freq_sort(lst):
 	counts = collections.Counter(lst)
@@ -228,72 +74,23 @@ def restart_program(additional_args=None, remove_args=None):
 	if not remove_args:
 		remove_args = []
 
-	new_cmd = ''
+	new_args = sys.argv[:]
 
-	for i in sys.argv:
-		new_cmd += ' ' + '"{}"'.format(i)
+	for arg in remove_args:
+		if arg in sys.argv:
+			new_args.remove(arg)
 
-	if remove_args != []:
-		for arg in remove_args:
-			for i in sys.argv:
-				if arg in i:
-					new_cmd = new_cmd.replace(i, '')
-
-	if additional_args != []:
-		for arg in additional_args:
-			new_cmd += ' ' + arg
+	new_args.extend(additional_args)
 
 	print('Restarting as:', new_cmd)
 
 	with open(restart_script, 'w') as f:
 		f.write('%s %s' % (sys.executable, new_cmd))
 
-	restart_proc = sp.Popen(['sh', restart_script])
-	restart_proc.wait()  # Allow restart.sh to fully execute
+	restart_proc = sp.Popen([sys.executable, new_args])
+	restart_proc.wait()
 
 	sys.exit(restart_proc.returncode)
-
-if args.all_words:
-	current_word = ''
-	suggest_method = 'insert'
-
-else:
-	if args.word:
-		current_word = ' '.join(args.word)
-
-	else:
-		if args.auto_selection:
-			if args.auto_selection == 'beginning':
-				# Ctrl + Shift + ->
-				sp.Popen([
-					'sleep 0.5; xdotool key Ctrl+Shift+Right > /dev/null'],
-					shell=True)
-			elif args.auto_selection == 'middle':
-				# Ctrl + <- then Ctrl + Shift + ->
-				sp.Popen([
-					'sleep 0.5; xdotool key Ctrl+Left; xdotool key Ctrl+Shift+Right > /dev/null'],
-					shell=True)
-			else:
-				# Ctrl + Shift + <-
-				sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'],
-						 shell=True)
-
-			time.sleep(1)
-
-		current_word = get_cmd_out(['xsel'])
-
-	suggest_method = 'replace'
-
-if current_word.endswith('.'):
-	current_word = current_word[:-1]
-
-if args.log:
-	sys.stdout = open(args.log, 'a')
-	sys.stderr = open(args.log, 'a')
-	print('TextSuggest version {}, running on {}, with application {}.'.format(
-		__version__,
-		os.getenv('XDG_CURRENT_DESKTOP'),
-		get_cmd_out('xdotool getwindowfocus getwindowname')))
 
 
 def remove_dups(s_list):
@@ -331,41 +128,41 @@ def get_focused_window():
 	except:
 		return ''
 
-def is_program_gtk3(program):
-
-	gtk3_apps = ['gedit', 'mousepad', 'abiword']
-
-	if args.force_gtk3_fix:
-		return True
-
-	try:
-		program_ldd = get_cmd_out('ldd $(which %s 2>/dev/null)' % program, suppress_stderr=True)
-
-		return bool('libgtk-3' in program_ldd)
-
-	except sp.CalledProcessError:
-		# Not a dynamic executable
-		pass
-
-	try:
-		with open(get_cmd_out('$(which %s 2>/dev/null)' % program), 'r') as f:
-			for line in f:
-				if 'require_version' in line and 'Gtk' in line and '3.0' in line:
-					return True
-
-				elif 'from gi.repository import Gtk' in line:
-					return True
-
-				elif 'import gi.repository' in line:
-					return True
-
-				elif 'require' in line and 'gtk3' in line:
-					return True
-
-	except:
-		pass
-
-	return bool(program.lower() in gtk3_apps)
+#def is_program_gtk3(program):
+#
+#	gtk3_apps = ['gedit', 'mousepad', 'abiword']
+#
+#	if args.force_gtk3_fix:
+#		return True
+#
+#	try:
+#		program_ldd = get_cmd_out('ldd $(which %s 2>/dev/null)' % program, suppress_stderr=True)
+#
+#		return bool('libgtk-3' in program_ldd)
+#
+#	except sp.CalledProcessError:
+#		# Not a dynamic executable
+#		pass
+#
+#	try:
+#		with open(get_cmd_out('$(which %s 2>/dev/null)' % program), 'r') as f:
+#			for line in f:
+#				if 'require_version' in line and 'Gtk' in line and '3.0' in line:
+#					return True
+#
+#				elif 'from gi.repository import Gtk' in line:
+#					return True
+#
+#				elif 'import gi.repository' in line:
+#					return True
+#
+#				elif 'require' in line and 'gtk3' in line:
+#					return True
+#
+#	except:
+#		pass
+#
+#	return bool(program.lower() in gtk3_apps)
 
 def type_text(text):
 
@@ -432,11 +229,12 @@ def process_suggestion(suggestion):
 			f.write('\n' + suggestion.replace('\n', '\\n'))
 
 	if suggest_method == 'replace':
-		if is_program_gtk3(get_focused_window()):
-			print('Using GTK+ 3 workaround.')
-			gtk3_fix = sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Right; sleep 0.5'], shell=True)
-			gtk3_fix.wait()
+		#if is_program_gtk3(get_focused_window()):
+		#	print('Using GTK+ 3 workaround.')
+		#	gtk3_fix = sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Right; sleep 0.5'], shell=True)
+		#	gtk3_fix.wait()
 		# Erase current word
+		# Already selected
 		sp.Popen(['xdotool', 'key', 'BackSpace'])
 
 		if current_word[:1].isupper():
@@ -477,6 +275,197 @@ def process_suggestion(suggestion):
 
 def main():
 
+	script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
+	config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
+	config_dir = os.path.join(config_home, 'textsuggest')
+	dict_dir = '/usr/share/textsuggest/dictionaries'
+	extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
+	custom_words_file = os.path.join(config_dir, 'Custom_Words.txt')
+	hist_file = os.path.join(config_dir, 'history.txt')
+
+	processor_dirs = [os.path.join(config_dir, 'processors'),
+					'/usr/share/textsuggest/processors']
+
+	for processor_dir in processor_dirs:
+		sys.path.insert(0, processor_dir)
+
+	try:
+		with open(custom_words_file) as f:
+			contents = f.read() or '{}'
+			custom_words = json.loads(contents)
+
+	except:
+		custom_words = json.loads('{}')
+
+	# Arguments
+
+	arg_parser_args = {
+		'description': '''TextSuggest — X11 utility to autocomplete words in the GUI''',
+		'formatter_class': argparse.RawTextHelpFormatter,
+		'usage': '%(prog)s [options]',
+		'allow_abbrev': False,
+		'epilog': '''See also: Offline documentation at /usr/share/doc/textsuggest/README'''
+	}
+
+	if sys.version_info.minor > 5:
+		# allow_abbrev not supported in Python >3.5
+		del arg_parser_args['usage']
+
+	arg_parser = argparse.ArgumentParser(**arg_parser_args)
+
+	arg_parser.add_argument(
+		'--word', type=str,
+		help='Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. \n \n',
+		nargs='+', required=False)
+
+	arg_parser.add_argument(
+		'--all-words', '--no-selection', action='store_true',
+		help='Give all words as suggestions, which you can then filter. \n \n',
+		required=False)
+
+	arg_parser.add_argument(
+		'--font', type=str,
+		help='Specify font for Rofi. Format: FontName Weight Size. \n \n',
+		nargs='+', required=False)
+
+	arg_parser.add_argument(
+		'--no-history', action='store_true',
+		help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) \n \n',
+		required=False)
+
+	arg_parser.add_argument(
+		'--exit-if-no-words-found', action='store_true',
+		help='Exit if no words are found (instead of restarting in --no-selection mode) \n \n',
+		required=False)
+
+	arg_parser.add_argument(
+		'--language', type=str,
+		help='Manually set language(s), in case script fails to auto-detect from keyboard layout. \n \n',
+		nargs='+', required=False, metavar='languages')
+
+	arg_parser.add_argument(
+		'--auto-selection', type=str, nargs='?',
+		help='Automatically select word under cursor and suggest. Ignored if --no-selection. \n \n',
+		choices=['beginning', 'middle', 'end'], const='end', required=False, metavar='beginning|middle|end')
+
+	arg_parser.add_argument(
+		'--custom-words-only', action='store_true',
+		help='Use custom words only. \n \n', required=False)
+
+	arg_parser.add_argument(
+		'--no-processing', action='store_true',
+		help='Disable using of any processors. \n \n', required=False)
+
+	arg_parser.add_argument(
+		'--rofi-options', type=str,
+		help='Specify additonal options to pass to Rofi. \n \n',
+		required=False, metavar='options for rofi')
+
+	#arg_parser.add_argument(
+	#	'--force-gtk3-fix', action='store_true',
+	#	help='Always use the GTK+ 3 workaround. If not set, tries to detect the current program\'s GTK+ version. \n \n',
+	#	required=False)
+
+	#arg_parser.add_argument(
+	#	'--disable-gtk3-fix', action='store_true',
+	#	help='Disable the GTK+ 3 workaround.\n \n',
+	#	required=False)
+
+	# Disabling (i.e. commenting out code related to) GTK+ 3 workaround,
+	# which I suspect to not be working.
+	# If users report issues, will restore
+
+	arg_parser.add_argument(
+		'--log', type=str, metavar='LOG_FILE',
+		help='Log all output to a file. Useful when debugging. \n \n',
+		required=False)
+
+	arg_parser.add_argument(
+		'-v', '--version', action='store_true',
+		help='Print version and license information.',
+		required=False)
+
+	args, unknown_args = arg_parser.parse_known_args()
+	globals()['args'] = args
+
+	if os.getenv('XDG_RUNTIME_DIR'):
+		runtime_dir = os.path.join(os.getenv('XDG_RUNTIME_DIR'), 'textsuggest')
+
+	elif os.getenv('TMPDIR'):
+		runtime_dir = os.path.join(os.getenv('TMPDIR'), 'textsuggest')
+
+	else:
+		runtime_dir = '/tmp/textsuggest'
+
+	if not os.path.isdir(runtime_dir):
+		os.mkdir(runtime_dir)
+
+	# Scripts generated while running
+	menu_script = os.path.join(runtime_dir, 'menu_script.sh')
+	restart_script = os.path.join(runtime_dir, 'restart_auto_sel.sh')
+
+	for arg in unknown_args:
+		print_error('Unknown option: %s. Ignoring.' % arg)
+
+	if args.version:
+		print('''TextSuggest %d
+
+				Copyright © 2016 Bharadwaj Raju <bharadwaj DOT raju777 AT gmail DOT com>
+				License GPLv3+: GNU GPL (General Public License) version 3 or later <https://gnu.org/licenses/gpl.html>
+				This is free software; you are free to change and redistribute it.
+				There is NO WARRANTY, to the extent permitted by law.'''.replace('\t', '').replace('	', '') % __version__)
+
+		sys.exit(0)
+
+	if not os.path.isdir(config_dir):
+		os.makedirs(config_dir)
+
+	sp.Popen(['xsel', '--keep'])  # Make selection persist
+
+	language = args.language or get_language_name()
+
+	if args.all_words:
+		current_word = ''
+		suggest_method = 'insert'
+
+	else:
+		if args.word:
+			current_word = ' '.join(args.word)
+
+		else:
+			if args.auto_selection:
+				if args.auto_selection == 'beginning':
+					# Ctrl + Shift + ->
+					sp.Popen([
+						'sleep 0.5; xdotool key Ctrl+Shift+Right > /dev/null'],
+						shell=True)
+				elif args.auto_selection == 'middle':
+					# Ctrl + <- then Ctrl + Shift + ->
+					sp.Popen([
+						'sleep 0.5; xdotool key Ctrl+Left; xdotool key Ctrl+Shift+Right > /dev/null'],
+						shell=True)
+				else:
+					# Ctrl + Shift + <-
+					sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'],
+							shell=True)
+
+				time.sleep(1)
+
+			current_word = get_cmd_out(['xsel'])
+
+		suggest_method = 'replace'
+
+	if current_word.endswith('.'):
+		current_word = current_word[:-1]
+
+	if args.log:
+		sys.stdout = open(args.log, 'a')
+		sys.stderr = open(args.log, 'a')
+		print('TextSuggest version {}, running on {}, with application {}.'.format(
+			__version__,
+			os.getenv('XDG_CURRENT_DESKTOP'),
+			get_cmd_out('xdotool getwindowfocus getwindowname')))
+
 	print('Running in %s mode.' % suggest_method)
 
 	if suggest_method == 'replace':
@@ -505,11 +494,9 @@ def main():
 	words_list = '\n'.join(words_list)
 
 	chosen_word = display_menu(words_list)
-
 	print('Chosen word:', chosen_word)
 
 	processed_chosen_word = process_suggestion(chosen_word)
-
 	print('Processed:', processed_chosen_word)
 
 	type_text(processed_chosen_word)

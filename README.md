@@ -60,29 +60,52 @@ Otherwise use `sudo ./install.sh --uninstall`.
 
 ## Options
 
-Also documented in the manual page: `man textsuggest` and `--help`.
+    $ textsuggest --help
+	usage: TextSuggest.py [-h] [--word WORD [WORD ...]] [--all-words]
+                      [--font FONT [FONT ...]] [--no-history]
+                      [--exit-if-no-words-found]
+                      [--language languages [languages ...]]
+                      [--auto-selection [beginning|middle|end]]
+                      [--custom-words-only] [--no-processing]
+                      [--rofi-options options for rofi] [--log LOG_FILE] [-v]
 
-- `-h`, `--help`: Print out a help message.
+	TextSuggest — X11 utility to autocomplete words in the GUI
 
-- `--word word ...`: Specify word to give suggestions for. If not specified, taken from X11 selection. Ignored if `--all-words`.
+	optional arguments:
+	-h, --help            show this help message and exit
+	--word WORD [WORD ...]
+							Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection.
 
-- `--all-words`: Give *all* the suggestions. Then you can search through them etc.
+	--all-words, --no-selection
+							Give all words as suggestions, which you can then filter.
 
-- `--font font`: Specify font to use for Rofi. Format: FontName (Weight) (Size). Default: Varies based on language.
+	--font FONT [FONT ...]
+							Specify font for Rofi. Format: FontName Weight Size.
 
-- `--no-history`: Disable the storage of frequently-used words in `~/.config/textsuggest/history.txt`
+	--no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt)
 
-- `--language languages ...`: Specify language to use. Appropriate language will be detected if not specified. If detection fails too, English will be used.
+	--exit-if-no-words-found
+							Exit if no words are found (instead of restarting in --no-selection mode)
 
-- `--auto-selection [beginning|middle|end]`: Auto-select word under cursor and suggest. See [Auto-selection](#auto-selection).
+	--language languages [languages ...]
+							Manually set language(s), in case script fails to auto-detect from keyboard layout.
 
-- `--no-processing`: Disable use of [processors](#extensions)
+	--auto-selection [beginning|middle|end]
+							Automatically select word under cursor and suggest. Ignored if --no-selection.
 
-- `--rofi-options options ...`: Specify additional options for Rofi.
+	--custom-words-only   Use custom words only.
 
-- `--exit-if-no-words-found`: Exit if no words are found (`ERR_NOWORDS`, return code 1) instead of restarting in `--all-words` mode (`WARN_NOWORDS`)
+	--no-processing       Disable using of any processors.
 
-- `-v`, `--version`: Print out version and license information.
+	--rofi-options options for rofi
+							Specify additonal options to pass to Rofi.
+
+	--log LOG_FILE        Log all output to a file. Useful when debugging.
+
+	-v, --version         Print version and license information.
+
+	See also: Offline documentation at /usr/share/doc/textsuggest/README
+
 
 ## Expansions
 
@@ -250,7 +273,7 @@ It is an effort to achieve TextSuggest's final goal: to be like the suggestions 
 
 ### Running textsuggestd
 
-**WARNING**: It is currently unusable. Run at risk. See [escaping](#escaping-textsuggestd).
+**WARNING**: It is currently unusable. Run at your own risk. See [escaping](#escaping-textsuggestd).
 
 Simply do:
 
