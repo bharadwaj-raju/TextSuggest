@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1574 # Updated using git pre-commit hook
+__version__ = 1575 # Updated using git pre-commit hook
 
 def print_error(error):
 
@@ -118,6 +118,10 @@ def get_focused_window():
 	except:
 		return ''
 
+def get_focused_window_id():
+
+	return get_cmd_out(['xdotool', 'getwindowfocus']).strip()
+
 #def is_program_gtk3(program):
 #
 #	gtk3_apps = ['gedit', 'mousepad', 'abiword']
@@ -159,6 +163,11 @@ def set_clipboard_text(text):
 	
 	clipboard_input_proc = sp.Popen(['xsel', '--clipboard', '--input'], stdin=sp.PIPE)
 	clipboard_input_proc.communicate(text.encode('utf-8'))
+	clipboard_input_proc.wait()
+
+def get_clipboard_text():
+
+	return get_cmd_out(['xsel', '--clipboard', '--output'])
 
 
 def type_text(text):
@@ -179,9 +188,9 @@ def type_text(text):
 
 
 	# Default faster method, but messes with clipboard history
-	old_clipboard_text = get_cmd_out(['xsel', '--clipboard', '--output'])
+	old_clipboard_text = get_clipboard_text()
 	set_clipboard_text(text)
-	sp.Popen(['xdotool', 'key', 'Ctrl+V']).wait()
+	sp.Popen(['xdotool', 'key', 'Shift+Insert']).wait()
 	set_clipboard_text(old_clipboard_text)
 
 
@@ -240,7 +249,7 @@ def process_suggestion(suggestion):
 		#	gtk3_fix.wait()
 		# Erase current word
 		# Already selected
-		sp.Popen(['xdotool', 'key', 'BackSpace'])
+		#sp.Popen(['xdotool', 'key', 'BackSpace'])
 
 		if current_word[:1].isupper():
 			suggestion = suggestion.capitalize()
@@ -390,6 +399,8 @@ def main():
 		help='Disable the use of clipboard for fast typing, and instead use the slower xdotool type method. See README for more info. \n \n',
 		required=False)
 
+
+
 	#arg_parser.add_argument(
 	#	'--force-gtk3-fix', action='store_true',
 	#	help='Always use the GTK+ 3 workaround. If not set, tries to detect the current program\'s GTK+ version. \n \n',
@@ -436,16 +447,18 @@ def main():
 	if not os.path.isdir(config_dir):
 		os.makedirs(config_dir)
 
-	sp.Popen(['xsel', '--keep'])
+	#sp.Popen(['xsel', '--keep']).wait()
 	# Make selection persist even when app (which is the owner of selected text) goes out-of-focus/exits
 
-	language = args.language or get_language_name()
+	language = args.language or [get_language_name()]
 
 	if args.all_words:
 		current_word = ''
 		suggest_method = 'insert'
 
 	else:
+		focused_window_id = get_focused_window_id()
+		
 		if args.word:
 			current_word = ' '.join(args.word)
 
@@ -454,21 +467,33 @@ def main():
 				if args.auto_selection == 'beginning':
 					# Ctrl + Shift + ->
 					sp.Popen([
-						'sleep 0.5; xdotool key Ctrl+Shift+Right > /dev/null'],
-						shell=True)
+						'xdotool key Control_L+Shift+Right'],
+						shell=True).wait()
 				elif args.auto_selection == 'middle':
 					# Ctrl + <- then Ctrl + Shift + ->
 					sp.Popen([
-						'sleep 0.5; xdotool key Ctrl+Left; xdotool key Ctrl+Shift+Right > /dev/null'],
-						shell=True)
+						'xdotool key Control_L+Left; xdotool key Ctrl+Shift+Right'],
+						shell=True).wait()
 				else:
 					# Ctrl + Shift + <-
-					sp.Popen(['sleep 0.5; xdotool key Ctrl+Shift+Left > /dev/null'],
-							shell=True)
+					sp.Popen(['xdotool key Control_L+Shift+Left'],
+							shell=True).wait()
 
 				time.sleep(1)
+				sp.Popen(['xsel', '--keep'])
+				sp.Popen(['xdotool', 'windowactivate', focused_window_id])
+				sp.Popen(['xsel', '--keep'])
 
-			current_word = get_cmd_out(['xsel'])
+			old_clipboard_text = get_clipboard_text()
+			print(old_clipboard_text)
+			sp.Popen(['xdotool', 'windowactivate', focused_window_id, 'key', '--window', focused_window_id, '--clearmodifiers', 'Control_L+c']).wait()
+			#time.sleep(1)
+			current_word = get_clipboard_text()
+			print(current_word)
+			set_clipboard_text(old_clipboard_text)
+			sp.Popen(['xdotool', 'windowactivate', focused_window_id, 'key', '--window', focused_window_id, '--clearmodifiers', 'BackSpace'])
+
+			#print(current_word)
 
 		suggest_method = 'replace'
 
@@ -492,7 +517,10 @@ def main():
 	if suggest_method == 'replace':
 		print('Getting suggestions for word:', current_word)
 
-	words_list = get_suggestions(current_word, dict_files=get_dictionaries(language))
+	print(language)
+	dicts = get_dictionaries(language)
+
+	words_list = get_suggestions(current_word, dict_files=dicts)
 
 	if not words_list or words_list == ['']:
 		if not args.exit_if_no_words_found:

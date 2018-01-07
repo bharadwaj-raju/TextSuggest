@@ -109,6 +109,10 @@ your clipboard history, which some users may not want.
 
 This option disables that method, and instead uses the (noticeably) slower `xdotool type` method.
 
+Note that when running with `--auto-selection`, and/or when not using `--custom-words-only`/`--all-words`/`--word`, then
+the usage of the clipboard by TextSuggest is inevitable, as it is unfortunately the only reliable method of getting a
+selected word from an input field in X11.
+
 
 
 ## Expansions
