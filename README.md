@@ -1,20 +1,19 @@
 # TextSuggest
+### Universal Autocomplete
 
-![TextSuggest](img/TextSuggest.png)
-
-**Save keystrokes.** Autocomplete, [expansions](#custom-words) and [more](#expansions) — everywhere.
+Autocomplete (and other features) in all GUI apps (on X11).
 
 A utility to autocomplete words in the GUI.
 
 TextSuggest supports [multiple languages](#other-languages) and [extensions](#extensions).
-
-Want to contribute? See [this](CONTRIBUTING.md).
 
 **Click the image to view a GIF demo.**
 
 [![TextSuggest in action](img/demo-first-frame.png)](img/demo.gif)
 
 Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSuggest is free as in freedom.
+
+Want to contribute? See [this](CONTRIBUTING.md).
 
 ## Overview
 
@@ -48,7 +47,7 @@ Run the included install script with `sudo ./install.sh`.
 
 ### Post-install
 
-Bind the command `textsuggest --auto-selection` to a keyboard shortcut. Type a word, press the shortcut and ... TextSuggest will give you suggestions!
+Bind the command `textsuggest --auto-selection` to a keyboard shortcut. Type a word, press the shortcut and ... TextSuggest will give you autocomplete.
 
 This offers the most basic use of TextSuggest. For more, see [options](#options) and browse through the rest of this page.
 
@@ -61,50 +60,55 @@ Otherwise use `sudo ./install.sh --uninstall`.
 ## Options
 
     $ textsuggest --help
-	usage: TextSuggest.py [-h] [--word WORD [WORD ...]] [--all-words]
-                      [--font FONT [FONT ...]] [--no-history]
-                      [--exit-if-no-words-found]
-                      [--language languages [languages ...]]
-                      [--auto-selection [beginning|middle|end]]
-                      [--custom-words-only] [--no-processing]
-                      [--rofi-options options for rofi] [--log LOG_FILE] [-v]
+	usage: TextSuggest.py [options]
 
 	TextSuggest — X11 utility to autocomplete words in the GUI
 
 	optional arguments:
-	-h, --help            show this help message and exit
-	--word WORD [WORD ...]
-							Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection.
-
-	--all-words, --no-selection
-							Give all words as suggestions, which you can then filter.
-
-	--font FONT [FONT ...]
-							Specify font for Rofi. Format: FontName Weight Size.
-
-	--no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt)
-
-	--exit-if-no-words-found
-							Exit if no words are found (instead of restarting in --no-selection mode)
-
-	--language languages [languages ...]
-							Manually set language(s), in case script fails to auto-detect from keyboard layout.
-
-	--auto-selection [beginning|middle|end]
-							Automatically select word under cursor and suggest. Ignored if --no-selection.
-
-	--custom-words-only   Use custom words only.
-
-	--no-processing       Disable using of any processors.
-
-	--rofi-options options for rofi
-							Specify additonal options to pass to Rofi.
-
-	--log LOG_FILE        Log all output to a file. Useful when debugging.
-
-	-v, --version         Print version and license information.
+	  -h, --help            show this help message and exit
+	  --word WORD [WORD ...]
+	                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. 
+	                         
+	  --all-words, --no-selection
+	                        Give all words as suggestions, which you can then filter. 
+	                         
+	  --font FONT [FONT ...]
+	                        Specify font for Rofi. Format: FontName Weight Size. 
+	                         
+	  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
+	                         
+	  --exit-if-no-words-found
+	                        Exit if no words are found (instead of restarting in --no-selection mode) 
+	                         
+	  --language languages [languages ...]
+	                        Manually set language(s), in case script fails to auto-detect from keyboard layout. 
+	                         
+	  --auto-selection [beginning|middle|end]
+	                        Automatically select word under cursor and suggest. Ignored if --no-selection. 
+	                         
+	  --custom-words-only   Use custom words only. 
+	                         
+	  --no-processing       Disable using of any processors. 
+	                         
+	  --rofi-options options for rofi
+	                        Specify additonal options to pass to Rofi. 
+	                         
+	  --no-clipboard        Do not use clipboard for fast typing, instead use the slower xdotool. See README for more info. 
+	                         
+	  --log LOG_FILE        Log all output to a file. Useful when debugging. 
+	                         
+	  -v, --version         Print version and license information.
 
 	See also: Offline documentation at /usr/share/doc/textsuggest/README
+
+
+#### `--no-clipboard`
+
+TextSuggest uses the clipboard (copy-paste) for fast typing (restoring old clipboard contents afterwards), but it can flood
+your clipboard history, which some users may not want.
+
+This option disables that method, and instead uses the (noticeably) slower `xdotool type` method.
+
 
 
 ## Expansions

@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1573 # Updated using git pre-commit hook
+__version__ = 1574 # Updated using git pre-commit hook
 
 def print_error(error):
 
@@ -82,25 +82,15 @@ def restart_program(additional_args=None, remove_args=None):
 
 	new_args.extend(additional_args)
 
-	print('Restarting as:', new_cmd)
+	print('Restarting as:', new_args)
 
-	with open(restart_script, 'w') as f:
-		f.write('%s %s' % (sys.executable, new_cmd))
-
-	restart_proc = sp.Popen([sys.executable, new_args])
+	restart_proc = sp.Popen([sys.executable, *new_args])
 	restart_proc.wait()
 
 	sys.exit(restart_proc.returncode)
 
 
-def remove_dups(s_list):
-
-	seen = set()
-	seen_add = seen.add
-
-	return [x for x in s_list if not (x in seen or seen_add(x))]
-
-def get_dictionaries():
+def get_dictionaries(language):
 
 	dictionaries = []
 
@@ -164,21 +154,36 @@ def get_focused_window():
 #
 #	return bool(program.lower() in gtk3_apps)
 
+
+def set_clipboard_text(text):
+	
+	clipboard_input_proc = sp.Popen(['xsel', '--clipboard', '--input'], stdin=sp.PIPE)
+	clipboard_input_proc.communicate(text.encode('utf-8'))
+
+
 def type_text(text):
 
-	if '\n' in text:
-		newline_list = text.split('\n')
+	if args.no_clipboard:
+		# Slower method, but does not mess with clipboard history
+		if '\n' in text:
+			text_lsplit = text.splitlines()
+			for line in text_lsplit[:-1]:
+				# All but the last line
+				sp.Popen(['xdotool', 'type', '-delay', '0', line]).wait()
+				sp.Popen(['xdotool', 'key', 'Shift+Return']).wait()
+			sp.Popen(['xdotool', 'type', '-delay', '0', text_lsplit[-1]]).wait()
+		else:
+			sp.Popen(['xdotool', 'type', '-delay', '0', text]).wait()
 
-		for i in newline_list:
-			type_proc = sp.Popen(['xdotool', 'type', '--clearmodifiers', '--', i])
+		return
 
-			type_proc.wait()
-			sp.Popen(['xdotool', 'key', 'Shift+Return'])
 
-			time.sleep(0.2)
+	# Default faster method, but messes with clipboard history
+	old_clipboard_text = get_cmd_out(['xsel', '--clipboard', '--output'])
+	set_clipboard_text(text)
+	sp.Popen(['xdotool', 'key', 'Ctrl+V']).wait()
+	set_clipboard_text(old_clipboard_text)
 
-	else:
-		sp.Popen(['xdotool', 'type', '--', text])
 
 def display_menu(items_list):
 
@@ -275,16 +280,33 @@ def process_suggestion(suggestion):
 
 def main():
 
-	script_cwd = os.path.abspath(os.path.join(__file__, os.pardir))
-	config_home = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
-	config_dir = os.path.join(config_home, 'textsuggest')
-	dict_dir = '/usr/share/textsuggest/dictionaries'
-	extra_words_file = '/usr/share/textsuggest/Extra_Words.txt'
-	custom_words_file = os.path.join(config_dir, 'Custom_Words.txt')
-	hist_file = os.path.join(config_dir, 'history.txt')
+	if os.getenv('XDG_RUNTIME_DIR'):
+		runtime_dir = os.path.join(os.getenv('XDG_RUNTIME_DIR'), 'textsuggest')
 
-	processor_dirs = [os.path.join(config_dir, 'processors'),
-					'/usr/share/textsuggest/processors']
+	elif os.getenv('TMPDIR'):
+		runtime_dir = os.path.join(os.getenv('TMPDIR'), 'textsuggest')
+
+	else:
+		runtime_dir = '/tmp/textsuggest'
+
+	if not os.path.isdir(runtime_dir):
+		os.mkdir(runtime_dir)
+
+	globals()['runtime_dir'] = runtime_dir
+
+	globals()['script_cwd'] = os.path.abspath(os.path.join(__file__, os.pardir))
+	globals()['config_home'] = os.getenv('XDG_CONFIG_HOME') or os.path.expanduser('~/.config')
+	globals()['config_dir'] = os.path.join(config_home, 'textsuggest')
+	globals()['dict_dir'] = '/usr/share/textsuggest/dictionaries'
+	globals()['extra_words_file'] = '/usr/share/textsuggest/Extra_Words.txt'
+	globals()['custom_words_file'] = os.path.join(config_dir, 'Custom_Words.txt')
+	globals()['hist_file'] = os.path.join(config_dir, 'history.txt')
+	globals()['menu_script'] = os.path.join(runtime_dir, 'menu_script.sh')
+	globals()['clipboard_file'] = os.path.join(runtime_dir, 'clipboard.txt')
+
+	globals()['processor_dirs'] = [os.path.join(config_dir, 'processors'),
+								   '/usr/share/textsuggest/processors']
+
 
 	for processor_dir in processor_dirs:
 		sys.path.insert(0, processor_dir)
@@ -296,6 +318,8 @@ def main():
 
 	except:
 		custom_words = json.loads('{}')
+
+	globals()['custom_words'] = custom_words
 
 	# Arguments
 
@@ -309,7 +333,7 @@ def main():
 
 	if sys.version_info.minor > 5:
 		# allow_abbrev not supported in Python >3.5
-		del arg_parser_args['usage']
+		del arg_parser_args['allow_abbrev']
 
 	arg_parser = argparse.ArgumentParser(**arg_parser_args)
 
@@ -361,6 +385,11 @@ def main():
 		help='Specify additonal options to pass to Rofi. \n \n',
 		required=False, metavar='options for rofi')
 
+	arg_parser.add_argument(
+		'--no-clipboard', action='store_true',
+		help='Disable the use of clipboard for fast typing, and instead use the slower xdotool type method. See README for more info. \n \n',
+		required=False)
+
 	#arg_parser.add_argument(
 	#	'--force-gtk3-fix', action='store_true',
 	#	help='Always use the GTK+ 3 workaround. If not set, tries to detect the current program\'s GTK+ version. \n \n',
@@ -388,20 +417,7 @@ def main():
 	args, unknown_args = arg_parser.parse_known_args()
 	globals()['args'] = args
 
-	if os.getenv('XDG_RUNTIME_DIR'):
-		runtime_dir = os.path.join(os.getenv('XDG_RUNTIME_DIR'), 'textsuggest')
-
-	elif os.getenv('TMPDIR'):
-		runtime_dir = os.path.join(os.getenv('TMPDIR'), 'textsuggest')
-
-	else:
-		runtime_dir = '/tmp/textsuggest'
-
-	if not os.path.isdir(runtime_dir):
-		os.mkdir(runtime_dir)
-
 	# Scripts generated while running
-	menu_script = os.path.join(runtime_dir, 'menu_script.sh')
 	restart_script = os.path.join(runtime_dir, 'restart_auto_sel.sh')
 
 	for arg in unknown_args:
@@ -420,7 +436,8 @@ def main():
 	if not os.path.isdir(config_dir):
 		os.makedirs(config_dir)
 
-	sp.Popen(['xsel', '--keep'])  # Make selection persist
+	sp.Popen(['xsel', '--keep'])
+	# Make selection persist even when app (which is the owner of selected text) goes out-of-focus/exits
 
 	language = args.language or get_language_name()
 
@@ -455,8 +472,12 @@ def main():
 
 		suggest_method = 'replace'
 
+	globals()['suggest_method'] = suggest_method
+
 	if current_word.endswith('.'):
 		current_word = current_word[:-1]
+	
+	globals()['current_word'] = current_word
 
 	if args.log:
 		sys.stdout = open(args.log, 'a')
@@ -471,7 +492,7 @@ def main():
 	if suggest_method == 'replace':
 		print('Getting suggestions for word:', current_word)
 
-	words_list = get_suggestions(current_word, dict_files=get_dictionaries())
+	words_list = get_suggestions(current_word, dict_files=get_dictionaries(language))
 
 	if not words_list or words_list == ['']:
 		if not args.exit_if_no_words_found:
