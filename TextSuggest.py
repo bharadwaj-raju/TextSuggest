@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1575 # Updated using git pre-commit hook
+__version__ = 1576 # Updated using git pre-commit hook
 
 def print_error(error):
 
@@ -480,9 +480,7 @@ def main():
 							shell=True).wait()
 
 				time.sleep(1)
-				sp.Popen(['xsel', '--keep'])
 				sp.Popen(['xdotool', 'windowactivate', focused_window_id])
-				sp.Popen(['xsel', '--keep'])
 
 			old_clipboard_text = get_clipboard_text()
 			print(old_clipboard_text)
@@ -491,7 +489,7 @@ def main():
 			current_word = get_clipboard_text()
 			print(current_word)
 			set_clipboard_text(old_clipboard_text)
-			sp.Popen(['xdotool', 'windowactivate', focused_window_id, 'key', '--window', focused_window_id, '--clearmodifiers', 'BackSpace'])
+			#sp.Popen(['xdotool', 'windowactivate', focused_window_id, 'key', '--window', focused_window_id, '--clearmodifiers', 'Delete'])
 
 			#print(current_word)
 
