@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1576 # Updated using git pre-commit hook
+__version__ = 1577 # Updated using git pre-commit hook
 
 def print_error(error):
 
@@ -172,26 +172,18 @@ def get_clipboard_text():
 
 def type_text(text):
 
-	if args.no_clipboard:
-		# Slower method, but does not mess with clipboard history
-		if '\n' in text:
-			text_lsplit = text.splitlines()
-			for line in text_lsplit[:-1]:
-				# All but the last line
-				sp.Popen(['xdotool', 'type', '-delay', '0', line]).wait()
-				sp.Popen(['xdotool', 'key', 'Shift+Return']).wait()
-			sp.Popen(['xdotool', 'type', '-delay', '0', text_lsplit[-1]]).wait()
-		else:
-			sp.Popen(['xdotool', 'type', '-delay', '0', text]).wait()
+	if '\n' in text:
+		text_lsplit = text.splitlines()
+		for line in text_lsplit[:-1]:
+			# All but the last line
+			sp.Popen(['xdotool', 'type', '-delay', '0', line]).wait()
+			sp.Popen(['xdotool', 'key', 'Shift+Return']).wait()
+		sp.Popen(['xdotool', 'type', '-delay', '0', text_lsplit[-1]]).wait()
+	else:
+		sp.Popen(['xdotool', 'type', '-delay', '0', text]).wait()
 
-		return
+	return
 
-
-	# Default faster method, but messes with clipboard history
-	old_clipboard_text = get_clipboard_text()
-	set_clipboard_text(text)
-	sp.Popen(['xdotool', 'key', 'Shift+Insert']).wait()
-	set_clipboard_text(old_clipboard_text)
 
 
 def display_menu(items_list):
@@ -395,11 +387,14 @@ def main():
 		required=False, metavar='options for rofi')
 
 	arg_parser.add_argument(
-		'--no-clipboard', action='store_true',
-		help='Disable the use of clipboard for fast typing, and instead use the slower xdotool type method. See README for more info. \n \n',
+		'--log', type=str, metavar='LOG_FILE',
+		help='Log all output to a file. Useful when debugging. \n \n',
 		required=False)
 
-
+	arg_parser.add_argument(
+		'-v', '--version', action='store_true',
+		help='Print version and license information.',
+		required=False)
 
 	#arg_parser.add_argument(
 	#	'--force-gtk3-fix', action='store_true',
@@ -414,19 +409,18 @@ def main():
 	# Disabling (i.e. commenting out code related to) GTK+ 3 workaround,
 	# which I suspect to not be working.
 	# If users report issues, will restore
-
-	arg_parser.add_argument(
-		'--log', type=str, metavar='LOG_FILE',
-		help='Log all output to a file. Useful when debugging. \n \n',
-		required=False)
-
-	arg_parser.add_argument(
-		'-v', '--version', action='store_true',
-		help='Print version and license information.',
-		required=False)
-
+	
 	args, unknown_args = arg_parser.parse_known_args()
 	globals()['args'] = args
+
+	if args.log:
+		sys.stdout = open(args.log, 'a')
+		sys.stderr = open(args.log, 'a')
+		print('---------------------------------------------------------------------')
+		print('TextSuggest version {}, running on {}, with application {}.'.format(
+			__version__,
+			os.getenv('XDG_CURRENT_DESKTOP'),
+			get_cmd_out('xdotool getwindowfocus getwindowname')))
 
 	# Scripts generated while running
 	restart_script = os.path.join(runtime_dir, 'restart_auto_sel.sh')
@@ -502,14 +496,6 @@ def main():
 	
 	globals()['current_word'] = current_word
 
-	if args.log:
-		sys.stdout = open(args.log, 'a')
-		sys.stderr = open(args.log, 'a')
-		print('TextSuggest version {}, running on {}, with application {}.'.format(
-			__version__,
-			os.getenv('XDG_CURRENT_DESKTOP'),
-			get_cmd_out('xdotool getwindowfocus getwindowname')))
-
 	print('Running in %s mode.' % suggest_method)
 
 	if suggest_method == 'replace':
@@ -532,7 +518,8 @@ def main():
 		print('History is disabled.')
 
 	if not args.no_history:
-		words_list.extend(get_suggestions(current_word, dict_files=[hist_file]))
+		hist_suggestions = get_suggestions(current_word, dict_files=[('EXTRA', hist_file)])
+		words_list.extend(hist_suggestions)
 
 		# Frequency sort + Remove duplicates
 		words_list = uniq(freq_sort(words_list))
