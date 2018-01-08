@@ -31,7 +31,7 @@ from suggestions import get_suggestions
 
 import argparse
 
-__version__ = 1577 # Updated using git pre-commit hook
+__version__ = 1578 # Updated using git pre-commit hook
 
 def print_error(error):
 
@@ -160,7 +160,7 @@ def get_focused_window_id():
 
 
 def set_clipboard_text(text):
-	
+
 	clipboard_input_proc = sp.Popen(['xsel', '--clipboard', '--input'], stdin=sp.PIPE)
 	clipboard_input_proc.communicate(text.encode('utf-8'))
 	clipboard_input_proc.wait()
@@ -318,7 +318,7 @@ def main():
 			custom_words = json.loads(contents)
 
 	except:
-		custom_words = json.loads('{}')
+		custom_words = {}
 
 	globals()['custom_words'] = custom_words
 
@@ -409,7 +409,7 @@ def main():
 	# Disabling (i.e. commenting out code related to) GTK+ 3 workaround,
 	# which I suspect to not be working.
 	# If users report issues, will restore
-	
+
 	args, unknown_args = arg_parser.parse_known_args()
 	globals()['args'] = args
 
@@ -452,7 +452,7 @@ def main():
 
 	else:
 		focused_window_id = get_focused_window_id()
-		
+
 		if args.word:
 			current_word = ' '.join(args.word)
 
@@ -493,7 +493,7 @@ def main():
 
 	if current_word.endswith('.'):
 		current_word = current_word[:-1]
-	
+
 	globals()['current_word'] = current_word
 
 	print('Running in %s mode.' % suggest_method)
@@ -509,7 +509,7 @@ def main():
 	if not words_list or words_list == ['']:
 		if not args.exit_if_no_words_found:
 			print('WARN_NOWORDS: Restarting in --no-selection mode. To prevent restarting, use --exit-on-no-words-found.')
-			restart_program(additional_args=['--no-selection'])
+			restart_program(additional_args=['--no-selection'], remove_args=['--custom-words-only', '--word'])
 		else:
 			print_error('ERR_NOWORDS: No words found.')
 			sys.exit(1)
@@ -519,6 +519,9 @@ def main():
 
 	if not args.no_history:
 		hist_suggestions = get_suggestions(current_word, dict_files=[('EXTRA', hist_file)])
+		if args.custom_words_only:
+			hist_suggestions = [x for x in hist_suggestions if x in custom_words]
+
 		words_list.extend(hist_suggestions)
 
 		# Frequency sort + Remove duplicates
