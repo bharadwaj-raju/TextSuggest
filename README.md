@@ -37,8 +37,8 @@ Make sure you have all the requirements:
   - `xdotool`
   - `xclip`
   - `PyQt5`
-  - `python-dbus`
-  - `pyperclip` (from `pip install pyperclip`)
+  - `dbus-python` (`pip install dbus-python`)
+  - `pyperclip` (`pip install pyperclip`)
 
 Then run the included install script with `sudo ./install.sh`.
 
