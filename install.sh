@@ -79,8 +79,8 @@ fi
 cp -rf textsuggest/dictionaries/ /usr/share/textsuggest/
 cp -rf textsuggest/processors/ /usr/share/textsuggest
 
-install -D -m755 textsuggest.py /usr/share/textsuggest/textsuggest
-install -D -m755 textsuggest-server.py /usr/share/textsuggest/textsuggest-server
+install -D -m755 textsuggest.py /usr/share/textsuggest/textsuggest.py
+install -D -m755 textsuggest-server.py /usr/share/textsuggest/textsuggest-server.py
 
 install -D -m644 README.md /usr/share/doc/textsuggest/README
 
