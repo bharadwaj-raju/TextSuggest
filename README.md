@@ -15,9 +15,9 @@ Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSugges
 
 ## Overview
 
-TextSuggest is a program that shows completions for the word selected or (optionally) [currently being typed](#auto-selection).
+TextSuggest is a program that shows completions for the word selected or (optionally) currently being typed.
 
-It can be easily bound to a keyboard shortcut.
+It is generally bound to a keyboard shortcut.
 
 ## Features
 
@@ -25,7 +25,9 @@ Click on these for more info:
 
 <details><summary><b>Fast</b></summary>
 <p><br />
-TextSuggest is highly performant. Even with large dictionaries of ~30,000 words, it performs a full regex-matching searcj on it in about 0.1 second.
+TextSuggest is highly performant. Even with large dictionaries of ~30,000 words, it performs a full regular expressiom search on it in about 0.01 second.
+
+With the included English dictionary of ~3,000 words, it does this in 0.001 second.
 </p>
 </details> <br />
 
