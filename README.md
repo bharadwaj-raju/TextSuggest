@@ -27,13 +27,13 @@ Click on these for more info:
 <p><br />
 TextSuggest is highly performant. Even with large dictionaries of ~30,000 words, it performs a full regex-matching searcj on it in about 0.1 second.
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>Universal Autocomplete</summary>
 <p><br />
 TextSuggest can provide autocomplete in any GUI app on X11.
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>Text Expansions, and more</summary>
 <p><br />
@@ -85,7 +85,7 @@ Add in `~/.config/textsuggest/custom-words.json`:
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
 </p>
-</details> <hr />
+</details> <br /><br />
 
 
 <details><summary>Fuzzy Matching</summary>
@@ -94,7 +94,7 @@ TextSuggest supports very fast and intuitive fuzzy matching, so that you don't h
 
 For example, as the screenshot at the top shows, `inting` shows suggestions for `interesting`, `painting` and so on, in order of best match.
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>Extensions</summary>
 <p><br />
@@ -127,7 +127,7 @@ Processors in `~/.config/textsuggest/processors` take precedence over those in `
 
 You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have a newline-separated list of processors. The processors will then load in that order.
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>History</summary>
 <p><br />
@@ -137,13 +137,13 @@ History can be disabled using the `--no-history` option.
 
 You can remove a word from history, by pressing <kbd>Shift+Delete</kbd>, or in the file `~/.config/textsuggest/history.json`
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>"Ignore" Certain Words</summary>
 <p><br />
 You can tell TextSuggest to *never* show some words conveniently through <kbd>Ctrl+Shift+Delete</kbd>, or in the file `~/.config/textsuggest/ignore.json`.
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>Keyboard Shortcuts</summary>
 <p><br />
@@ -152,7 +152,7 @@ While browsing the list of suggestions, press
   - <kbd>Shift+Delete</kbd> to remove it from your history.
   - <kbd>Ctrl+Shift+Delete</kbd> to add it to the ignore list (i.e. will never show up in suggestions)
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>Native UI</summary>
 <p><br />
@@ -160,7 +160,7 @@ Unlike many apps, TextSuggest has a performant, entirely native user interface w
 
 Custom, third-party interfaces can also be easily written.
 </p>
-</details> <hr />
+</details> <br /><br />
 
 <details><summary>Multiple Languages</summary>
 <p><br />
@@ -194,7 +194,7 @@ You can change this by:
 
 TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr/share/textsuggest/dictionaries`.
 </p>
-</details> <hr />
+</details>
 
 
 
