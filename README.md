@@ -143,7 +143,10 @@ You can remove a word from history, by pressing <kbd>Shift+Delete</kbd>, or in t
 
 <details><summary><b>"Ignore" Certain Words</b></summary>
 <p><br />
-You can tell TextSuggest to *never* show some words conveniently through <kbd>Ctrl+Shift+Delete</kbd>, or in the file `~/.config/textsuggest/ignore.json`.
+You can tell TextSuggest to *never* show some words conveniently through 
+
+ - <kbd>Ctrl+Shift+Delete</kbd>
+ - or in the file `~/.config/textsuggest/ignore.json`
 </p>
 </details> <br />
 
