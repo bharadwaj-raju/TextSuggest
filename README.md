@@ -1,53 +1,55 @@
 # TextSuggest
 ### Universal Autocomplete
 
-Autocomplete (and other features) in all GUI apps (on X11).
-
-A utility to autocomplete words in the GUI.
+Autocomplete, text expansion, etc, in all GUI apps (on X11).
 
 TextSuggest supports [multiple languages](#other-languages) and [extensions](#extensions).
 
-**Click the image to view a GIF demo.**
+<!--**Click the image to view a GIF demo.**-->
 
-[![TextSuggest in action](img/demo-first-frame.png)](img/demo.gif)
+![TextSuggest in action](img/demo.png)
 
 Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSuggest is free as in freedom.
 
-Want to contribute? See [this](CONTRIBUTING.md).
+[Acknowledgements for the dictionaries.](#dictionary-credits)
 
 ## Overview
 
-TextSuggest is a script that, when a [keyboard shortcut](#post-install) is pressed, shows completions for the word selected or (optionally) [currently being typed](#auto-selection).
+TextSuggest is a program that shows completions for the word selected or (optionally) [currently being typed](#auto-selection).
 
-Then you can [efficiently search](#search) for the right word with smart search (thanks to [Rofi](https://github.com/DaveDavenport/Rofi)) and hit Enter to choose. Or Esc to exit.
+It can be easily bound to a keyboard shortcut.
 
-An [alternative background service, textsuggestd](#textsuggestd) that intelligently offers completions when appropriate, without the need of pressing a shortcut is in development.
+### Features
+
+  - Fast
+  - Autocomplete in all GUI apps
+  - Text expansions (including shell commands, math, etc)
+  - Fuzzy matching (e.g. 'exmy' matches 'extremely', 'empnt' matches 'employment', etc)
+  - Very configurable
+  - History (more used words rise to the top)
+  - Native (Qt 5) UI
+
 
 ## Installation
 
-### Ubuntu and Debian
+Make sure you have all the requirements:
 
-[Download `textsuggest-git.deb`](https://github.com/bharadwaj-raju/packages/raw/master/TextSuggest/textsuggest-git.deb)
+  - `xdotool`
+  - `xclip`
+  - `PyQt5`
+  - `python-dbus`
+  - `pyperclip` (from `pip install pyperclip`)
 
-**Now, see [Post-install](#post-install)**
-
-###  Arch Linux
-
-AUR (Arch User Repository): [`textsuggest-git`](https://aur.archlinux.org/packages/textsuggest-git/), submitted by [Daniel Sandman (shellkr)](https://github.com/shellkr)
-
-**Now, see [Post-install](#post-install)**
-
-###  Manual
-
-Make sure you have all the requirements (`xdotool`, `xsel` and `rofi`).
-
-Run the included install script with `sudo ./install.sh`.
+Then run the included install script with `sudo ./install.sh`.
 
 **Now, see [Post-install](#post-install)**
+
 
 ### Post-install
 
-Bind the command `textsuggest --auto-selection` to a keyboard shortcut. Type a word, press the shortcut and ... TextSuggest will give you autocomplete.
+Run the command `textsuggest-server` in the background, and set it to run on startup.
+
+Set the command `textsuggest` to a keyboard shortcut. Type a word, select it, press the shortcut and TextSuggest will give you autocomplete.
 
 This offers the most basic use of TextSuggest. For more, see [options](#options) and browse through the rest of this page.
 
@@ -60,59 +62,35 @@ Otherwise use `sudo ./install.sh --uninstall`.
 ## Options
 
     $ textsuggest --help
-	usage: TextSuggest.py [options]
+	usage: textsuggest [options]
 
-	TextSuggest — X11 utility to autocomplete words in the GUI
+	TextSuggest — universal autocomplete
 
 	optional arguments:
+	  
 	  -h, --help            show this help message and exit
-	  --word WORD [WORD ...]
-	                        Specify word to give suggestions for. Default: taken from X11 clipboard. Ignored if --no-selection. 
-	                         
-	  --all-words, --no-selection
-	                        Give all words as suggestions, which you can then filter. 
-	                         
-	  --font FONT [FONT ...]
-	                        Specify font for Rofi. Format: FontName Weight Size. 
+	  
+	  --word WORD [...]
+	                        Specify word to give suggestions for. Default: all words. 
 	                         
 	  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
 	                         
-	  --exit-if-no-words-found
-	                        Exit if no words are found (instead of restarting in --no-selection mode) 
+	  --language languages [...]
+	                        Set language(s). Default: English. See also: --auto-detect-language. 
 	                         
-	  --language languages [languages ...]
-	                        Manually set language(s), in case script fails to auto-detect from keyboard layout. 
+	  --auto-detect-language
+	                        Auto-detect language from keyboard layout. 
+	                         
+	  --selection           Show suggestions for currently selected word. See also: --auto-selection 
 	                         
 	  --auto-selection [beginning|middle|end]
 	                        Automatically select word under cursor and suggest. Ignored if --no-selection. 
 	                         
-	  --custom-words-only   Use custom words only. 
+	  --custom-words-only   Show custom words only. 
 	                         
 	  --no-processing       Disable using of any processors. 
 	                         
-	  --rofi-options options for rofi
-	                        Specify additonal options to pass to Rofi. 
-	                         
-	  --no-clipboard        Do not use clipboard for fast typing, instead use the slower xdotool. See README for more info. 
-	                         
-	  --log LOG_FILE        Log all output to a file. Useful when debugging. 
-	                         
 	  -v, --version         Print version and license information.
-
-	See also: Offline documentation at /usr/share/doc/textsuggest/README
-
-
-#### `--no-clipboard`
-
-TextSuggest uses the clipboard (copy-paste) for fast typing (restoring old clipboard contents afterwards), but it can flood
-your clipboard history, which some users may not want.
-
-This option disables that method, and instead uses the (noticeably) slower `xdotool type` method.
-
-Note that when running with `--auto-selection`, and/or when not using `--custom-words-only`/`--all-words`/`--word`, then
-the usage of the clipboard by TextSuggest is inevitable, as it is unfortunately the only reliable method of getting a
-selected word from an input field in X11.
-
 
 
 ## Expansions
@@ -121,22 +99,22 @@ TextSuggest can handle a range of expansions. It can also be [extended](#extensi
 
 ### Custom words
 
-Simply add them to `~/.config/textsuggest/Custom_Words.txt` in a JSON format like this:
+Simply add them to `~/.config/textsuggest/custom-words.json` in a JSON format like this:
 
 	{
 	    "custom": "Expansion",
 	    "another": "Another expansion"
 	}
 
-and whenever 'custom' is typed, 'Expansion' will be inserted. Similarly for 'another' ('Another expansion' will be inserted)
+and whenever 'custom' is typed, 'Expansion' will be typed. Similarly for 'another' ('Another expansion').
 
 ### Commands
 
 Inserts the output of a command:
 
-    #ls
+    #ls -l
 
-when typed into a TextSuggest window, will insert output of `ls`.
+when typed into a TextSuggest window, will insert output of `ls -l` as if it was run in a shell.
 
 #### Custom words + Commands
 
@@ -150,17 +128,17 @@ and whenever you type 'custom' into TextSuggest, the output of `command --opts` 
 
 Simply type into TextSuggest:
 
-    %2 + 3
+    = 2 + 3
 
 And '5' will be inserted. You can do any math expression that Python supports.
 
-You can also use any function in the Python [`math`](https://docs.python.org/3/library/math.html) library, for example `%sqrt(25)` for √25.
+You can also use any function in the Python [`math`](https://docs.python.org/3/library/math.html) library, for example `= sqrt(25)` for √25.
 
 #### Custom Words + Math
 
 Add in `~/.config/textsuggest/Custom_Words.txt`:
 
-    "custom": "%2+3"
+    "custom": "= 2 + 3"
 
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
@@ -176,7 +154,7 @@ You can see this in TextSuggest output:
 ```bash
 $ textsuggest --all-words
 Running in insert mode.
-Chosen word: %2 + 3
+Chosen word: =2 + 3
 Using processor math_expression from /usr/share/textsuggest/processors/math_expression.py
 Processed: 5
 ```
@@ -203,98 +181,45 @@ Make one based on the sample above, and place it in `~/.config/textsuggest/proce
 
 Processors in `~/.config/textsuggest/processors` take precedence over those in `/usr/share/textsuggest/processors`, in case of a name or match conflict.
 
-You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have
-a newline-separated list of processors. The processors will then load in that order.
+You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have a newline-separated list of processors. The processors will then load in that order.
 
 ## Other languages
 
 English and Bangla dictionaries are provided by default.
 
-For other languages, follow these steps:
+By default, only the English dictionary will be used.
 
-- Get a suitable dictionary/wordlist for your language. Search online for "<language name> wordlist" or "<language name> dictionary".
+You can change this by:
 
-- Put that dictionary into a text file in `/usr/share/textsuggest/dictionaries` with its name being your language's name and extension being `.txt` (English name, like "German.txt" instead of "Deutsch.txt").
+  - Auto-detect language from keyboard layout: Use the option `--auto-detect-language`. The mapping of layouts to languages is given below:
+    - `bd` → Bangla
+    - `us` → English
+    - `uk` → English
+    - `gb` → English
+    - `cn` → Chinese
+    - `ar` → Arabic
+    - `tw` → Chinese
+    - `de` → German
+    - `jp` → Japanese
+    - `ru` → Russian
+    - `es` → Spanish
+    - `se` → Swedish
+    - `fi` → Finnish
+    - `kr` → Korean
+    - `pk` → Urdu
+    - `fr` → French
+    - `gr` → Greek
+    - `ua` → Ukrainian
 
-- A suitable font should be auto-detected. If not, pass a suitable font with the `--font` option.
+  - Manually specify the language(s) to use. For example, `--language English German`.
 
-- Language should be auto-detected. If not, manually set language using the `--language` option.
+TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr/share/textsuggest/dictionaries`.
 
-## Auto-select and suggest
 
-This feature allows you to get suggestions for the word being typed, without having to select it. Save *more* keystrokes!
+## Dictionary Credits
 
-### Using it
+- English:
+  Oxford 3k wordlist (filtered to only include words with >= 5 chars)
 
-Pass the `--auto-selection` option to TextSuggest.
-
-#### Additional options
-
-You can change the way `--auto-selection` selects words.
-
-- Add `beginning` to `--auto-selection` to assume that text-cursor is **at beginning of word**.
-
-- Add `middle` to `--auto-selection` to assume that text-cursor is **in the middle of word**.
-
-- Add `end` to `--auto-selection` to assume that text-cursor is **at end of the word**. *This is the default.*
-
-## Search
-
-TextSuggest offers powerful search, thanks to [Rofi](https://github.com/DaveDavenport/Rofi).
-
-It has:
-
-- **Fuzzy search**: No need to type the complete word. Just type parts of it (separated by spaces).
-- **Globbing**: Use wildcards like `?`, `*` etc.
-
-## Errors
-
-- `ERR_NOWORDS`: Caused when no suggestions are found. Return value: 1. *NOTE*: Suppressed and program restarted in `--all-words` mode unless
-`--exit-if-no-words-found` is passed.
-
-- `ERR_REJECTED`: Caused when TextSuggest is cancelled by user (for example, by pressing `Esc`). Return value: 2.
-
-- `ERR_EXPRESSION`: Caused when evaluating a [math expression](#math) results in a Python error. (Usually `SyntaxError`). Full traceback of said error is writted to stderr. Return value: 3.
-
-## Modes
-
-Internally, TextSuggest has two *modes*:
-
-1. Provides completion for a specific word: `replace` mode.
-2. Provides a list of all words: `insert` mode.
-
-You will see this in TextSuggest output:
-
-```bash
-$ textsuggest
-Running in replace mode.
-...
-```
-
-## textsuggestd
-
-`textsuggestd` is a work-in-progress background service that automatically launches TextSuggest when appropriate.
-
-It is an effort to achieve TextSuggest's final goal: to be like the suggestions on mobile phones, which appear without stealing focus and disrupting typing, and without having to press shortcuts.
-
-**WARNING**: It is currently unusable. Do *not* run. However, if you want to alpha-test, see below.
-
-### Running textsuggestd
-
-**WARNING**: It is currently unusable. Run at your own risk. See [escaping](#escaping-textsuggestd).
-
-Simply do:
-
-```bash
-$ ./textsuggestd &
-```
-
-### Escaping textsuggestd
-
-Get to a terminal somehow (TTY, maybe?) and run:
-
-```bash
-for i in $(pgrep python3); do
-    ps -fp $i | grep 'textsuggestd' && kill $i
-done
-```
+- Bangla:
+  Contributed by @maateen

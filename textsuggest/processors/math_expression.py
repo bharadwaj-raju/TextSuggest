@@ -4,7 +4,7 @@ from math import *  # simpler + shorter (for users): math.sqrt() → sqrt()
 
 def matches(text):
 
-	return text.startswith('%')
+	return text.startswith('=')
 
 def process(text):
 
@@ -16,6 +16,6 @@ def process(text):
 	except (SyntaxError, NameError, UnboundLocalError):
 		sys.stderr.write(traceback.format_exc())
 		sys.stderr.flush()
-		sys.stderr.write('ERR_EXPRESSION: Invalid expression: %s' % text)
+		sys.stderr.write('math_expression: Invalid expression: %s' % text)
 
 		sys.exit(3)

@@ -60,5 +60,5 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
-history.txt
-Custom_Words.txt
+history.json
+custom-words.json
