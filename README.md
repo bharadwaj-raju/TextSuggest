@@ -24,19 +24,19 @@ It can be easily bound to a keyboard shortcut.
 Click on these for more info:
 
 <details><summary>Fast</summary>
-<p>
+<p><br />
 TextSuggest is highly performant. Even with large dictionaries of ~30,000 words, it performs a full regex-matching searcj on it in about 0.1 second.
 </p>
-</details>
+</details> <hr />
 
 <details><summary>Universal Autocomplete</summary>
-<p>
+<p><br />
 TextSuggest can provide autocomplete in any GUI app on X11.
 </p>
-</details>
+</details> <hr />
 
 <details><summary>Text Expansions, and more</summary>
-<p>
+<p><br />
 TextSuggest can handle a range of expansions.
 
 ### Custom words
@@ -85,19 +85,19 @@ Add in `~/.config/textsuggest/custom-words.json`:
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
 </p>
-</details>
+</details> <hr />
 
 
 <details><summary>Fuzzy Matching</summary>
-<p>
+<p><br />
 TextSuggest supports very fast and intuitive fuzzy matching, so that you don't have to type the entire word, only portions.
 
 For example, as the screenshot at the top shows, `inting` shows suggestions for `interesting`, `painting` and so on, in order of best match.
 </p>
-</details>
+</details> <hr />
 
 <details><summary>Extensions</summary>
-<p>
+<p><br />
 TextSuggest supports powerful *processors* for extensions.
 
 A processor *processes* text before handing it over to TextSuggest to type it out.
@@ -127,43 +127,43 @@ Processors in `~/.config/textsuggest/processors` take precedence over those in `
 
 You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have a newline-separated list of processors. The processors will then load in that order.
 </p>
-</details>
+</details> <hr />
 
 <details><summary>History</summary>
-<p>
+<p><br />
 TextSuggest supports storing history of suggestions used. More-used suggestions will rise to the top.
 
 History can be disabled using the `--no-history` option.
 
 You can remove a word from history, by pressing <kbd>Shift+Delete</kbd>, or in the file `~/.config/textsuggest/history.json`
 </p>
-</details>
+</details> <hr />
 
 <details><summary>"Ignore" Certain Words</summary>
-<p>
+<p><br />
 You can tell TextSuggest to *never* show some words conveniently through <kbd>Ctrl+Shift+Delete</kbd>, or in the file `~/.config/textsuggest/ignore.json`.
 </p>
-</details>
+</details> <hr />
 
 <details><summary>Keyboard Shortcuts</summary>
-<p>
+<p><br />
 While browsing the list of suggestions, press
 
   - <kbd>Shift+Delete</kbd> to remove it from your history.
   - <kbd>Ctrl+Shift+Delete</kbd> to add it to the ignore list (i.e. will never show up in suggestions)
 </p>
-</details>
+</details> <hr />
 
 <details><summary>Native UI</summary>
-<p>
+<p><br />
 Unlike many apps, TextSuggest has a performant, entirely native user interface written in Qt 5.
 
 Custom, third-party interfaces can also be easily written.
 </p>
-</details>
+</details> <hr />
 
 <details><summary>Multiple Languages</summary>
-<p>
+<p><br />
 English and Bangla dictionaries are provided by default.
 
 By default, only the English dictionary will be used.
@@ -194,7 +194,7 @@ You can change this by:
 
 TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr/share/textsuggest/dictionaries`.
 </p>
-</details>
+</details> <hr />
 
 
 
