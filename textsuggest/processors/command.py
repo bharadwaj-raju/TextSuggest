@@ -2,7 +2,7 @@ import subprocess as sp
 
 def matches(text):
 
-	return text.startswith('#')
+	return text.startswith('$')
 
 def process(text):
 

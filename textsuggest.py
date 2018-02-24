@@ -322,7 +322,7 @@ def main():
 
 	arg_parser.add_argument(
 		'--no-history', action='store_true',
-		help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) \n \n',
+		help='Disable the frequently-used words history (stored in ~/.config/textsuggest/history.json) \n \n',
 		required=False)
 
 	arg_parser.add_argument(

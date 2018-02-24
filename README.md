@@ -19,83 +19,25 @@ TextSuggest is a program that shows completions for the word selected or (option
 
 It can be easily bound to a keyboard shortcut.
 
-### Features
+## Features
 
-  - Fast
-  - Autocomplete in all GUI apps
-  - Text expansions (including shell commands, math, etc)
-  - Fuzzy matching (e.g. 'exmy' matches 'extremely', 'empnt' matches 'employment', etc)
-  - Very configurable
-  - History (more used words rise to the top)
-  - Native (Qt 5) UI
+Click on these for more info:
 
+<details><summary>Fast</summary>
+<p>
+TextSuggest is highly performant. Even with large dictionaries of ~30,000 words, it performs a full regex-matching searcj on it in about 0.1 second.
+</p>
+</details>
 
-## Installation
+<details><summary>Universal Autocomplete</summary>
+<p>
+TextSuggest can provide autocomplete in any GUI app on X11.
+</p>
+</details>
 
-Make sure you have all the requirements:
-
-  - `xdotool`
-  - `xclip`
-  - `PyQt5`
-  - `dbus-python` (`pip install dbus-python`)
-  - `pyperclip` (`pip install pyperclip`)
-
-Then run the included install script with `sudo ./install.sh`.
-
-**Now, see [Post-install](#post-install)**
-
-
-### Post-install
-
-Run the command `textsuggest-server` in the background, and set it to run on startup.
-
-Set the command `textsuggest` to a keyboard shortcut. Type a word, select it, press the shortcut and TextSuggest will give you autocomplete.
-
-This offers the most basic use of TextSuggest. For more, see [options](#options) and browse through the rest of this page.
-
-### Uninstallation
-
-If you installed it using packages, use your system's package manager.
-
-Otherwise use `sudo ./install.sh --uninstall`.
-
-## Options
-
-    $ textsuggest --help
-	usage: textsuggest [options]
-
-	TextSuggest — universal autocomplete
-
-	optional arguments:
-	  
-	  -h, --help            show this help message and exit
-	  
-	  --word WORD [...]
-	                        Specify word to give suggestions for. Default: all words. 
-	                         
-	  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.txt) 
-	                         
-	  --language languages [...]
-	                        Set language(s). Default: English. See also: --auto-detect-language. 
-	                         
-	  --auto-detect-language
-	                        Auto-detect language from keyboard layout. 
-	                         
-	  --selection           Show suggestions for currently selected word. See also: --auto-selection 
-	                         
-	  --auto-selection [beginning|middle|end]
-	                        Automatically select word under cursor and suggest. Ignored if --no-selection. 
-	                         
-	  --custom-words-only   Show custom words only. 
-	                         
-	  --no-processing       Disable using of any processors. 
-	                         
-	  -v, --version         Print version and license information.
-
-
-## Expansions
-
-TextSuggest can handle a range of expansions. It can also be [extended](#extensions).
+<details><summary>Text Expansions, and more</summary>
+<p>
+TextSuggest can handle a range of expansions.
 
 ### Custom words
 
@@ -112,15 +54,15 @@ and whenever 'custom' is typed, 'Expansion' will be typed. Similarly for 'anothe
 
 Inserts the output of a command:
 
-    #ls -l
+    $ls -l
 
 when typed into a TextSuggest window, will insert output of `ls -l` as if it was run in a shell.
 
 #### Custom words + Commands
 
-Add in `~/.config/textsuggest/Custom_Words.txt`:
+Add in `~/.config/textsuggest/custom-words.json`:
 
-    "custom": "#command --opts"
+    "custom": "$ command --opts"
 
 and whenever you type 'custom' into TextSuggest, the output of `command --opts` will be inserted.
 
@@ -136,28 +78,30 @@ You can also use any function in the Python [`math`](https://docs.python.org/3/l
 
 #### Custom Words + Math
 
-Add in `~/.config/textsuggest/Custom_Words.txt`:
+Add in `~/.config/textsuggest/custom-words.json`:
 
     "custom": "= 2 + 3"
 
 And whenever you type 'custom' into TextSuggest, 5 will be inserted.
 
-## Extensions
+</p>
+</details>
 
+
+<details><summary>Fuzzy Matching</summary>
+<p>
+TextSuggest supports very fast and intuitive fuzzy matching, so that you don't have to type the entire word, only portions.
+
+For example, as the screenshot at the top shows, `inting` shows suggestions for `interesting`, `painting` and so on, in order of best match.
+</p>
+</details>
+
+<details><summary>Extensions</summary>
+<p>
 TextSuggest supports powerful *processors* for extensions.
 
 A processor *processes* text before handing it over to TextSuggest to type it out.
-By default TextSuggest has two processors, [`command`](#commands) and [`math_expression`](#math).
-
-You can see this in TextSuggest output:
-
-```bash
-$ textsuggest --all-words
-Running in insert mode.
-Chosen word: =2 + 3
-Using processor math_expression from /usr/share/textsuggest/processors/math_expression.py
-Processed: 5
-```
+By default TextSuggest has two processors, [`command`] and [`math_expression`] (see the above *Text Expansions* section).
 
 ### Making your own extension
 
@@ -168,7 +112,7 @@ def matches(text):
 
 	# Return whether this processor should process 'text' or not. (True or False)
 	# For example, the command processor has it like this:
-	#     return True if text.startswith('#') else False
+	#     return True if text.startswith('$') else False
 
 def process(text):
 
@@ -182,9 +126,44 @@ Make one based on the sample above, and place it in `~/.config/textsuggest/proce
 Processors in `~/.config/textsuggest/processors` take precedence over those in `/usr/share/textsuggest/processors`, in case of a name or match conflict.
 
 You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have a newline-separated list of processors. The processors will then load in that order.
+</p>
+</details>
 
-## Other languages
+<details><summary>History</summary>
+<p>
+TextSuggest supports storing history of suggestions used. More-used suggestions will rise to the top.
 
+History can be disabled using the `--no-history` option.
+
+You can remove a word from history, by pressing <kbd>Shift+Delete</kbd>, or in the file `~/.config/textsuggest/history.json`
+</p>
+</details>
+
+<details><summary>"Ignore" Certain Words</summary>
+<p>
+You can tell TextSuggest to *never* show some words conveniently through <kbd>Ctrl+Shift+Delete</kbd>, or in the file `~/.config/textsuggest/ignore.json`.
+</p>
+</details>
+
+<details><summary>Keyboard Shortcuts</summary>
+<p>
+While browsing the list of suggestions, press
+
+  - <kbd>Shift+Delete</kbd> to remove it from your history.
+  - <kbd>Ctrl+Shift+Delete</kbd> to add it to the ignore list (i.e. will never show up in suggestions)
+</p>
+</details>
+
+<details><summary>Native UI</summary>
+<p>
+Unlike many apps, TextSuggest has a performant, entirely native user interface written in Qt 5.
+
+Custom, third-party interfaces can also be easily written.
+</p>
+</details>
+
+<details><summary>Multiple Languages</summary>
+<p>
 English and Bangla dictionaries are provided by default.
 
 By default, only the English dictionary will be used.
@@ -214,6 +193,72 @@ You can change this by:
   - Manually specify the language(s) to use. For example, `--language English German`.
 
 TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr/share/textsuggest/dictionaries`.
+</p>
+</details>
+
+
+
+
+## Installation
+
+Make sure you have all the requirements:
+
+  - `xdotool`
+  - `xclip`
+  - `PyQt5`
+  - `dbus-python` (`pip install dbus-python`)
+  - `pyperclip` (`pip install pyperclip`)
+
+Then run the included install script with `sudo ./install.sh`.
+
+**Now, see [Usage](#usage)**
+
+
+## Usage
+
+Run the command `textsuggest-server` in the background, and set it to run on startup.
+
+Set the command `textsuggest` to a keyboard shortcut. Type a word, select it, press the shortcut and TextSuggest will give you autocomplete.
+
+This offers the most basic use of TextSuggest. For more, see [options](#options) and click on the [features](#features).
+
+## Uninstallation
+
+Use `sudo ./install.sh --uninstall`.
+
+## Options
+
+    $ textsuggest --help
+	usage: textsuggest [options]
+
+	TextSuggest — universal autocomplete
+
+	optional arguments:
+	  
+	  -h, --help            show this help message and exit
+	  
+	  --word WORD [...]
+	                        Specify word to give suggestions for. Default: all words. 
+	                         
+	  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.json) 
+	                         
+	  --language languages [...]
+	                        Set language(s). Default: English. See also: --auto-detect-language. 
+	                         
+	  --auto-detect-language
+	                        Auto-detect language from keyboard layout. 
+	                         
+	  --selection           Show suggestions for currently selected word. See also: --auto-selection 
+	                         
+	  --auto-selection [beginning|middle|end]
+	                        Automatically select word under cursor and suggest. Ignored if --no-selection. 
+	                         
+	  --custom-words-only   Show custom words only. 
+	                         
+	  --no-processing       Disable using of any processors. 
+	                         
+	  -v, --version         Print version and license information.
+
 
 
 ## Dictionary Credits
