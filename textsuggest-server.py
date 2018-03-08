@@ -273,7 +273,7 @@ class Service(dbus.service.Object):
 							  if x not in self.ignore_list]
 
 		t2 = time.time()
-		print(f'time get_suggestions({word}, {languages}) =', t2-t1)
+		print('time get_suggestions(%s, %s) =' % (word, language), t2-t1)
 
 		return sorted_suggestions
 
@@ -307,7 +307,7 @@ class Service(dbus.service.Object):
 							  if x not in self.ignore_list]
 
 		t2 = time.time()
-		print(f'time get_all_words({languages}) =', t2-t1)
+		print('time get_all_words(%s) =' % languages, t2-t1)
 
 		return sorted_suggestions
 
@@ -395,7 +395,7 @@ class Service(dbus.service.Object):
 
 				try:
 					if processor.matches(suggestion):
-						print(f'Using processor {processor.__name__} from {processor.__file__}')
+						print(f'Using processor %s from %s' % (processor.__name__, processor.__file__))
 						suggestion = processor.process(suggestion)
 
 				except Exception as e:
