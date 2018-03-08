@@ -395,7 +395,7 @@ class Service(dbus.service.Object):
 
 				try:
 					if processor.matches(suggestion):
-						print(f'Using processor %s from %s' % (processor.__name__, processor.__file__))
+						print('Using processor %s from %s' % (processor.__name__, processor.__file__))
 						suggestion = processor.process(suggestion)
 
 				except Exception as e:
