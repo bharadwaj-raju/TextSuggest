@@ -31,12 +31,12 @@ class DataBase(object):
 	def __init__(self, path, list_=False):
 
 		self.path = path
-		
+
 		if list_:
 			self.defaultobj = list
 		else:
 			self.defaultobj = dict
-		
+
 		self.load()
 
 
@@ -53,7 +53,7 @@ class DataBase(object):
 						self.write()
 					else:
 						raise
-		
+
 		except FileNotFoundError:
 			with open(self.path, 'w') as f:
 				f.write(json.dumps(self.defaultobj()))
@@ -128,7 +128,7 @@ class Service(dbus.service.Object):
 	def __init__(self):
 		pass
 
-	
+
 	def run(self):
 
 		if os.getenv('XDG_RUNTIME_DIR'):
@@ -165,7 +165,7 @@ class Service(dbus.service.Object):
 				self.dictionaries[dict_file[0]] = f.read().splitlines()
 
 		self.load_custom_words()  # runs in background loop (kind of)
-		
+
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		bus_name = dbus.service.BusName("org.textsuggest.server", dbus.SessionBus())
 		dbus.service.Object.__init__(self, bus_name, "/org/textsuggest/server")
@@ -173,7 +173,7 @@ class Service(dbus.service.Object):
 		self._loop = GObject.MainLoop()
 		self._loop.run()
 
-	
+
 	@dbus.service.method('org.textsuggest.server')
 	def load_custom_words(self):
 
@@ -199,18 +199,18 @@ class Service(dbus.service.Object):
 		self.load_ignore_list()
 
 	def fuzzyfinder(self, user_input, collection):
-		
+
 		suggestions = []
 		sanitised_user_input = re.compile('[\(\)\+,\.!?]').sub('', user_input)
-		
+
 		pattern = '.*?'.join(sanitised_user_input)   # Converts 'djm' to 'd.*?j.*?m'
 		regex = re.compile(pattern)  # Compiles a regex.
-		
+
 		for item in collection:
-			match = regex.search(item)   # Checks if the current item matches the regex.    
+			match = regex.search(item)   # Checks if the current item matches the regex.
 			if match:
 				suggestions.append((len(match.group()), match.start(), item))
-		
+
 		return [x for _, _, x in sorted(suggestions)]
 
 
@@ -220,13 +220,13 @@ class Service(dbus.service.Object):
 		t1 = time.time()
 
 		suggestions = SuggestionsCounter()
-		
+
 		# Format: {"word": points, …}
 		# Each word has "points"
 		# More points == higher ranking in results
-		
+
 		# SuggestionsCounter has the '=' operator overloaded to sort-of '+='
-		# basically whenever you 'assign' some value to a key, 
+		# basically whenever you 'assign' some value to a key,
 		# it actually appends value to existing value of the key
 
 		installed_languages = [x for x in languages if x in self.dictionaries]
@@ -238,13 +238,6 @@ class Service(dbus.service.Object):
 			for idx, dictword in enumerate(fuzz_results):
 				suggestions[dictword] = idx
 
-			#for dictword in self.dictionaries[lang]:
-			#	if word in dictword:
-			#		suggestions[dictword] = 0
-			#		if dictword.startswith(word):
-			#			suggestions[dictword] = 1
-			#		if dictword == word:
-			#			suggestions[dictword] = 1
 
 		fuzz_results = self.fuzzyfinder(word, self.custom_words)
 		fuzz_results.reverse()
@@ -252,15 +245,7 @@ class Service(dbus.service.Object):
 		for idx, custword in enumerate(fuzz_results):
 			suggestions[custword] = idx
 
-		#for custword in self.custom_words:
-			#if custword not in suggestions:				
-				#if word in custword:
-				#	suggestions[custword] =  0.5
-				#	if custword.startswith(word):
-				#		suggestions[custword] = 1
-				#	if custword == word:
-				#		suggestions[custword] = 1
-		
+
 		for histword in self.history:
 			if histword in suggestions:
 				if self.history[histword] > 1:
@@ -273,11 +258,11 @@ class Service(dbus.service.Object):
 							  if x not in self.ignore_list]
 
 		t2 = time.time()
-		print('time get_suggestions(%s, %s) =' % (word, language), t2-t1)
+		print('time get_suggestions(%s, %s) =' % (word, languages), t2-t1)
 
 		return sorted_suggestions
 
-	
+
 	@dbus.service.method('org.textsuggest.server', in_signature='as', out_signature='as')
 	def get_all_words(self, languages):
 
@@ -326,7 +311,7 @@ class Service(dbus.service.Object):
 
 		sorted_suggestions = [x for x in sorted(suggestions, key=suggestions.get, reverse=True) \
 							  if x not in self.ignore_list]
-		
+
 		return sorted_suggestions
 
 
@@ -354,7 +339,7 @@ class Service(dbus.service.Object):
 
 		except KeyError:
 			pass
-			
+
 		self.history.write()
 
 
@@ -363,7 +348,7 @@ class Service(dbus.service.Object):
 
 		if word not in self.ignored:
 			self.ignored.append(word)
-		
+
 		self.ignored.write()
 
 
@@ -420,13 +405,13 @@ class Service(dbus.service.Object):
 
 	@dbus.service.method('org.textsuggest.server', out_signature='s')
 	def get_focused_window_id(self):
-		
+
 		return sp.check_output(['xdotool', 'getwindowfocus']).strip()
 
-	
+
 	@dbus.service.method('org.textsuggest.server', in_signature='s')
 	def autoselect_current_word(self, mode):
-		
+
 		if mode == 'beginning':
 			# Ctrl + Shift + ->
 			sp.Popen([
@@ -451,13 +436,13 @@ class Service(dbus.service.Object):
 
 		old_clipboard_text = self.get_clipboard_text()
 		sp.Popen(['xdotool', 'windowactivate', focused_window_id, 'key', '--window', focused_window_id, '--clearmodifiers', 'Control_L+c']).wait()
-		
-		current_word = self.get_clipboard_text()		
+
+		current_word = self.get_clipboard_text()
 		self.set_clipboard_text(old_clipboard_text)
 
 		return current_word
 
-	
+
 	@dbus.service.method('org.textsuggest.server', out_signature='s')
 	def determine_language_from_keyboard_layout(self):
 
@@ -512,7 +497,7 @@ class Service(dbus.service.Object):
 def main():
 
 	pyperclip.set_clipboard('xclip')
-	
+
 	srv = Service()
 	print('Started DBus service at org.textsuggest.server, PID %d' % os.getpid())
 	srv.run()
