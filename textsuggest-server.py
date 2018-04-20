@@ -198,13 +198,9 @@ class Service(dbus.service.Object):
 		self.load_custom_words()
 		self.load_ignore_list()
 
-	def fuzzyfinder(self, user_input, collection):
+	def regex_search(self, regex, collection):
 
 		suggestions = []
-		sanitised_user_input = re.compile('[\(\)\+,\.!?]').sub('', user_input)
-
-		pattern = '.*?'.join(sanitised_user_input)   # Converts 'djm' to 'd.*?j.*?m'
-		regex = re.compile(pattern)  # Compiles a regex.
 
 		for item in collection:
 			match = regex.search(item)   # Checks if the current item matches the regex.
@@ -231,18 +227,23 @@ class Service(dbus.service.Object):
 
 		installed_languages = [x for x in languages if x in self.dictionaries]
 
+		sanitised_word = re.compile('[\(\)\+,\.!?]').sub('', word)
+
+		pattern = '.*?'.join(sanitised_word)   # Converts 'abc' to 'a.*?b.*?c' so that 'abc' matches 'a_b_c' etc
+		regex = re.compile(pattern)
+
 		for lang in installed_languages:
-			fuzz_results = self.fuzzyfinder(word, self.dictionaries[lang])
-			fuzz_results.reverse()
+			search_results = self.regex_search(regex, self.dictionaries[lang])
+			search_results.reverse()
 			# Best results go last, thus having a higher index
-			for idx, dictword in enumerate(fuzz_results):
+			for idx, dictword in enumerate(search_results):
 				suggestions[dictword] = idx
 
 
-		fuzz_results = self.fuzzyfinder(word, self.custom_words)
-		fuzz_results.reverse()
+		search_results = self.regex_search(regex, self.custom_words)
+		search_results.reverse()
 		# Best results go last, thus having a higher index
-		for idx, custword in enumerate(fuzz_results):
+		for idx, custword in enumerate(search_results):
 			suggestions[custword] = idx
 
 

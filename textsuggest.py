@@ -15,7 +15,7 @@ import sys
 import subprocess as sp
 import argparse
 
-__version__ = 2000 # Updated using git pre-commit hook
+__version__ = 2002 # Updated using git pre-commit hook
 
 WINDOW_WIDTH = 200
 
@@ -362,7 +362,7 @@ def main():
 
 	if opts.version:
 		print('''\
-TextSuggest release 2.0 (build %d)
+TextSuggest release 2.0.2 (build %d)
 
 Copyright © 2016-2018 Bharadwaj Raju, and others <https://github.com/bharadwaj-raju/TextSuggest/graphs/contributors>.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
