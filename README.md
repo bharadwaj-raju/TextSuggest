@@ -5,8 +5,6 @@ Autocomplete, text expansion, etc, in all GUI apps (on X11).
 
 TextSuggest supports [multiple languages](#other-languages) and [extensions](#extensions).
 
-<!--**Click the image to view a GIF demo.**-->
-
 ![TextSuggest in action](img/demo.png)
 
 Licensed under the [GNU GPL 3](https://www.gnu.org/licenses/gpl.txt). TextSuggest is free as in freedom.
@@ -169,7 +167,7 @@ Custom, third-party interfaces can also be easily written.
 
 <details><summary><b>Multiple Languages</b></summary>
 <p><br />
-English and Bangla dictionaries are provided by default.
+English dictionary are provided by default.
 
 By default, only the English dictionary will be used.
 
@@ -195,7 +193,7 @@ You can change this by:
     - `gr` → Greek
     - `ua` → Ukrainian
 
-  - Manually specify the language(s) to use. For example, `--language English German`.
+  - Manually specify the language(s) to use. For example, `--language English --language German`. (This will set the language to both English and German. Must pass `--language` or `-l` for each language).
 
 TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr/share/textsuggest/dictionaries`.
 </p>
@@ -206,15 +204,20 @@ TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr
 
 ## Installation
 
-Make sure you have all the requirements:
+Make sure you have these installed:
 
   - `xdotool`
   - `xclip`
-  - `PyQt5`
+  - `Qt 5`
+  - `dbus-c++`
   - `dbus-python` (`pip install dbus-python`)
   - `pyperclip` (`pip install pyperclip`)
 
-Then run the included install script with `sudo ./install.sh`.
+  1. [Download this script.](https://raw.githubusercontent.com/bharadwaj-raju/TextSuggest/master/download-install.sh) this script.
+
+  2. Run `sh download-install.sh`.
+
+<small>For other installation methods, like building from source, see [INSTALL.md](./INSTALL.md)</small>
 
 **Now, see [Usage](#usage)**
 
@@ -270,6 +273,3 @@ Use `sudo ./install.sh --uninstall`.
 
 - English:
   Oxford 3k wordlist (filtered to only include words with >= 5 chars)
-
-- Bangla:
-  Contributed by @maateen

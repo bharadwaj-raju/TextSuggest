@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# textsuggest-ui C++ build outputs
+bin/textsuggest
+Makefile
+.qmake.stash
+
 # Distribution / packaging
 .Python
 env/
@@ -15,8 +20,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
@@ -60,5 +63,7 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# TextSuggest
 history.json
 custom-words.json

@@ -496,6 +496,14 @@ class Service(dbus.service.Object):
 
 def main():
 
+	if ('--version' in sys.argv) or ('-v' in sys.argv):
+		print('textsuggest-server (TextSuggest) release 3.0.0 (build 3000)\n')
+		print('''Copyright © 2016-2018 Bharadwaj Raju, and others <https://github.com/bharadwaj-raju/TextSuggest/graphs/contributors>.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.''')
+		return
 	pyperclip.set_clipboard('xclip')
 
 	srv = Service()
