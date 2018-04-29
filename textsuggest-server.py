@@ -158,13 +158,12 @@ class Service(dbus.service.Object):
 
 		self.history = IncrementingDataBase(self.history_file)
 
-		self.ignore_list = DataBase(self.ignore_list_file, list_=True)
-
 		for dict_file in self.dictionary_files:
 			with open(dict_file[1]) as f:
 				self.dictionaries[dict_file[0]] = f.read().splitlines()
 
-		self.load_custom_words()  # runs in background loop (kind of)
+		self.load_custom_words()
+		self.load_ignore_list()
 
 		dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 		bus_name = dbus.service.BusName("org.textsuggest.server", dbus.SessionBus())
@@ -353,7 +352,7 @@ class Service(dbus.service.Object):
 		self.ignored.write()
 
 
-	@dbus.service.method('org.textsuggest.server', in_signature='s')
+	@dbus.service.method('org.textsuggest.server', in_signature='s', out_signature='s')
 	def process_suggestion(self, suggestion):
 
 		if suggestion in self.custom_words:
