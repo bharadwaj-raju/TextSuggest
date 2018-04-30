@@ -204,11 +204,15 @@ TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr
 
 ## Installation
 
-  1. [Download the latest release](https://github.com/bharadwaj-raju/TextSuggest/archive/v3.0.0.zip), then extract it.
+  1. [Download the latest release (ZIP file)](https://github.com/bharadwaj-raju/TextSuggest/archive/v3.0.0.zip), then extract it.
 
   2. Run:
-      $ cd <i>{path to extracted source code}</i>
-      $ sudo sh auto-install.sh
+    
+```bash    
+$ cd {path to extracted files}
+$ sudo sh auto-install.sh
+```
+
 
 
 **Now, see [Usage](#usage)**
