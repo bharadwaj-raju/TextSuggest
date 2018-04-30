@@ -95,7 +95,9 @@ chown -R $user_pre_sudo ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest
 ln -sf /usr/share/textsuggest/textsuggest /usr/bin/textsuggest
 ln -sf /usr/share/textsuggest/textsuggest-server.py /usr/bin/textsuggest-server
 
-chmod -R a+r /usr/share/textsuggest
+chmod -R a+rwx /usr/share/textsuggest
+chmod -R a+rwx /usr/share/textsuggest/dictionaries
+chmod -R a+rwx /usr/share/textsuggest/dictionaries/*
 chmod a+x /usr/bin/textsuggest
 chmod a+x /usr/bin/textsuggest-server
 

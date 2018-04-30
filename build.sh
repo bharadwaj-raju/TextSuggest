@@ -33,7 +33,7 @@ cd ui
 
 qmake -makefile
 make
-mkdir ../bin
+mkdir -p ../bin
 mv textsuggest ../bin/textsuggest
 make clean
 rm Makefile
