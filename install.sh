@@ -25,6 +25,7 @@ case "$1" in
 		echo "Uninstalling..."
 		rm -rf /usr/share/textsuggest
 		rm /usr/bin/textsuggest
+		rm /usr/bin/textsuggest-server
 		rm -rf /usr/lib/textsuggest
 		rm -rf /usr/share/doc/textsuggest
 		rm -rf /usr/share/licenses/textsuggest
