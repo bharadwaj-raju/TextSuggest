@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET = textsuggest
 INCLUDEPATH += .
-INCLUDEPATH += /usr/include/dbus-c++-1
+INCLUDEPATH += $$system("pkg-config dbus-c++-1 --cflags --libs")
 LIBS += -ldbus-c++-1
 
 QT += core

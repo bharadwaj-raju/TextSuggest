@@ -204,20 +204,12 @@ TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr
 
 ## Installation
 
-Make sure you have these installed:
+  1. [Download the latest release](https://github.com/bharadwaj-raju/TextSuggest/archive/v3.0.0.zip), then extract it.
 
-  - `xdotool`
-  - `xclip`
-  - `Qt 5`
-  - `dbus-c++`
-  - `dbus-python` (`pip install dbus-python`)
-  - `pyperclip` (`pip install pyperclip`)
+  2. Run:
+      $ cd <i>{path to extracted source code}</i>
+      $ sudo sh auto-install.sh
 
-  1. [Download this script.](https://raw.githubusercontent.com/bharadwaj-raju/TextSuggest/master/download-install.sh) this script.
-
-  2. Run `sh download-install.sh`.
-
-<small>For other installation methods, like building from source, see [INSTALL.md](./INSTALL.md)</small>
 
 **Now, see [Usage](#usage)**
 
