@@ -13,7 +13,7 @@ QT += widgets
 
 #CONFIG += debug
 
-QMAKE_CXXFLAGS += -ggdb3 -fstack-protector-all -fno-omit-frame-pointer
+QMAKE_CXXFLAGS += -Ofast -ggdb3 -fstack-protector-all -fno-omit-frame-pointer -std=c++14
 
 # The following define makes your compiler warn you if you use any
 # feature of Qt which has been marked as deprecated (the exact warnings

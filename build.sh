@@ -19,7 +19,7 @@ for dep in "g++" "qmake" "moc"; do
 	fi
 done
 
-for dep in "libQt5Widgets" "libQt5Core" "libQt5Gui" "dbus-c++-1"; do
+for dep in "libQt5Widgets" "libQt5Core" "libQt5Gui" "dbus-c++-1" "libpthread" "libxcb"; do
 	if ! /sbin/ldconfig -p | grep "$dep" > /dev/null 2>&1; then
 		echo "$dep not installed!"
 		exit 1
@@ -40,6 +40,22 @@ rm Makefile
 rm .qmake.stash
 
 cd ..
+
+cd server
+make
+mkdir -p ../bin
+mv textsuggest-server ../bin/textsuggest-server
+
+cd ..
+
+cd textsuggest/processors
+
+for processor in "command" "math_expression"; do
+	echo "g++ -Ofast -std=c++14 $processor.cpp -o $processor"
+	g++ -Ofast "$processor.cpp" -o "$processor"
+	mv "$processor" "../../bin/$processor"
+done
+
 
 echo "Finished building textsuggest"
 

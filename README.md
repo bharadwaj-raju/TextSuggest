@@ -1,6 +1,8 @@
 # TextSuggest
 ### Universal Autocomplete
 
+**TextSuggest 4.0.0 released: now 100x faster (thanks to C++)**
+
 Autocomplete, text expansion, etc, in all GUI apps (on X11).
 
 TextSuggest supports [multiple languages](#other-languages) and [extensions](#extensions).
@@ -23,9 +25,7 @@ Click on these for more info:
 
 <details><summary><b>Fast</b></summary>
 <p><br />
-TextSuggest is highly performant. Even with large dictionaries of ~30,000 words, it performs a full regular expressiom search on it in about 0.01 second.
-
-With the included English dictionary of ~3,000 words, it does this in 0.001 second.
+TextSuggest is extremely fast. It does a fuzzy search of the full included English dictionary in 0.0005 seconds.
 </p>
 </details> <br />
 
@@ -49,6 +49,8 @@ Simply add them to `~/.config/textsuggest/custom-words.json` in a JSON format li
 	}
 
 and whenever 'custom' is typed, 'Expansion' will be typed. Similarly for 'another' ('Another expansion').
+
+Whenever you type an unknown word, it is automatically added to your custom words file.
 
 ### Commands
 
@@ -105,27 +107,32 @@ By default TextSuggest has two processors, [`command`] and [`math_expression`] (
 
 ### Making your own extension
 
-A *processor* is a simple Python script, that *must* define two functions, `matches()` and `process()`. Look into this example:
+A *processor* is a simple script/executable (any language), that *must* respond to `matches {text}` and `process {text}` as command line arguments.
+
+Look into this example, written in Python (you can use any language, as long as it is an executable):
 
 ```python
-def matches(text):
+import sys
 
-	# Return whether this processor should process 'text' or not. (True or False)
+if sys.argv[1] == "matches":
+	# Exit (sys.exit()) with 0 (yes) or 1 (no): whether this processor should process 'text' or not.
 	# For example, the command processor has it like this:
-	#     return True if text.startswith('$') else False
+	#     if text.startswith('$'):
+	#         sys.exit(0)  # should process
+	#     else:
+	#         sys.exit(1)  # should not process
 
-def process(text):
-
-	# Do something with 'text' and return it.
-	# You *must* return a string.
+if sys.argv[1] == "process":
+	text = sys.argv[2]
+	# Do something with 'text' and print() it.
 	# This is what will be finally typed.
 ```
 
-Make one based on the sample above, and place it in `~/.config/textsuggest/processors/` (file must end with `.py` extension).
+Make one based on the sample above, and place it in `~/.config/textsuggest/processors/`.
+
+File must be executable (`chmod a+x ~/.config/textsuggest/processors/YOUR_PROCESSOR`).
 
 Processors in `~/.config/textsuggest/processors` take precedence over those in `/usr/share/textsuggest/processors`, in case of a name or match conflict.
-
-You can set the order of loading of processors by creating a file called `load-order.txt` in the processor directory, which should have a newline-separated list of processors. The processors will then load in that order.
 </p>
 </details> <br />
 
@@ -141,7 +148,7 @@ You can remove a word from history, by pressing <kbd>Shift+Delete</kbd>, or in t
 
 <details><summary><b>"Ignore" Certain Words</b></summary>
 <p><br />
-You can tell TextSuggest to *never* show some words conveniently through 
+You can tell TextSuggest to *never* show some words conveniently through
 
  - <kbd>Ctrl+Shift+Delete</kbd>
  - or in the file `~/.config/textsuggest/ignore.json`
@@ -152,6 +159,7 @@ You can tell TextSuggest to *never* show some words conveniently through
 <p><br />
 While browsing the list of suggestions, press
 
+  - <kbd>Alt+Enter</kbd> to type it without processing.
   - <kbd>Shift+Delete</kbd> to remove it from your history.
   - <kbd>Ctrl+Shift+Delete</kbd> to add it to the ignore list (i.e. will never show up in suggestions)
 </p>
@@ -159,9 +167,9 @@ While browsing the list of suggestions, press
 
 <details><summary><b>Native UI</b></summary>
 <p><br />
-Unlike many apps, TextSuggest has a performant, entirely native user interface written in Qt 5.
+Unlike many apps, TextSuggest has a fast, entirely native user interface written in Qt 5 and C++.
 
-Custom, third-party interfaces can also be easily written.
+Custom third-party UIs can also be easily made by other developers if they wish.
 </p>
 </details> <br />
 
@@ -207,12 +215,15 @@ TextSuggest will then use `<language name>.txt` file(s) (if they exist) in `/usr
   1. [Download the latest release (ZIP file)](https://github.com/bharadwaj-raju/TextSuggest/archive/v3.0.0.zip), then extract it.
 
   2. Run:
-    
-```bash    
+
+```bash
 $ cd {path to extracted files}
 $ sudo sh auto-install.sh
 ```
 
+The `auto-install.sh` will try to install dependencies using your distro's package manager.
+
+If you don't want that, please run `sh build.sh` then `sudo sh install.sh`.
 
 
 **Now, see [Usage](#usage)**
@@ -238,29 +249,29 @@ Use `sudo ./install.sh --uninstall`.
 	TextSuggest — universal autocomplete
 
 	optional arguments:
-	  
+
 	  -h, --help            show this help message and exit
-	  
+
 	  --word WORD [...]
-	                        Specify word to give suggestions for. Default: all words. 
-	                         
-	  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.json) 
-	                         
+	                        Specify word to give suggestions for. Default: all words.
+
+	  --no-history          Disable the frequently-used words history (stored in ~/.config/textsuggest/history.json)
+
 	  --language languages [...]
-	                        Set language(s). Default: English. See also: --auto-detect-language. 
-	                         
+	                        Set language(s). Default: English. See also: --auto-detect-language.
+
 	  --auto-detect-language
-	                        Auto-detect language from keyboard layout. 
-	                         
-	  --selection           Show suggestions for currently selected word. See also: --auto-selection 
-	                         
+	                        Auto-detect language from keyboard layout.
+
+	  --selection           Show suggestions for currently selected word. See also: --auto-selection
+
 	  --auto-selection [beginning|middle|end]
-	                        Automatically select word under cursor and suggest. Ignored if --no-selection. 
-	                         
-	  --custom-words-only   Show custom words only. 
-	                         
-	  --no-processing       Disable using of any processors. 
-	                         
+	                        Automatically select word under cursor and suggest. Ignored if --no-selection.
+
+	  --custom-words-only   Show custom words only.
+
+	  --no-processing       Disable using of any processors.
+
 	  -v, --version         Print version and license information.
 
 

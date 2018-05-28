@@ -12,15 +12,15 @@ fi
 
 if command -v apt > /dev/null 2>&1; then
 	# Debian (based)
-	apt install 'build-essential' 'qt5-default' 'qtbase5-dev' 'qt5-qmake' 'libdbus-c++-dev' 'dbus-c++' 'python-dbus'
+	apt install 'build-essential' 'qt5-default' 'qtbase5-dev' 'qt5-qmake' 'libdbus-c++-dev' 'dbus-c++' 'python-dbus' 'libxcb'
 	apt install 'xclip' 'xdotool'
 elif command -v yum > /dev/null 2>&1; then
 	# RedHat/RPM (based)
-	yum install 'make' 'automake' 'gcc' 'gcc-c++' 'qt5-qtbase' 'qt5-devel' 'dbus-c++' 'dbus-c++-devel' 'dbus-python'
+	yum install 'make' 'automake' 'gcc' 'gcc-c++' 'qt5-qtbase' 'qt5-devel' 'dbus-c++' 'dbus-c++-devel' 'dbus-python' 'libxcb'
 	yum install 'xclip' 'xdotool'
 elif command -v pacman > /dev/null 2>&1; then
 	# Arch (based)
-	pacman -S 'dbus-c++' 'qt5-base' 'make' 'automake' 'gcc' 'python-dbus'
+	pacman -S 'dbus-c++' 'qt5-base' 'make' 'automake' 'gcc' 'python-dbus' 'libxcb'
 	pacman -S 'xclip' 'xdotool'
 fi
 

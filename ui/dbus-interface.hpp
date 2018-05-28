@@ -127,13 +127,13 @@ public:
         ::DBus::Message ret = invoke_method (call);
     }
 
-    void add_to_ignore_list(const std::string& word)
+    void ignore_list_add(const std::string& word)
     {
         ::DBus::CallMessage call;
         ::DBus::MessageIter wi = call.writer();
 
         wi << word;
-        call.member("add_to_ignore_list");
+        call.member("ignore_list_add");
         ::DBus::Message ret = invoke_method (call);
     }
 
@@ -220,7 +220,7 @@ public:
         return argout;
     }
 
-    bool history_score(const std::string& text)
+    int32_t history_score(const std::string& text)
     {
         ::DBus::CallMessage call;
         ::DBus::MessageIter wi = call.writer();
@@ -230,7 +230,7 @@ public:
         ::DBus::Message ret = invoke_method (call);
         ::DBus::MessageIter ri = ret.reader();
 
-        bool argout;
+        int32_t argout;
         ri >> argout;
         return argout;
     }

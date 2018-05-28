@@ -4,9 +4,6 @@
 #include <dbus-c++/dbus.h>
 #include "dbus-interface.hpp"
 
-static const char * SERVICE_NAME = "org.textsuggest.server";
-static const char * OBJECT_PATH = "/org/textsuggest/server";
-
 class TextSuggestServerIFace
 : public org::textsuggest::server_proxy,
   public DBus::IntrospectableProxy,
