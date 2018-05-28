@@ -1,0 +1,5 @@
+-I/usr/include/dbus-c++-1
+-I/usr/include/qt
+-I/usr/include/qt/QtWidgets
+-I/usr/include/qt/QtGui
+-I/usr/include/qt/QtCore

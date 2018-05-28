@@ -1,0 +1,2 @@
+all:
+	c++ -Ofast -std=c++14 textsuggest-server.cpp ../lib/clip/clip.cpp ../lib/clip/image.cpp ../lib/clip/clip_x11.cpp -isystem /usr/include/dbus-c++-1 -lxcb -lpthread -ldbus-c++-1 -o textsuggest-server

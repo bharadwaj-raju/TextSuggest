@@ -6,9 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
-# textsuggest-ui C++ build outputs
+# C++ build outputs
 bin/textsuggest
-Makefile
+bin/textsuggest-server
+bin/command
+bin/math_expression
+ui/Makefile
 .qmake.stash
 
 # Distribution / packaging

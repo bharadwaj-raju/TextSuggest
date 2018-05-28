@@ -18,6 +18,7 @@ TextSuggestApp::TextSuggestApp(int &argc, char ** argv, TextSuggestServerIFace *
 
 	this->opt_history = opt_history;
 	this->opt_processing = opt_processing;
+	this->opt_languages = opt_languages;
 
 	if (opt_auto_selection != "none") {
 		server->autoselect_current_word(opt_auto_selection);
@@ -103,29 +104,49 @@ void TextSuggestApp::keyEventCatcher(QKeyEvent e) {
 	}
 
 	if (key == Qt::Key_Down) {
-		currentlySelectedIndex.set(currentlySelectedIndex.get() + 1);
-		suggestionList->setCurrentRow(currentlySelectedIndex.get());
-		entry->setText(suggestionList->currentItem()->text());
+		if (suggestionList->count() == 0) {
+			currentlySelectedIndex.set(0);
+		} else if (suggestionList->count() == 1) {
+			currentlySelectedIndex.set(0);
+			suggestionList->setCurrentRow(0);
+			entry->setText(suggestionList->item(0)->text());
+		} else {
+			currentlySelectedIndex.set(currentlySelectedIndex.get() + 1);
+			suggestionList->setCurrentRow(currentlySelectedIndex.get());
+			entry->setText(suggestionList->currentItem()->text());
+		}
 	}
 
 	if (key == Qt::Key_Up) {
-		currentlySelectedIndex.set(currentlySelectedIndex.get() - 1);
-		suggestionList->setCurrentRow(currentlySelectedIndex.get());
-		entry->setText(suggestionList->currentItem()->text());
+		if (suggestionList->count() == 0) {
+			currentlySelectedIndex.set(0);
+		} else if (suggestionList->count() == 1) {
+			currentlySelectedIndex.set(0);
+			suggestionList->setCurrentRow(0);
+			entry->setText(suggestionList->item(0)->text());
+		} else {
+			currentlySelectedIndex.set(currentlySelectedIndex.get() - 1);
+			suggestionList->setCurrentRow(currentlySelectedIndex.get());
+			entry->setText(suggestionList->currentItem()->text());
+		}
 	}
 
 	if (key == Qt::Key_Enter || key == Qt::Key_Return) {
+		if (modifiers & Qt::AltModifier) {
+			std::cout << "Alt+Enter: disabling processing" << std::endl;
+			this->opt_processing = false;
+		}
 		applySuggestion();
 	}
 
 	if (key == Qt::Key_Delete) {
 		if ((modifiers & Qt::ShiftModifier) && (modifiers & Qt::ControlModifier)) {
-			// Ctrl+Shift+Delete
+			std::cout << "Ctrl+Shift+Delete: adding to ignore list" << std::endl;
 			addSuggestionToIgnoreList();
 		}
 		
 		if (modifiers & Qt::ShiftModifier) {
-			//Shift+Delete
+			std::cout << "Shift+Delete: removing from history" << std::endl;
 			removeSuggestionFromHistory();
 		}
 	}
@@ -168,7 +189,7 @@ void TextSuggestApp::filterSuggestions() {
 
 std::string TextSuggestApp::getCurrentSuggestion() {
 	
-	if (suggestionList->currentItem()) {
+	if (suggestionList->count() == 0) {
 		return entry->text().toStdString();
 	} else {
 		return suggestionList->currentItem()->text().toStdString();
@@ -190,12 +211,15 @@ void TextSuggestApp::applySuggestion() {
 		server->history_increment(text);
 	}
 
-	std::cout << opt_processing;
+	std::cout << text << std::endl;
 	
 	if (opt_processing) {
 		text = server->process_suggestion(text);
 	}
 	
+
+	std::cout << text << std::endl;
+
 	server->type_text(text);
 	server->reload_configs();
 
@@ -208,7 +232,7 @@ void TextSuggestApp::removeSuggestionFromHistory() {
 }
 
 void TextSuggestApp::addSuggestionToIgnoreList() {	
-	server->add_to_ignore_list(getCurrentSuggestion());
+	server->ignore_list_add(getCurrentSuggestion());
 }
 
 TextSuggestApp::~TextSuggestApp() {}

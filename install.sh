@@ -48,28 +48,12 @@ for dep in xclip xdotool; do
 	fi
 done
 
-for dep in libQt5Widgets libQt5Core libQt5Gui dbus-c++-1; do
+for dep in "libQt5Widgets" "libQt5Core" "libQt5Gui" "dbus-c++-1" "libpthread" "libxcb"; do
 	if ! /sbin/ldconfig -p | grep "$dep" > /dev/null 2>&1; then
 		echo "$dep not installed!"
 		exit 1
 	fi
 done
-
-if ! python3 -c 'import dbus' > /dev/null 2>&1; then
-	echo "python-dbus not installed!"
-	exit 1
-fi
-
-if ! python3 -c 'from gi.repository import GObject' > /dev/null 2>&1; then
-	echo "PyGObject not installed!"
-	exit 1
-fi
-
-if ! python3 -c 'import pyperclip' > /dev/null 2>&1; then
-	echo "pyperclip not installed!"
-	exit 1
-fi
-
 
 echo -e "Installing..."
 
@@ -79,11 +63,17 @@ install -d ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest/processors
 if [ ! -s ${XDG_CONFIG_HOME:-$user_home/.config} ]; then
 	echo "{}" > ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest/custom-words.json
 fi
+
 cp -rf textsuggest/dictionaries/ /usr/share/textsuggest/
-cp -rf textsuggest/processors/ /usr/share/textsuggest
+
+install -d /usr/share/textsuggest/processors
+cp bin/math_expression /usr/share/textsuggest/processors
+cp bin/command /usr/share/textsuggest/processors
 
 install -D -m755 bin/textsuggest /usr/share/textsuggest/textsuggest
-install -D -m755 textsuggest-server.py /usr/share/textsuggest/textsuggest-server.py
+install -D -m755 bin/textsuggest-server /usr/share/textsuggest/textsuggest-server
+
+chmod -R a+rwx /usr/share/textsuggest/processors
 
 install -D -m644 README.md /usr/share/doc/textsuggest/README
 
@@ -93,7 +83,7 @@ install -D -m644 LICENSE /usr/share/licenses/textsuggest/COPYING
 chown -R $user_pre_sudo ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest
 
 ln -sf /usr/share/textsuggest/textsuggest /usr/bin/textsuggest
-ln -sf /usr/share/textsuggest/textsuggest-server.py /usr/bin/textsuggest-server
+ln -sf /usr/share/textsuggest/textsuggest-server /usr/bin/textsuggest-server
 
 chmod -R a+rwx /usr/share/textsuggest
 chmod -R a+rwx /usr/share/textsuggest/dictionaries

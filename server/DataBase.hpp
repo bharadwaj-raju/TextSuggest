@@ -1,0 +1,78 @@
+#ifndef DATABASE_H
+#define DATABASE_H
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+
+#include "../lib/json.hpp"
+
+using json = nlohmann::json;
+
+class JSONDataBase {
+public:
+	JSONDataBase() {};
+	~JSONDataBase() {};
+
+	std::string fname;
+	json db = {};
+
+	void load(std::string fname) {
+		
+		this->fname = fname;
+		
+		std::ifstream file (fname);
+		
+		if (file.good()) {
+			db = json::parse(file);
+		} else {
+			std::cout << "File '" << fname << "' does not exist or is inaccessible!" << std::endl;
+			std::cout << "    Creating empty '" << fname << "'." << std::endl;
+			db = json::parse("{}");
+			write();	
+		}
+
+		file.close();
+
+	};
+
+	void write() {
+		
+		std::ofstream file;
+		
+		file.open(fname, std::ofstream::out | std::ofstream::trunc);
+		file << db.dump(4);
+
+		file.close();
+		
+	};
+
+};
+
+class SuggestionsScoreCounter {
+public:
+	SuggestionsScoreCounter();
+	~SuggestionsScoreCounter();
+
+	std::map<std::string, float> suggestions;
+	
+	void add(std::string suggestion, float inc_value=1.0f) {
+		if (suggestions.count(suggestion) == 0) {
+			suggestions[suggestion] = inc_value;
+		} else {
+			suggestions[suggestion] = suggestions[suggestion] + inc_value;
+		}
+	}
+
+	float get(std::string suggestion) {
+		if (suggestions.count(suggestion) == 0) {
+			return 0.0f;
+		} else {
+			return suggestions[suggestion];
+		}
+	}
+	
+};
+
+#endif // DATABASE_H

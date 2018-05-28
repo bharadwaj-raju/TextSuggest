@@ -35,7 +35,7 @@
     <method name="history_remove">
       <arg direction="in"  type="s" name="word" />
     </method>
-    <method name="add_to_ignore_list">
+    <method name="ignore_list_add">
       <arg direction="in"  type="s" name="word" />
     </method>
     <method name="process_suggestion">
@@ -62,7 +62,7 @@
     </method>
     <method name="history_score">
       <arg direction="in"  type="s" name="text" />
-      <arg direction="out" type="b" />
+      <arg direction="out" type="i" />
     </method>
   </interface>
 </node>

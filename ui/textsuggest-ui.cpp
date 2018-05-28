@@ -4,14 +4,11 @@
 
 #include <dbus-c++/dbus.h>
 
-#include "lib/cxxopts.hpp"
+#include "../lib/cxxopts.hpp"
 
 #include "TextSuggestServerIFace.hpp"
-#include "messages.hpp"
+#include "../common.hpp"
 #include "TextSuggestApp.hpp"
-
-const int BUILD = 3000;
-const int VERSION[3] = {3, 0, 0};  // x.y.z
 
 DBus::BusDispatcher dispatcher;
 
@@ -35,7 +32,7 @@ int main(int argc, char ** argv) {
 	auto result = options.parse(argc, (const char**&)argv);
 
 	if (result.count("help")) {
-		std::cout << HELP_MESSAGE << std::endl;
+		std::cout << UI_HELP_MESSAGE << std::endl;
 		return 0;
 	}
 
