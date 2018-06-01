@@ -30,13 +30,8 @@ case "$1" in
 		rm -rf /usr/share/doc/textsuggest
 		rm -rf /usr/share/licenses/textsuggest
 		exit
-		;;
+	;;
 esac
-
-user_pre_sudo="$SUDO_USER"
-user_home=$(eval echo "~$SUDO_USER")
-
-echo $user_home
 
 
 echo "Verifying dependencies..."
@@ -58,11 +53,6 @@ done
 echo -e "Installing..."
 
 install -d /usr/share/textsuggest
-install -d ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest
-install -d ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest/processors
-if [ ! -s ${XDG_CONFIG_HOME:-$user_home/.config} ]; then
-	echo "{}" > ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest/custom-words.json
-fi
 
 cp -rf textsuggest/dictionaries/ /usr/share/textsuggest/
 
@@ -70,24 +60,17 @@ install -d /usr/share/textsuggest/processors
 cp bin/math_expression /usr/share/textsuggest/processors
 cp bin/command /usr/share/textsuggest/processors
 
-install -D -m755 bin/textsuggest /usr/share/textsuggest/textsuggest
-install -D -m755 bin/textsuggest-server /usr/share/textsuggest/textsuggest-server
+install -D -m755 bin/textsuggest /usr/bin/textsuggest
+install -D -m755 bin/textsuggest-server /usr/bin/textsuggest-server
 
 chmod -R a+rwx /usr/share/textsuggest/processors
 
 install -D -m644 README.md /usr/share/doc/textsuggest/README
-
-chmod 664 /usr/share/doc/textsuggest/README
 install -D -m644 LICENSE /usr/share/licenses/textsuggest/COPYING
 
-chown -R $user_pre_sudo ${XDG_CONFIG_HOME:-$user_home/.config}/textsuggest
-
-ln -sf /usr/share/textsuggest/textsuggest /usr/bin/textsuggest
-ln -sf /usr/share/textsuggest/textsuggest-server /usr/bin/textsuggest-server
-
-chmod -R a+rwx /usr/share/textsuggest
-chmod -R a+rwx /usr/share/textsuggest/dictionaries
-chmod -R a+rwx /usr/share/textsuggest/dictionaries/*
+chmod -R a+rw /usr/share/textsuggest
+chmod -R a+rw /usr/share/textsuggest/dictionaries
+chmod -R a+rw /usr/share/textsuggest/dictionaries/*
 chmod a+x /usr/bin/textsuggest
 chmod a+x /usr/bin/textsuggest-server
 

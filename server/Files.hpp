@@ -40,6 +40,7 @@ public:
 
 		config_dir = path_join({config_home, "textsuggest"});
 		mkdir_p(config_dir);
+		mkdir_p(path_join({config_dir, "processors"}));
 
 		dictionaries_dir = "/usr/share/textsuggest/dictionaries";
 

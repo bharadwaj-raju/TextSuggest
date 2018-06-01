@@ -50,29 +50,4 @@ public:
 
 };
 
-class SuggestionsScoreCounter {
-public:
-	SuggestionsScoreCounter();
-	~SuggestionsScoreCounter();
-
-	std::map<std::string, float> suggestions;
-	
-	void add(std::string suggestion, float inc_value=1.0f) {
-		if (suggestions.count(suggestion) == 0) {
-			suggestions[suggestion] = inc_value;
-		} else {
-			suggestions[suggestion] = suggestions[suggestion] + inc_value;
-		}
-	}
-
-	float get(std::string suggestion) {
-		if (suggestions.count(suggestion) == 0) {
-			return 0.0f;
-		} else {
-			return suggestions[suggestion];
-		}
-	}
-	
-};
-
 #endif // DATABASE_H
