@@ -1,3 +1,6 @@
+# TextSuggest has moved!
+# Now at [GitLab](https://gitlab.com/bharadwaj-raju/TextSuggest)!
+
 # TextSuggest
 ### Universal Autocomplete
 
